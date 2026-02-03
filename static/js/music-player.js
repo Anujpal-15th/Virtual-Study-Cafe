@@ -1,81 +1,153 @@
-/* 
- * Music Player Component
- * Custom HTML5 Audio Player with playlist support
- */
-
+// Music Player - Expandable Design with Playlist
 class MusicPlayer {
     constructor() {
         this.audio = new Audio();
+        this.playlist = [
+            { title: 'Forever', artist: 'Niladri Kumar', src: '/static/music/SpotiDownloader.com - Forever - Niladri Kumar.mp3' }
+        ];
         this.currentTrackIndex = 0;
         this.isPlaying = false;
         this.volume = 0.5;
-        
-        // Music playlist - Add your music files here
-        this.playlist = [
-            {
-                title: "Lofi Study Beat 1",
-                artist: "Study Music",
-                file: "/static/music/track1.mp3"
-            },
-            {
-                title: "Chill Vibes",
-                artist: "Focus Sounds",
-                file: "/static/music/track2.mp3"
-            },
-            {
-                title: "Peaceful Piano",
-                artist: "Relaxing Tunes",
-                file: "/static/music/track3.mp3"
-            },
-            {
-                title: "Nature Sounds",
-                artist: "Ambient",
-                file: "/static/music/track4.mp3"
-            }
-        ];
-        
-        this.init();
-    }
-    
-    init() {
         this.audio.volume = this.volume;
-        this.audio.addEventListener('ended', () => this.nextTrack());
+
+        this.initElements();
+        this.attachEvents();
+        this.renderPlaylist();
+        this.loadTrack(0);
+    }
+
+    initElements() {
+        // Panel elements
+        this.toggleBtn = document.getElementById('musicToggleBtn');
+        this.panel = document.getElementById('musicPlayerPanel');
+        this.closeBtn = document.getElementById('closePlayerBtn');
+
+        // Display elements
+        this.trackTitle = document.getElementById('currentTrackTitle');
+        this.trackArtist = document.getElementById('currentTrackArtist');
+        this.currentTimeDisplay = document.getElementById('currentTime');
+        this.durationDisplay = document.getElementById('duration');
+
+        // Control elements
+        this.playBtn = document.getElementById('playBtn');
+        this.prevBtn = document.getElementById('prevBtn');
+        this.nextBtn = document.getElementById('nextBtn');
+        this.progressBar = document.getElementById('progressBar');
+
+        // Volume elements
+        this.volumeSlider = document.getElementById('volumeSlider');
+        this.volumeUpBtn = document.getElementById('volumeUpBtn');
+        this.volumeDownBtn = document.getElementById('volumeDownBtn');
+        this.volumePercentage = document.getElementById('volumePercentage');
+
+        // Playlist container
+        this.playlistContainer = document.getElementById('playlistContainer');
+    }
+
+    attachEvents() {
+        // Toggle panel
+        this.toggleBtn.addEventListener('click', () => this.togglePanel());
+        this.closeBtn.addEventListener('click', () => this.closePanel());
+
+        // Playback controls
+        this.playBtn.addEventListener('click', () => this.togglePlay());
+        this.prevBtn.addEventListener('click', () => this.previousTrack());
+        this.nextBtn.addEventListener('click', () => this.nextTrack());
+
+        // Progress bar
+        this.progressBar.addEventListener('input', (e) => this.seek(e.target.value));
+
+        // Volume controls
+        this.volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value / 100));
+        this.volumeUpBtn.addEventListener('click', () => this.increaseVolume());
+        this.volumeDownBtn.addEventListener('click', () => this.decreaseVolume());
+
+        // Audio events
         this.audio.addEventListener('timeupdate', () => this.updateProgress());
-        this.loadTrack(this.currentTrackIndex);
+        this.audio.addEventListener('loadedmetadata', () => this.updateDuration());
+        this.audio.addEventListener('ended', () => this.nextTrack());
+
+        // Close panel when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!this.panel.contains(e.target) && !this.toggleBtn.contains(e.target)) {
+                if (this.panel.classList.contains('active')) {
+                    this.closePanel();
+                }
+            }
+        });
     }
-    
+
+    renderPlaylist() {
+        this.playlistContainer.innerHTML = '';
+        this.playlist.forEach((track, index) => {
+            const item = document.createElement('div');
+            item.className = 'playlist-item';
+            if (index === this.currentTrackIndex) {
+                item.classList.add('active');
+                if (this.isPlaying) item.classList.add('playing');
+            }
+            
+            item.innerHTML = `
+                <div class="track-number">${index + 1}</div>
+                <div class="track-info-playlist">
+                    <div class="track-title">${track.title}</div>
+                    <div class="track-artist">${track.artist}</div>
+                </div>
+                <span class="playing-indicator">♪</span>
+            `;
+            
+            item.addEventListener('click', () => {
+                this.loadTrack(index);
+                this.play();
+            });
+            
+            this.playlistContainer.appendChild(item);
+        });
+    }
+
+    togglePanel() {
+        this.panel.classList.toggle('active');
+        if (this.panel.classList.contains('active')) {
+            this.renderPlaylist(); // Refresh playlist when opening
+        }
+    }
+
+    closePanel() {
+        this.panel.classList.remove('active');
+    }
+
     loadTrack(index) {
-        if (index < 0 || index >= this.playlist.length) return;
-        
-        const track = this.playlist[index];
-        this.audio.src = track.file;
-        this.currentTrackIndex = index;
-        
-        // Update UI
-        this.updateTrackInfo();
+        if (index >= 0 && index < this.playlist.length) {
+            this.currentTrackIndex = index;
+            const track = this.playlist[index];
+            
+            this.audio.src = track.src;
+            this.trackTitle.textContent = track.title;
+            this.trackArtist.textContent = track.artist;
+            
+            this.renderPlaylist(); // Update playlist highlight
+        }
     }
-    
-    updateTrackInfo() {
-        const track = this.playlist[this.currentTrackIndex];
-        const titleEl = document.getElementById('track-title');
-        const artistEl = document.getElementById('track-artist');
-        
-        if (titleEl) titleEl.textContent = track.title;
-        if (artistEl) artistEl.textContent = track.artist;
-    }
-    
+
     play() {
-        this.audio.play();
-        this.isPlaying = true;
-        this.updatePlayButton();
+        this.audio.play().then(() => {
+            this.isPlaying = true;
+            this.playBtn.innerHTML = '⏸';
+            this.toggleBtn.classList.add('playing');
+            this.renderPlaylist();
+        }).catch(err => {
+            console.log('Playback error:', err);
+        });
     }
-    
+
     pause() {
         this.audio.pause();
         this.isPlaying = false;
-        this.updatePlayButton();
+        this.playBtn.innerHTML = '▶';
+        this.toggleBtn.classList.remove('playing');
+        this.renderPlaylist();
     }
-    
+
     togglePlay() {
         if (this.isPlaying) {
             this.pause();
@@ -83,55 +155,55 @@ class MusicPlayer {
             this.play();
         }
     }
-    
+
     nextTrack() {
-        this.currentTrackIndex = (this.currentTrackIndex + 1) % this.playlist.length;
-        this.loadTrack(this.currentTrackIndex);
+        const nextIndex = (this.currentTrackIndex + 1) % this.playlist.length;
+        this.loadTrack(nextIndex);
         if (this.isPlaying) this.play();
     }
-    
+
     previousTrack() {
-        this.currentTrackIndex = (this.currentTrackIndex - 1 + this.playlist.length) % this.playlist.length;
-        this.loadTrack(this.currentTrackIndex);
+        const prevIndex = (this.currentTrackIndex - 1 + this.playlist.length) % this.playlist.length;
+        this.loadTrack(prevIndex);
         if (this.isPlaying) this.play();
     }
-    
+
     setVolume(value) {
-        this.volume = value;
-        this.audio.volume = value;
+        this.volume = Math.max(0, Math.min(1, value));
+        this.audio.volume = this.volume;
+        this.volumeSlider.value = this.volume * 100;
+        this.volumePercentage.textContent = Math.round(this.volume * 100) + '%';
     }
-    
+
+    increaseVolume() {
+        this.setVolume(this.volume + 0.1);
+    }
+
+    decreaseVolume() {
+        this.setVolume(this.volume - 0.1);
+    }
+
     seek(value) {
         const time = (value / 100) * this.audio.duration;
-        this.audio.currentTime = time;
+        if (!isNaN(time)) {
+            this.audio.currentTime = time;
+        }
     }
-    
+
     updateProgress() {
-        const progressBar = document.getElementById('progress-bar');
-        const currentTimeEl = document.getElementById('current-time');
-        const durationEl = document.getElementById('duration-time');
-        
-        if (progressBar && this.audio.duration) {
+        if (this.audio.duration) {
             const progress = (this.audio.currentTime / this.audio.duration) * 100;
-            progressBar.value = progress;
-        }
-        
-        if (currentTimeEl) {
-            currentTimeEl.textContent = this.formatTime(this.audio.currentTime);
-        }
-        
-        if (durationEl && this.audio.duration) {
-            durationEl.textContent = this.formatTime(this.audio.duration);
+            this.progressBar.value = progress;
+            this.currentTimeDisplay.textContent = this.formatTime(this.audio.currentTime);
         }
     }
-    
-    updatePlayButton() {
-        const playBtn = document.getElementById('play-pause-btn');
-        if (playBtn) {
-            playBtn.textContent = this.isPlaying ? '⏸' : '▶';
+
+    updateDuration() {
+        if (this.audio.duration) {
+            this.durationDisplay.textContent = this.formatTime(this.audio.duration);
         }
     }
-    
+
     formatTime(seconds) {
         if (isNaN(seconds)) return '0:00';
         const mins = Math.floor(seconds / 60);
@@ -140,39 +212,7 @@ class MusicPlayer {
     }
 }
 
-// Initialize player when DOM is ready
-let musicPlayer;
-document.addEventListener('DOMContentLoaded', function() {
-    musicPlayer = new MusicPlayer();
-    
-    // Setup event listeners
-    const playPauseBtn = document.getElementById('play-pause-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const prevBtn = document.getElementById('prev-btn');
-    const volumeSlider = document.getElementById('volume-slider');
-    const progressBar = document.getElementById('progress-bar');
-    
-    if (playPauseBtn) {
-        playPauseBtn.addEventListener('click', () => musicPlayer.togglePlay());
-    }
-    
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => musicPlayer.nextTrack());
-    }
-    
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => musicPlayer.previousTrack());
-    }
-    
-    if (volumeSlider) {
-        volumeSlider.addEventListener('input', (e) => {
-            musicPlayer.setVolume(e.target.value / 100);
-        });
-    }
-    
-    if (progressBar) {
-        progressBar.addEventListener('input', (e) => {
-            musicPlayer.seek(e.target.value);
-        });
-    }
+// Initialize player when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    const player = new MusicPlayer();
 });

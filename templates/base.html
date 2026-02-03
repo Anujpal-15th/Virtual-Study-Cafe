@@ -1,162 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-That's it! Your music player is ready! 🎵5. **Click** the play button ▶️ at the bottom4. **Reload** your website3. **Rename** them to `track1.mp3`, `track2.mp3`, etc.2. **Copy** them to: `d:\Progrraming file\EY - project\static\music\`1. **Download** some study music MP3 files## 🚀 Quick Start```{% endif %}    ...    <!-- Music Player -->{% if request.path != '/login/' %}```htmlEdit `base.html` and wrap the music player in a conditional:### Remove Player from Specific Pages```}    file: "/static/music/your-file.mp3"    artist: "Artist Name",    title: "Your Song Name",{```javascriptJust add more objects to the playlist array:### Add More Tracks```this.volume = 0.5;  // 0.5 = 50%, change to 0.7 for 70%, etc.```javascriptEdit `music-player.js` line 7:### Change Default Volume## ⚙️ Customization```    └── music-player.js└── js/│   └── music-player.css├── css/│   └── rain-sounds.mp3│   ├── piano-study.mp3│   ├── lofi-beats.mp3│   ├── track4.mp3│   ├── track3.mp3│   ├── track2.mp3│   ├── track1.mp3          ← Put your MP3 files here├── music/static/```## 📋 Example Folder Structure- **Dark mode** - Black background- **Light mode** - White backgroundThe player automatically matches your theme:## 🎨 Player Styling- Progress page- Solo study room- Rooms- Dashboard- Landing pageThe music player appears at the **bottom of every page**:## 📱 Where the Player Appears- 🔄 **Auto-play next** - Continuous playback- ⏱️ **Progress Bar** - Seek to any position- 🔊 **Volume Control** - Adjust sound level- ⏭ **Next Track** - Skip forward- ⏮ **Previous Track** - Go back- ▶️ **Play/Pause** - Start/stop musicYour music player includes:## 🎛️ Music Player Features- Make sure it's royalty-free/Creative Commons- Use youtube-dl or online converters to download MP3- Search YouTube for "lofi study music no copyright"### Study Music Playlists (Download):   - https://www.purple-planet.com/5. **Purple Planet Music** - Free background music   - https://www.bensound.com/4. **Bensound** - Royalty-free tracks   - https://incompetech.com/3. **Incompetech** - Kevin MacLeod's music   - https://freemusicarchive.org/2. **Free Music Archive** - Creative Commons music   - https://studio.youtube.com/channel/UC.../music1. **YouTube Audio Library** - Free, no attribution needed### Royalty-Free Music Sites:## 🆓 Where to Get Free Music- `file` - Path to your MP3 file- `artist` - Artist or category- `title` - Song nameChange:```];    // Add more tracks here    },        file: "/static/music/track2.mp3"        artist: "Focus Sounds",        title: "Chill Vibes",    {    },        file: "/static/music/track1.mp3"        artist: "Study Music",        title: "Lofi Study Beat 1",    {this.playlist = [```javascriptFind this section (around line 10):Edit the file: `static/js/music-player.js`## 🔧 How to Update the Playlist- **Jazz** - Soft jazz, smooth jazz- **Ambient Music** - Background focus music- **Nature Sounds** - Rain, ocean waves, forest- **Piano Instrumentals** - Peaceful melodies- **Classical Music** - Mozart, Bach, Beethoven- **Lofi Hip Hop** - Relaxing beatsGood music for studying:## 🎼 Recommended Music TypesOr use custom names (just update the playlist in the JS file).- `track4.mp3`- `track3.mp3`- `track2.mp3`- `track1.mp3`Name your music files like this:## 📝 File Naming```d:\Progrraming file\EY - project\static\music\```**Put your MP3 files in this folder:**## 📁 Where to Put Your Music Files<head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Virtual Cafe{% endblock %}</title>
@@ -331,6 +175,7 @@ That's it! Your music player is ready! 🎵5. **Click** the play button ▶️ a
                 <a href="{% url 'solo:study_room' %}">Solo Study</a>
                 <a href="{% url 'create_room' %}">Create Room</a>
                 <a href="{% url 'progress' %}">Progress</a>
+                <a href="{% url 'profile' %}">Profile</a>
                 <span class="username">Hi, {{ user.username }}</span>
                 <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
                     <span class="theme-icon">🌙</span>
@@ -366,34 +211,59 @@ That's it! Your music player is ready! 🎵5. **Click** the play button ▶️ a
         {% endblock %}
     </main>
 
-    <!-- Music Player -->
-    <div class="music-player">
-        <div class="music-player-content">
-            <!-- Track Info -->
-            <div class="track-info">
-                <div class="track-title" id="track-title">Select a track</div>
-                <div class="track-artist" id="track-artist">No music playing</div>
-            </div>
-            
-            <!-- Player Controls -->
-            <div class="player-controls">
-                <button class="control-btn" id="prev-btn" title="Previous">⏮</button>
-                <button class="control-btn play-btn" id="play-pause-btn" title="Play/Pause">▶</button>
-                <button class="control-btn" id="next-btn" title="Next">⏭</button>
-            </div>
-            
+    <!-- Music Player Toggle Button -->
+    <button class="music-toggle-btn" id="musicToggleBtn" title="Music Player">
+        🎵
+    </button>
+
+    <!-- Expandable Music Player Panel -->
+    <div class="music-player-panel" id="musicPlayerPanel">
+        <!-- Player Header -->
+        <div class="player-header">
+            <h3>🎵 Music Player</h3>
+            <button class="close-player-btn" id="closePlayerBtn">✕</button>
+        </div>
+
+        <!-- Current Track Display -->
+        <div class="current-track-display">
+            <div class="track-title" id="currentTrackTitle">Select a track</div>
+            <div class="track-artist" id="currentTrackArtist">No music playing</div>
+        </div>
+
+        <!-- Player Controls Section -->
+        <div class="player-controls-section">
             <!-- Progress Bar -->
             <div class="progress-section">
-                <span class="time-display" id="current-time">0:00</span>
-                <input type="range" class="progress-bar" id="progress-bar" min="0" max="100" value="0">
-                <span class="time-display" id="duration-time">0:00</span>
+                <input type="range" class="progress-bar" id="progressBar" min="0" max="100" value="0">
+                <div class="time-display-row">
+                    <span class="time-display" id="currentTime">0:00</span>
+                    <span class="time-display" id="duration">0:00</span>
+                </div>
             </div>
-            
-            <!-- Volume Control -->
+
+            <!-- Control Buttons -->
+            <div class="player-controls">
+                <button class="control-btn prev-btn" id="prevBtn" title="Previous">⏮</button>
+                <button class="control-btn play-btn" id="playBtn" title="Play/Pause">▶</button>
+                <button class="control-btn next-btn" id="nextBtn" title="Next">⏭</button>
+            </div>
+        </div>
+
+        <!-- Volume Controls -->
+        <div class="volume-controls">
+            <h4>Volume</h4>
             <div class="volume-section">
-                <span class="volume-icon">🔊</span>
-                <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="50">
+                <button class="volume-btn" id="volumeDownBtn" title="Decrease Volume">🔉</button>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
+                <button class="volume-btn" id="volumeUpBtn" title="Increase Volume">🔊</button>
+                <span class="volume-percentage" id="volumePercentage">50%</span>
             </div>
+        </div>
+
+        <!-- Playlist Section -->
+        <div class="playlist-section">
+            <h4>Playlist</h4>
+            <div id="playlistContainer"></div>
         </div>
     </div>
 

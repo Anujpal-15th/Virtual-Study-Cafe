@@ -207,3 +207,101 @@ def check_achievements(user):
             new_achievements.append(user_achievement)
     
     return new_achievements
+
+
+@login_required
+def get_study_stats(request):
+    """
+    API endpoint to get study statistics for the Study Stats panel
+    Supports filtering by period: today, week, month
+    """
+    period = request.GET.get('period', 'month')
+    user = request.user
+    now = timezone.now()
+    
+    # Determine date range based on period
+    if period == 'today':
+        start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        period_label = 'Today'
+    elif period == 'week':
+        start_date = now - timedelta(days=now.weekday())  # Start of week (Monday)
+        start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        period_label = 'This week'
+    else:  # month
+        start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        period_label = 'This month'
+    
+    # Get study sessions in the period (only focus sessions)
+    sessions = StudySession.objects.filter(
+        user=user,
+        created_at__gte=start_date,
+        session_type='focus',
+        completed=True
+    )
+    
+    # Calculate total study time in minutes
+    total_minutes = sessions.aggregate(Sum('minutes'))['minutes__sum'] or 0
+    study_hours = round(total_minutes / 60, 1)
+    
+    # Calculate level based on hours
+    level_name = 'Beginner (0-3h)'
+    next_level = 'Intermediate (3-6h)'
+    progress_percentage = min(100, (study_hours / 3) * 100)
+    hours_left = max(0, 3 - study_hours)
+    
+    if study_hours >= 10:
+        level_name = 'Expert (10h+)'
+        next_level = 'Master'
+        progress_percentage = 100
+        hours_left = 0
+    elif study_hours >= 6:
+        level_name = 'Proficient (6-10h)'
+        next_level = 'Expert (10h+)'
+        progress_percentage = ((study_hours - 6) / 4) * 100
+        hours_left = round(10 - study_hours, 1)
+    elif study_hours >= 3:
+        level_name = 'Intermediate (3-6h)'
+        next_level = 'Proficient (6-10h)'
+        progress_percentage = ((study_hours - 3) / 3) * 100
+        hours_left = round(6 - study_hours, 1)
+    
+    # Get goals data
+    total_goals = Task.objects.filter(user=user).count()
+    open_goals = Task.objects.filter(user=user, completed=False).count()
+    completed_goals = Task.objects.filter(user=user, completed=True).count()
+    
+    # Get leaderboard rank (based on total study time)
+    user_total_minutes = StudySession.objects.filter(
+        user=user,
+        session_type='focus',
+        completed=True
+    ).aggregate(Sum('minutes'))['minutes__sum'] or 0
+    
+    # Count users with more study time
+    from django.contrib.auth.models import User
+    from django.db.models import Q
+    
+    users_with_more_time = User.objects.filter(
+        study_sessions__session_type='focus',
+        study_sessions__completed=True
+    ).annotate(
+        total_time=Sum('study_sessions__minutes')
+    ).filter(
+        total_time__gt=user_total_minutes
+    ).distinct().count()
+    
+    rank = users_with_more_time + 1
+    
+    return JsonResponse({
+        'success': True,
+        'period': period_label,
+        'study_hours': study_hours,
+        'level_name': level_name,
+        'next_level': next_level,
+        'progress_percentage': round(progress_percentage, 1),
+        'hours_left': hours_left,
+        'open_goals': open_goals,
+        'completed_goals': completed_goals,
+        'total_goals': total_goals,
+        'rank': rank,
+    })

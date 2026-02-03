@@ -28,8 +28,12 @@ urlpatterns = [
     
     # User profiles
     path('profile/', views.profile_view, name='profile'),  # Own profile
+    path('profile/edit/', views.edit_profile_view, name='edit_profile'),  # Edit profile (must be before <username>)
     path('profile/<str:username>/', views.profile_view, name='profile_user'),  # Other user's profile
-    path('profile/edit/', views.edit_profile_view, name='edit_profile'),
+    
+    # Profile API endpoints
+    path('api/profile/', views.api_get_profile, name='api_get_profile'),
+    path('api/profile/update/', views.api_update_profile, name='api_update_profile'),
     
     # Notifications
     path('notifications/', views.notifications_view, name='notifications'),

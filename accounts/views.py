@@ -146,7 +146,7 @@ def edit_profile_view(request):
             user_form.save()
             profile_form.save()
             messages.success(request, 'Your profile has been updated successfully!')
-            return redirect('profile', username=request.user.username)
+            return redirect('profile')  # Redirect to own profile
         else:
             # Show validation errors
             messages.error(request, 'Please correct the errors below.')
@@ -231,3 +231,176 @@ def mark_all_notifications_read(request):
         })
     
     return JsonResponse({'success': False}, status=400)
+
+
+# ========================================
+# API ENDPOINTS FOR PROFILE
+# ========================================
+
+@login_required
+def api_get_profile(request):
+    """
+    API endpoint to get current user's profile data
+    Returns JSON with all profile information
+    """
+    try:
+        user = request.user
+        profile = user.profile
+        
+        # Calculate additional stats
+        from tracker.models import StudySession
+        from django.db.models import Sum, Count
+        
+        total_sessions = StudySession.objects.filter(user=user).count()
+        total_minutes = StudySession.objects.filter(
+            user=user, 
+            session_type='focus'
+        ).aggregate(Sum('minutes'))['minutes__sum'] or 0
+        
+        data = {
+            'success': True,
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'date_joined': user.date_joined.strftime('%Y-%m-%d'),
+            },
+            'profile': {
+                'avatar_url': profile.avatar.url if profile.avatar else None,
+                'bio': profile.bio,
+                'timezone': profile.timezone,
+                'total_study_minutes': profile.total_study_minutes,
+                'study_streak': profile.study_streak,
+                'longest_streak': profile.longest_streak,
+                'total_xp': profile.total_xp,
+                'level': profile.level,
+            },
+            'stats': {
+                'total_sessions': total_sessions,
+                'total_minutes': total_minutes,
+            }
+        }
+        
+        return JsonResponse(data)
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)
+
+
+@login_required
+def api_update_profile(request):
+    """
+    API endpoint to update current user's profile
+    Accepts JSON or form-data (for file uploads)
+    """
+    if request.method != 'POST' and request.method != 'PUT':
+        return JsonResponse({
+            'success': False,
+            'error': 'Only POST/PUT requests allowed'
+        }, status=405)
+    
+    try:
+        import json
+        from django.core.files.storage import default_storage
+        
+        user = request.user
+        profile = user.profile
+        
+        # Check if it's JSON or form-data
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            data = request.POST
+        
+        # Update User model fields
+        if 'username' in data:
+            new_username = data['username'].strip()
+            if new_username != user.username:
+                # Check if username is already taken
+                if User.objects.filter(username=new_username).exclude(id=user.id).exists():
+                    return JsonResponse({
+                        'success': False,
+                        'error': 'Username already taken'
+                    }, status=400)
+                user.username = new_username
+        
+        if 'email' in data:
+            new_email = data['email'].strip()
+            if not new_email:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Email is required'
+                }, status=400)
+            user.email = new_email
+        
+        if 'first_name' in data:
+            user.first_name = data['first_name'].strip()
+        
+        if 'last_name' in data:
+            user.last_name = data['last_name'].strip()
+        
+        user.save()
+        
+        # Update Profile model fields
+        if 'bio' in data:
+            profile.bio = data['bio'].strip()[:500]  # Max 500 chars
+        
+        if 'timezone' in data:
+            profile.timezone = data['timezone']
+        
+        # Handle avatar upload
+        if 'avatar' in request.FILES:
+            avatar_file = request.FILES['avatar']
+            
+            # Validate file size (max 2MB)
+            if avatar_file.size > 2 * 1024 * 1024:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Avatar file size must be less than 2MB'
+                }, status=400)
+            
+            # Validate file type
+            allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+            if avatar_file.content_type not in allowed_types:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Avatar must be a JPG, PNG, or GIF image'
+                }, status=400)
+            
+            # Delete old avatar if exists
+            if profile.avatar:
+                try:
+                    default_storage.delete(profile.avatar.path)
+                except:
+                    pass
+            
+            profile.avatar = avatar_file
+        
+        profile.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Profile updated successfully',
+            'user': {
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+            },
+            'profile': {
+                'avatar_url': profile.avatar.url if profile.avatar else None,
+                'bio': profile.bio,
+                'timezone': profile.timezone,
+            }
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)

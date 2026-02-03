@@ -4,14 +4,12 @@ Django settings for virtualcafe project.
 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from .env file
-# This loads all variables from .env into os.environ
-load_dotenv(BASE_DIR / '.env')
+# Note: For production, use environment variables
+# For now, settings are configured directly below
 
 
 # ========================================
@@ -19,15 +17,13 @@ load_dotenv(BASE_DIR / '.env')
 # ========================================
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# Get from environment variable, fallback to default (NOT for production!)
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-your-secret-key-change-in-production')
+SECRET_KEY = 'django-insecure-h5j#k7@x^2v&m*9p$q!r+s_t%u(w)z~a3b4c5d6e7f8g9h0i'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Get from environment variable, convert string to boolean
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+DEBUG = True
 
 # Allowed hosts for security
-# Get from environment variable, split by comma
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
 
@@ -49,7 +45,7 @@ INSTALLED_APPS = [
     
     # Our custom apps
     'accounts',  # User authentication with profiles
-    'rooms',  # Study rooms (old collaborative feature)
+    'rooms',  # Study rooms
     'chat',  # Real-time chat and WebRTC
     'tracker',  # Study progress tracking
     'notifications',  # In-app notification system

@@ -3,7 +3,7 @@
 Task/Goals API Views
 Simple CRUD operations for tasks
 """
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_http_methods
@@ -11,6 +11,15 @@ from django.utils import timezone
 import json
 
 from tracker.models import Task
+
+
+@login_required
+def study_goals_page(request):
+    """
+    Study Goals management page
+    """
+    goals = Task.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'tracker/study_goals.html', {'goals': goals})
 
 
 @login_required
@@ -160,6 +169,30 @@ def get_tasks(request):
         return JsonResponse({
             'success': True,
             'tasks': tasks_data
+        })
+    
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+
+@login_required
+def get_task(request, task_id):
+    """
+    Get a single task by ID
+    """
+    try:
+        task = get_object_or_404(Task, id=task_id, user=request.user)
+        
+        return JsonResponse({
+            'success': True,
+            'task': {
+                'id': task.id,
+                'title': task.title,
+                'notes': task.notes,
+                'priority': task.priority,
+                'due_date': task.due_date.strftime('%Y-%m-%d') if task.due_date else None,
+                'completed': task.completed,
+            }
         })
     
     except Exception as e:

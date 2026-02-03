@@ -1,0 +1,666 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Study Goals - Virtual Cafe{% endblock %}
+
+{% block extra_css %}
+<style>
+    .goals-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    
+    .goals-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    
+    .goals-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1a1a1a;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .dark-theme .goals-title {
+        color: #fff;
+    }
+    
+    .add-goal-btn-main {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .add-goal-btn-main:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .goals-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+    
+    .goal-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s;
+        border: 2px solid transparent;
+    }
+    
+    .dark-theme .goal-card {
+        background: #2a2a2a;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .goal-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    
+    .goal-card.completed {
+        border-color: #4ade80;
+        background: rgba(74, 222, 128, 0.05);
+    }
+    
+    .goal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+    }
+    
+    .goal-priority {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .goal-priority.high {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+    
+    .goal-priority.medium {
+        background: rgba(251, 191, 36, 0.1);
+        color: #f59e0b;
+    }
+    
+    .goal-priority.low {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+    }
+    
+    .goal-actions {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .goal-action-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+    
+    .goal-action-btn:hover {
+        background: rgba(0, 0, 0, 0.05);
+    }
+    
+    .dark-theme .goal-action-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .goal-title-text {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+    
+    .dark-theme .goal-title-text {
+        color: #fff;
+    }
+    
+    .goal-card.completed .goal-title-text {
+        text-decoration: line-through;
+        color: #9ca3af;
+    }
+    
+    .goal-notes {
+        color: #6b7280;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 16px;
+    }
+    
+    .dark-theme .goal-notes {
+        color: #9ca3af;
+    }
+    
+    .goal-meta {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        color: #6b7280;
+        font-size: 13px;
+    }
+    
+    .dark-theme .goal-meta {
+        color: #9ca3af;
+    }
+    
+    .goal-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .complete-checkbox {
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+        accent-color: #4ade80;
+    }
+    
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-overlay.show {
+        display: flex;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: 20px;
+        padding: 32px;
+        width: 500px;
+        max-width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    .dark-theme .modal-content {
+        background: #2a2a2a;
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+    
+    .modal-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
+    
+    .dark-theme .modal-title {
+        color: #fff;
+    }
+    
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 28px;
+        color: #6b7280;
+        cursor: pointer;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+    
+    .close-modal:hover {
+        background: rgba(0, 0, 0, 0.05);
+    }
+    
+    .dark-theme .close-modal:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+    
+    .dark-theme .form-label {
+        color: #d1d5db;
+    }
+    
+    .form-input, .form-textarea, .form-select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 14px;
+        transition: all 0.3s;
+        background: white;
+        color: #1a1a1a;
+    }
+    
+    .dark-theme .form-input, 
+    .dark-theme .form-textarea, 
+    .dark-theme .form-select {
+        background: #1a1a1a;
+        border-color: #404040;
+        color: #fff;
+    }
+    
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    .form-textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 24px;
+    }
+    
+    .btn {
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+        background: #e5e7eb;
+        color: #374151;
+    }
+    
+    .dark-theme .btn-secondary {
+        background: #404040;
+        color: #d1d5db;
+    }
+    
+    .btn-secondary:hover {
+        background: #d1d5db;
+    }
+    
+    .dark-theme .btn-secondary:hover {
+        background: #505050;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+    
+    .empty-state-icon {
+        font-size: 64px;
+        margin-bottom: 16px;
+    }
+    
+    .empty-state-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+    
+    .dark-theme .empty-state-title {
+        color: #fff;
+    }
+    
+    .empty-state-text {
+        color: #6b7280;
+        font-size: 16px;
+    }
+    
+    .dark-theme .empty-state-text {
+        color: #9ca3af;
+    }
+    
+    .filter-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+    
+    .filter-tab {
+        padding: 8px 16px;
+        border-radius: 20px;
+        background: #e5e7eb;
+        color: #374151;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+    
+    .dark-theme .filter-tab {
+        background: #404040;
+        color: #d1d5db;
+    }
+    
+    .filter-tab.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .filter-tab:hover:not(.active) {
+        background: #d1d5db;
+    }
+    
+    .dark-theme .filter-tab:hover:not(.active) {
+        background: #505050;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="goals-container">
+    <div class="goals-header">
+        <h1 class="goals-title">
+            🎯 Study Goals
+        </h1>
+        <button class="add-goal-btn-main" onclick="openAddGoalModal()">
+            <span>+</span>
+            Add New Goal
+        </button>
+    </div>
+    
+    <div class="filter-tabs">
+        <button class="filter-tab active" onclick="filterGoals('all')">All Goals</button>
+        <button class="filter-tab" onclick="filterGoals('active')">Active</button>
+        <button class="filter-tab" onclick="filterGoals('completed')">Completed</button>
+        <button class="filter-tab" onclick="filterGoals('high')">High Priority</button>
+    </div>
+    
+    <div class="goals-grid" id="goalsGrid">
+        {% if goals %}
+            {% for goal in goals %}
+            <div class="goal-card {% if goal.completed %}completed{% endif %}" data-priority="{{ goal.priority }}" data-completed="{{ goal.completed|lower }}">
+                <div class="goal-header">
+                    <span class="goal-priority {{ goal.priority }}">{{ goal.get_priority_display }}</span>
+                    <div class="goal-actions">
+                        <input type="checkbox" class="complete-checkbox" {% if goal.completed %}checked{% endif %} onchange="toggleGoalComplete({{ goal.id }})">
+                        <button class="goal-action-btn" onclick="openEditGoalModal({{ goal.id }})" title="Edit">✏️</button>
+                        <button class="goal-action-btn" onclick="deleteGoal({{ goal.id }})" title="Delete">🗑️</button>
+                    </div>
+                </div>
+                
+                <div class="goal-title-text">{{ goal.title }}</div>
+                
+                {% if goal.notes %}
+                <div class="goal-notes">{{ goal.notes }}</div>
+                {% endif %}
+                
+                <div class="goal-meta">
+                    <div class="goal-meta-item">
+                        📅 Created: {{ goal.created_at|date:"M d, Y" }}
+                    </div>
+                    {% if goal.due_date %}
+                    <div class="goal-meta-item">
+                        🎯 Due: {{ goal.due_date|date:"M d, Y" }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state" style="grid-column: 1 / -1;">
+                <div class="empty-state-icon">🎯</div>
+                <h2 class="empty-state-title">No study goals yet</h2>
+                <p class="empty-state-text">Create your first goal to start tracking your progress!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add/Edit Goal Modal -->
+<div class="modal-overlay" id="goalModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle">Add New Goal</h2>
+            <button class="close-modal" onclick="closeGoalModal()">×</button>
+        </div>
+        
+        <form id="goalForm" onsubmit="submitGoal(event)">
+            {% csrf_token %}
+            <input type="hidden" id="goalId" name="goalId">
+            
+            <div class="form-group">
+                <label class="form-label" for="goalTitle">Goal Title *</label>
+                <input type="text" class="form-input" id="goalTitle" name="title" required placeholder="e.g., Master Python programming">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="goalNotes">Notes (optional)</label>
+                <textarea class="form-textarea" id="goalNotes" name="notes" placeholder="Add details, resources, or motivation..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="goalPriority">Priority</label>
+                <select class="form-select" id="goalPriority" name="priority">
+                    <option value="low">Low Priority</option>
+                    <option value="medium" selected>Medium Priority</option>
+                    <option value="high">High Priority</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="goalDueDate">Due Date (optional)</label>
+                <input type="date" class="form-input" id="goalDueDate" name="due_date">
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeGoalModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Goal</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openAddGoalModal() {
+    document.getElementById('modalTitle').textContent = 'Add New Goal';
+    document.getElementById('goalForm').reset();
+    document.getElementById('goalId').value = '';
+    document.getElementById('goalModal').classList.add('show');
+}
+
+function closeGoalModal() {
+    document.getElementById('goalModal').classList.remove('show');
+}
+
+function openEditGoalModal(goalId) {
+    document.getElementById('modalTitle').textContent = 'Edit Goal';
+    document.getElementById('goalId').value = goalId;
+    
+    // Fetch goal data
+    fetch(`/study/tasks/${goalId}/get/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('goalTitle').value = data.task.title;
+                document.getElementById('goalNotes').value = data.task.notes || '';
+                document.getElementById('goalPriority').value = data.task.priority;
+                document.getElementById('goalDueDate').value = data.task.due_date || '';
+                document.getElementById('goalModal').classList.add('show');
+            }
+        });
+}
+
+function submitGoal(event) {
+    event.preventDefault();
+    
+    const goalId = document.getElementById('goalId').value;
+    const formData = {
+        title: document.getElementById('goalTitle').value,
+        notes: document.getElementById('goalNotes').value,
+        priority: document.getElementById('goalPriority').value,
+        due_date: document.getElementById('goalDueDate').value || null
+    };
+    
+    const url = goalId ? `/study/tasks/${goalId}/update/` : '/study/tasks/create/';
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + (data.error || 'Failed to save goal'));
+        }
+    });
+}
+
+function toggleGoalComplete(goalId) {
+    fetch(`/study/tasks/${goalId}/toggle/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function deleteGoal(goalId) {
+    if (!confirm('Are you sure you want to delete this goal?')) return;
+    
+    fetch(`/study/tasks/${goalId}/delete/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function filterGoals(filter) {
+    const cards = document.querySelectorAll('.goal-card');
+    const tabs = document.querySelectorAll('.filter-tab');
+    
+    // Update active tab
+    tabs.forEach(tab => tab.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Filter cards
+    cards.forEach(card => {
+        const priority = card.dataset.priority;
+        const completed = card.dataset.completed === 'true';
+        
+        let show = false;
+        
+        switch(filter) {
+            case 'all':
+                show = true;
+                break;
+            case 'active':
+                show = !completed;
+                break;
+            case 'completed':
+                show = completed;
+                break;
+            case 'high':
+                show = priority === 'high';
+                break;
+        }
+        
+        card.style.display = show ? 'block' : 'none';
+    });
+}
+
+// Close modal on outside click
+document.getElementById('goalModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeGoalModal();
+    }
+});
+</script>
+{% endblock %}
