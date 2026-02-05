@@ -15,6 +15,9 @@ daphne==4.0.0
 # Redis client for channel layer
 redis==5.0.1
 
+# Background task scheduler for room cleanup
+APScheduler==3.10.4
+
 # PostgreSQL support (optional for production)
 psycopg[binary]==3.3.2
 
