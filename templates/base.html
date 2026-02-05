@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Virtual Cafe{% endblock %}</title>
     <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/css/music-player.css">
+    <link rel="stylesheet" href="/static/css/chatbot.css">
     {% block extra_css %}{% endblock %}
     <style>
         * {
@@ -469,6 +469,7 @@
             {% endif %}
         </aside>
 
+<<<<<<< HEAD
         <!-- Main Content Wrapper -->
         <div class="main-wrapper">
             {% if user.is_authenticated %}
@@ -540,6 +541,29 @@
         </div>
     </div>
 
+=======
+    <!-- Messages Display -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Virtual Cafe - Study Together, Grow Together</p>
+    </footer>
+>>>>>>> 70df311 (Add chatbot feature with OpenAI integration and update settings)
     <script>
         // Personal Timer
         let timerSeconds = 50 * 60;
@@ -567,6 +591,9 @@
             });
         }, 5000);
     </script>
+
+    <!-- Chatbot Widget -->
+    <script src="/static/js/chatbot.js"></script>
 
     {% block extra_js %}{% endblock %}
 </body>

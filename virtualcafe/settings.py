@@ -8,6 +8,15 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(BASE_DIR, '.env'))
+except Exception as e:
+    print(f"Warning: Could not load .env file: {e}")
+    # Fallback: load from system environment
+    pass
+
 # Note: For production, use environment variables
 # For now, settings are configured directly below
 
@@ -50,6 +59,7 @@ INSTALLED_APPS = [
     'tracker',  # Study progress tracking
     'notifications',  # In-app notification system
     'solo',  # NEW: Solo study room with timer and tasks
+    'chatbot',  # AI Chatbot powered by Gemini
 ]
 
 MIDDLEWARE = [

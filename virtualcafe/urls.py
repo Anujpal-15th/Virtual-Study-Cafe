@@ -11,6 +11,9 @@ urlpatterns = [
     # Admin panel
     path('admin/', admin.site.urls),
     
+    # Chatbot API
+    path('', include('chatbot.urls')),
+    
     # Solo Study Room (main feature!)
     path('study/', include('solo.urls')),
     
