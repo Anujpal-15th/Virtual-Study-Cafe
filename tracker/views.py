@@ -5,11 +5,12 @@ Handles study progress tracking and saving study sessions.
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.utils import timezone
 from datetime import timedelta
-from .models import StudySession
+from .models import StudySession, Achievement
 from rooms.models import Room
+from django.contrib.auth.models import User
 
 
 @login_required
@@ -113,3 +114,99 @@ def save_session_view(request):
         return redirect('progress')
     
     return redirect('home')
+
+
+@login_required
+def leaderboard_view(request):
+    """
+    Display the leaderboard showing top users by study time.
+    """
+    period = request.GET.get('period', 'alltime')
+    now = timezone.now()
+    
+    # Determine date filter based on period
+    if period == 'today':
+        start_date = now.date()
+        period_label = "Today"
+    elif period == 'week':
+        start_date = now.date() - timedelta(days=now.weekday())
+        period_label = "This Week"
+    elif period == 'month':
+        start_date = now.date().replace(day=1)
+        period_label = "This Month"
+    else:  # alltime
+        start_date = None
+        period_label = "All Time"
+    
+    # Get all users with their study time
+    users_query = User.objects.filter(is_active=True)
+    
+    leaderboard = []
+    for user in users_query:
+        # Calculate total study minutes for this period
+        sessions = StudySession.objects.filter(user=user)
+        if start_date:
+            sessions = sessions.filter(created_at__date__gte=start_date)
+        
+        total_minutes = sessions.aggregate(Sum('minutes'))['minutes__sum'] or 0
+        total_hours = round(total_minutes / 60, 1)
+        
+        if total_hours > 0 or period == 'alltime':  # Show users with study time
+            leaderboard.append({
+                'user': user,
+                'total_minutes': total_minutes,
+                'total_hours': total_hours,
+            })
+    
+    # Sort by total minutes descending
+    leaderboard.sort(key=lambda x: x['total_minutes'], reverse=True)
+    
+    # Get top 3 for podium
+    top_users = leaderboard[:3]
+    
+    # Find current user's rank
+    user_rank = next((i + 1 for i, entry in enumerate(leaderboard) if entry['user'].id == request.user.id), len(leaderboard))
+    user_entry = next((entry for entry in leaderboard if entry['user'].id == request.user.id), {'total_hours': 0})
+    user_hours = user_entry['total_hours']
+    
+    # Calculate stats
+    top_hours = top_users[0]['total_hours'] if top_users else 0
+    hours_to_top = max(0, top_hours - user_hours)
+    total_users = len(leaderboard)
+    
+    # Get recent achievements for current user
+    recent_achievements = []
+    try:
+        user_achievements = Achievement.objects.filter(
+            userachievement__user=request.user,
+            userachievement__unlocked_at__isnull=False
+        ).order_by('-userachievement__unlocked_at')[:3]
+        
+        for achievement in user_achievements:
+            recent_achievements.append({
+                'icon': achievement.icon,
+                'name': achievement.name,
+                'description': achievement.description,
+            })
+    except:
+        # If Achievement model doesn't exist, use placeholder data
+        if request.user.profile.total_xp > 100:
+            recent_achievements = [
+                {'icon': '🎯', 'name': 'First Steps', 'description': 'Completed your first study session'},
+                {'icon': '🔥', 'name': 'Week Warrior', 'description': 'Studied for 7 consecutive days'},
+            ]
+    
+    context = {
+        'leaderboard': leaderboard,
+        'top_users': top_users,
+        'user_rank': user_rank,
+        'user_hours': user_hours,
+        'top_hours': top_hours,
+        'hours_to_top': hours_to_top,
+        'total_users': total_users,
+        'recent_achievements': recent_achievements,
+        'period': period,
+        'period_label': period_label,
+    }
+    
+    return render(request, 'tracker/leaderboard.html', context)

@@ -5,82 +5,139 @@
 {% block extra_css %}
 <style>
     .home-container {
-        max-width: 1200px;
+        max-width: 1400px;
         margin: 0 auto;
     }
-    .home-header {
+    
+    .hero-quote {
         text-align: center;
+        padding: 3rem 2rem;
         margin-bottom: 3rem;
-        background: white;
-        padding: 3rem;
+        background: rgba(102, 126, 234, 0.1);
+        backdrop-filter: blur(10px);
         border-radius: 20px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(102, 126, 234, 0.2);
     }
-    .home-header h1 {
-        color: #333;
+    
+    .hero-quote h1 {
         font-size: 2.5rem;
-        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #fff 0%, #a8b7ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
     }
-    .home-header p {
-        color: #666;
-        font-size: 1.2rem;
-        margin-bottom: 2rem;
+    
+    .quote-text {
+        font-size: 1.3rem;
+        font-style: italic;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 0.5rem;
+        line-height: 1.6;
     }
+    
+    .quote-author {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+    
     .btn-large {
-        padding: 1rem 2rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 0.6rem 1.5rem;
+        background: rgba(102, 126, 234, 0.2);
         color: white;
         text-decoration: none;
-        border-radius: 10px;
-        font-weight: 600;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.9rem;
         display: inline-block;
-        transition: transform 0.3s, box-shadow 0.3s;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(102, 126, 234, 0.4);
     }
+    
     .btn-large:hover {
+        background: rgba(102, 126, 234, 0.3);
+        border-color: #667eea;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        color: white;
         transform: translateY(-2px);
-        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
     }
+    
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+    }
+    
     .rooms-section {
         margin-bottom: 3rem;
     }
+    
     .rooms-section h2 {
-        color: #333;
-        font-size: 2rem;
+        color: #fff;
+        font-size: 1.8rem;
         margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
     }
+    
     .rooms-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 1.5rem;
     }
+    
     .room-card {
-        background: white;
-        border-radius: 15px;
+        background: rgba(26, 26, 46, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
         padding: 1.5rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s, box-shadow 0.3s;
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
+    
     .room-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+        border-color: rgba(102, 126, 234, 0.6);
     }
+    
     .room-card-header h3 {
-        color: #333;
-        font-size: 1.3rem;
-        margin-bottom: 0.5rem;
+        color: #fff;
+        font-size: 1.4rem;
+        margin-bottom: 0.8rem;
     }
+    
     .room-code {
-        background: #f0f0f0;
-        color: #667eea;
-        padding: 0.3rem 0.8rem;
-        border-radius: 15px;
+        background: rgba(102, 126, 234, 0.3);
+        color: #a8b7ff;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
         font-size: 0.85rem;
         display: inline-block;
         font-weight: 600;
+        border: 1px solid rgba(102, 126, 234, 0.5);
     }
+    
     .room-description {
-        color: #666;
+        color: rgba(255, 255, 255, 0.7);
         margin: 1rem 0;
+        line-height: 1.5;
     }
     .room-card-footer {
         display: flex;
@@ -89,31 +146,49 @@
         margin-top: 1rem;
     }
     .room-creator {
-        color: #999;
+        color: rgba(255, 255, 255, 0.6);
         font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
-    .btn-secondary {
-        padding: 0.5rem 1.2rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+    .creator-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #667eea;
+    }
+    
+    .btn-join {
+        padding: 0.5rem 1rem;
+        background: rgba(102, 126, 234, 0.2);
         color: white;
         text-decoration: none;
-        border-radius: 8px;
-        transition: transform 0.3s;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        font-size: 0.85rem;
+        border: 1px solid rgba(102, 126, 234, 0.4);
     }
-    .btn-secondary:hover {
+    
+    .btn-join:hover {
+        background: rgba(102, 126, 234, 0.3);
+        border-color: #667eea;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        color: white;
         transform: translateY(-2px);
     }
+    
     .no-rooms {
-        color: #666;
+        color: rgba(255, 255, 255, 0.6);
         text-align: center;
-        padding: 2rem;
-        font-size: 1.1rem;
-    }
-
-    /* Dark Theme */
-    body.dark-theme .home-header {
-        background: #2d2d2d;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        padding: 3rem 2rem;
+        font-size: 1.2rem;
+        background: rgba(102, 126, 234, 0.1);
+        border-radius: 12px;
+        border: 1px dashed rgba(102, 126, 234, 0.3);
     }
     body.dark-theme .home-header h1 {
         color: #e0e0e0;
@@ -152,14 +227,17 @@
 
 {% block content %}
 <div class="home-container">
-    <div class="home-header">
+    <!-- Hero Section with Quote -->
+    <div class="hero-quote">
         <h1>Welcome to Virtual Cafe ☕</h1>
-        <p>Join study rooms, connect with others, and track your progress!</p>
-        <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px; flex-wrap: wrap;">
-            <a href="{% url 'solo:study_room' %}" class="btn btn-primary btn-large" style="min-width: 200px;">
+        <p class="quote-text">"There are no secrets to success. It is the result of preparation, hard work, and learning from failure."</p>
+        <p class="quote-author">— Colin Powell</p>
+        
+        <div class="action-buttons">
+            <a href="{% url 'solo:study_room' %}" class="btn-large">
                 🎯 Solo Study Room
             </a>
-            <a href="{% url 'create_room' %}" class="btn btn-primary btn-large" style="min-width: 200px;">
+            <a href="{% url 'create_room' %}" class="btn-large btn-secondary">
                 ➕ Create New Room
             </a>
         </div>
@@ -168,7 +246,7 @@
     <!-- Your Rooms Section -->
     {% if user_rooms %}
     <section class="rooms-section">
-        <h2>Your Rooms</h2>
+        <h2>🏠 Your Rooms</h2>
         <div class="rooms-grid">
             {% for room in user_rooms %}
             <div class="room-card">
@@ -178,8 +256,11 @@
                 </div>
                 <p class="room-description">{{ room.description|truncatewords:20 }}</p>
                 <div class="room-card-footer">
-                    <span class="room-creator">By {{ room.created_by.username }}</span>
-                    <a href="{% url 'room_detail' room.room_code %}" class="btn btn-secondary">Join Room</a>
+                    <span class="room-creator">
+                        <img src="{{ room.created_by.profile.get_avatar_url }}" alt="{{ room.created_by.username }}" class="creator-avatar">
+                        {{ room.created_by.username }}
+                    </span>
+                    <a href="{% url 'room_detail' room.room_code %}" class="btn-join">Join Room</a>
                 </div>
             </div>
             {% endfor %}
@@ -189,7 +270,7 @@
 
     <!-- All Available Rooms -->
     <section class="rooms-section">
-        <h2>All Study Rooms</h2>
+        <h2>🌍 All Study Rooms</h2>
         
         {% if rooms %}
         <div class="rooms-grid">
@@ -201,8 +282,11 @@
                 </div>
                 <p class="room-description">{{ room.description|truncatewords:20 }}</p>
                 <div class="room-card-footer">
-                    <span class="room-creator">By {{ room.created_by.username }}</span>
-                    <a href="{% url 'room_detail' room.room_code %}" class="btn btn-secondary">Join Room</a>
+                    <span class="room-creator">
+                        <img src="{{ room.created_by.profile.get_avatar_url }}" alt="{{ room.created_by.username }}" class="creator-avatar">
+                        {{ room.created_by.username }}
+                    </span>
+                    <a href="{% url 'room_detail' room.room_code %}" class="btn-join">Join Room</a>
                 </div>
             </div>
             {% endfor %}

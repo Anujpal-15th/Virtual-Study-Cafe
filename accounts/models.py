@@ -19,6 +19,17 @@ class UserProfile(models.Model):
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, 
                                help_text="Profile picture (optional)")
     
+    # Gender for personalized avatar
+    GENDER_CHOICES = [
+        ('male', '👨 Male'),
+        ('female', '👩 Female'),
+        ('other', '🌟 Other'),
+        ('prefer_not_to_say', '🔒 Prefer not to say'),
+    ]
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, 
+                             default='prefer_not_to_say',
+                             help_text="Select your gender for personalized avatar")
+    
     # Personal information
     bio = models.TextField(max_length=500, blank=True, 
                           help_text="Tell others about yourself")
@@ -59,12 +70,20 @@ class UserProfile(models.Model):
     
     def get_avatar_url(self):
         """
-        Returns the avatar URL if exists, otherwise returns default avatar
+        Returns the avatar URL if exists, otherwise returns gender-specific default avatar
         """
         if self.avatar:
             return self.avatar.url
-        # Return a default avatar URL (using UI Avatars service)
-        return f"https://ui-avatars.com/api/?name={self.user.username}&background=random&size=200"
+        
+        # Gender-specific avatar URLs with beautiful illustrations
+        gender_avatars = {
+            'male': f"https://ui-avatars.com/api/?name={self.user.username}&background=4A90E2&color=fff&size=200&bold=true",
+            'female': f"https://ui-avatars.com/api/?name={self.user.username}&background=E91E63&color=fff&size=200&bold=true",
+            'other': f"https://ui-avatars.com/api/?name={self.user.username}&background=9C27B0&color=fff&size=200&bold=true",
+            'prefer_not_to_say': f"https://ui-avatars.com/api/?name={self.user.username}&background=667eea&color=fff&size=200&bold=true",
+        }
+        
+        return gender_avatars.get(self.gender, gender_avatars['prefer_not_to_say'])
     
     def update_study_stats(self, minutes):
         """

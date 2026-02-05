@@ -1,0 +1,570 @@
+{% extends 'base.html' %}
+
+{% block title %}Leaderboard - Virtual Cafe{% endblock %}
+
+{% block extra_css %}
+<style>
+    .leaderboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .leaderboard-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .leaderboard-title {
+        font-size: 3rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+    
+    .leaderboard-subtitle {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 1.1rem;
+    }
+    
+    .period-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .period-tab {
+        padding: 0.8rem 2rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 500;
+    }
+    
+    .period-tab:hover {
+        background: rgba(102, 126, 234, 0.2);
+        border-color: rgba(102, 126, 234, 0.4);
+        color: #fff;
+    }
+    
+    .period-tab.active {
+        background: rgba(102, 126, 234, 0.3);
+        border-color: #667eea;
+        color: #fff;
+    }
+    
+    .leaderboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    /* Top 3 Podium */
+    .podium-section {
+        background: rgba(26, 26, 46, 0.8);
+        backdrop-filter: blur(15px);
+        border-radius: 20px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .podium-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        text-align: center;
+        color: #fff;
+    }
+    
+    .podium {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .podium-place {
+        text-align: center;
+        position: relative;
+    }
+    
+    .podium-place.first {
+        order: 2;
+    }
+    
+    .podium-place.second {
+        order: 1;
+    }
+    
+    .podium-place.third {
+        order: 3;
+    }
+    
+    .podium-avatar-container {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+    
+    .podium-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid;
+        margin-bottom: 0.5rem;
+    }
+    
+    .podium-place.first .podium-avatar {
+        width: 100px;
+        height: 100px;
+        border-color: #FFD700;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    }
+    
+    .podium-place.second .podium-avatar {
+        border-color: #C0C0C0;
+    }
+    
+    .podium-place.third .podium-avatar {
+        border-color: #CD7F32;
+    }
+    
+    .podium-crown {
+        position: absolute;
+        top: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 2rem;
+    }
+    
+    .podium-rank {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .podium-place.first .podium-rank {
+        color: #FFD700;
+    }
+    
+    .podium-place.second .podium-rank {
+        color: #C0C0C0;
+    }
+    
+    .podium-place.third .podium-rank {
+        color: #CD7F32;
+    }
+    
+    .podium-username {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 0.5rem;
+    }
+    
+    .podium-stats {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .podium-hours {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #667eea;
+        margin-top: 0.5rem;
+    }
+    
+    .podium-base {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+        border-radius: 12px 12px 0 0;
+        padding: 1.5rem 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: none;
+    }
+    
+    .podium-place.first .podium-base {
+        height: 180px;
+    }
+    
+    .podium-place.second .podium-base {
+        height: 140px;
+    }
+    
+    .podium-place.third .podium-base {
+        height: 110px;
+    }
+    
+    /* Leaderboard List */
+    .leaderboard-list {
+        background: rgba(26, 26, 46, 0.8);
+        backdrop-filter: blur(15px);
+        border-radius: 20px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .rank-item {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1.2rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        margin-bottom: 0.8rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s;
+    }
+    
+    .rank-item:hover {
+        background: rgba(102, 126, 234, 0.15);
+        border-color: rgba(102, 126, 234, 0.3);
+        transform: translateX(5px);
+    }
+    
+    .rank-item.current-user {
+        background: rgba(102, 126, 234, 0.2);
+        border: 1px solid #667eea;
+    }
+    
+    .rank-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #667eea;
+        min-width: 50px;
+        text-align: center;
+    }
+    
+    .rank-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .rank-info {
+        flex: 1;
+    }
+    
+    .rank-username {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 0.3rem;
+    }
+    
+    .rank-level {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .rank-stats {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+    
+    .rank-stat {
+        text-align: center;
+    }
+    
+    .rank-stat-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #fff;
+    }
+    
+    .rank-stat-label {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 0.2rem;
+    }
+    
+    /* Stats Cards Sidebar */
+    .stats-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .stats-card {
+        background: rgba(26, 26, 46, 0.8);
+        backdrop-filter: blur(15px);
+        border-radius: 20px;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .stats-card-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .stats-card-title svg {
+        width: 24px;
+        height: 24px;
+        stroke: #667eea;
+    }
+    
+    .your-rank-display {
+        text-align: center;
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+        border-radius: 15px;
+        margin-bottom: 1rem;
+    }
+    
+    .your-rank-number {
+        font-size: 4rem;
+        font-weight: 700;
+        color: #667eea;
+        line-height: 1;
+    }
+    
+    .your-rank-label {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-top: 0.5rem;
+    }
+    
+    .achievement-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        margin-bottom: 0.8rem;
+    }
+    
+    .achievement-icon {
+        font-size: 2rem;
+    }
+    
+    .achievement-info h4 {
+        color: #fff;
+        font-size: 0.95rem;
+        margin-bottom: 0.3rem;
+    }
+    
+    .achievement-info p {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.8rem;
+    }
+    
+    .stat-comparison {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        margin-bottom: 0.8rem;
+    }
+    
+    .stat-comparison-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+    }
+    
+    .stat-comparison-value {
+        color: #fff;
+        font-weight: 600;
+    }
+    
+    .stat-comparison-value.positive {
+        color: #4ade80;
+    }
+    
+    @media (max-width: 1024px) {
+        .leaderboard-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .podium {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .podium-place {
+            order: initial !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="leaderboard-container">
+    <div class="leaderboard-header">
+        <h1 class="leaderboard-title">🏆 Leaderboard</h1>
+        <p class="leaderboard-subtitle">Compete with fellow learners and climb the ranks!</p>
+    </div>
+    
+    <div class="period-tabs">
+        <button class="period-tab active" onclick="changePeriod('today')">Today</button>
+        <button class="period-tab" onclick="changePeriod('week')">This Week</button>
+        <button class="period-tab" onclick="changePeriod('month')">This Month</button>
+        <button class="period-tab" onclick="changePeriod('alltime')">All Time</button>
+    </div>
+    
+    <div class="leaderboard-grid">
+        <div>
+            <!-- Top 3 Podium -->
+            <div class="podium-section">
+                <h2 class="podium-title">Top 3 Champions</h2>
+                <div class="podium">
+                    {% if top_users|length >= 2 %}
+                    <div class="podium-place second">
+                        <div class="podium-avatar-container">
+                            <div class="podium-crown">🥈</div>
+                            <img src="{{ top_users.1.user.profile.get_avatar_url }}" alt="{{ top_users.1.user.username }}" class="podium-avatar">
+                        </div>
+                        <div class="podium-rank">#2</div>
+                        <div class="podium-username">{{ top_users.1.user.username }}</div>
+                        <div class="podium-stats">Level {{ top_users.1.user.profile.level }}</div>
+                        <div class="podium-hours">{{ top_users.1.total_hours }}h</div>
+                        <div class="podium-base"></div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if top_users|length >= 1 %}
+                    <div class="podium-place first">
+                        <div class="podium-avatar-container">
+                            <div class="podium-crown">👑</div>
+                            <img src="{{ top_users.0.user.profile.get_avatar_url }}" alt="{{ top_users.0.user.username }}" class="podium-avatar">
+                        </div>
+                        <div class="podium-rank">#1</div>
+                        <div class="podium-username">{{ top_users.0.user.username }}</div>
+                        <div class="podium-stats">Level {{ top_users.0.user.profile.level }}</div>
+                        <div class="podium-hours">{{ top_users.0.total_hours }}h</div>
+                        <div class="podium-base"></div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if top_users|length >= 3 %}
+                    <div class="podium-place third">
+                        <div class="podium-avatar-container">
+                            <div class="podium-crown">🥉</div>
+                            <img src="{{ top_users.2.user.profile.get_avatar_url }}" alt="{{ top_users.2.user.username }}" class="podium-avatar">
+                        </div>
+                        <div class="podium-rank">#3</div>
+                        <div class="podium-username">{{ top_users.2.user.username }}</div>
+                        <div class="podium-stats">Level {{ top_users.2.user.profile.level }}</div>
+                        <div class="podium-hours">{{ top_users.2.total_hours }}h</div>
+                        <div class="podium-base"></div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Full Rankings -->
+            <div class="leaderboard-list">
+                {% for entry in leaderboard %}
+                <div class="rank-item {% if entry.user.id == user.id %}current-user{% endif %}">
+                    <div class="rank-number">{{ forloop.counter }}</div>
+                    <img src="{{ entry.user.profile.get_avatar_url }}" alt="{{ entry.user.username }}" class="rank-avatar">
+                    <div class="rank-info">
+                        <div class="rank-username">
+                            {{ entry.user.username }}
+                            {% if entry.user.id == user.id %}<span style="color: #4ade80;">• You</span>{% endif %}
+                        </div>
+                        <div class="rank-level">Level {{ entry.user.profile.level }} • {{ entry.user.profile.study_streak }}🔥 streak</div>
+                    </div>
+                    <div class="rank-stats">
+                        <div class="rank-stat">
+                            <div class="rank-stat-value">{{ entry.total_hours }}h</div>
+                            <div class="rank-stat-label">Study Time</div>
+                        </div>
+                        <div class="rank-stat">
+                            <div class="rank-stat-value">{{ entry.user.profile.total_xp }}</div>
+                            <div class="rank-stat-label">Total XP</div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.5);">
+                    <p>No study data yet. Start studying to appear on the leaderboard!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Stats Sidebar -->
+        <div class="stats-sidebar">
+            <div class="stats-card">
+                <h3 class="stats-card-title">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    Your Rank
+                </h3>
+                <div class="your-rank-display">
+                    <div class="your-rank-number">#{{ user_rank }}</div>
+                    <div class="your-rank-label">Out of {{ total_users }} learners</div>
+                </div>
+                <div class="stat-comparison">
+                    <span class="stat-comparison-label">Your Study Time</span>
+                    <span class="stat-comparison-value">{{ user_hours }}h</span>
+                </div>
+                <div class="stat-comparison">
+                    <span class="stat-comparison-label">Top Rank Time</span>
+                    <span class="stat-comparison-value">{{ top_hours }}h</span>
+                </div>
+                <div class="stat-comparison">
+                    <span class="stat-comparison-label">To Beat</span>
+                    <span class="stat-comparison-value positive">+{{ hours_to_top }}h</span>
+                </div>
+            </div>
+            
+            <div class="stats-card">
+                <h3 class="stats-card-title">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                    </svg>
+                    Recent Achievements
+                </h3>
+                {% for achievement in recent_achievements %}
+                <div class="achievement-item">
+                    <div class="achievement-icon">{{ achievement.icon }}</div>
+                    <div class="achievement-info">
+                        <h4>{{ achievement.name }}</h4>
+                        <p>{{ achievement.description }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="text-align: center; color: rgba(255, 255, 255, 0.5); padding: 1rem;">
+                    Keep studying to earn achievements!
+                </p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function changePeriod(period) {
+    // Update active tab
+    document.querySelectorAll('.period-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Reload page with new period
+    window.location.href = '?period=' + period;
+}
+</script>
+{% endblock %}

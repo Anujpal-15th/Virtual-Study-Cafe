@@ -6,7 +6,7 @@ from .models import UserProfile
 
 class SignUpForm(UserCreationForm):
     """
-    Extended signup form with email (required)
+    Extended signup form with email and gender (required)
     """
     email = forms.EmailField(
         required=True,
@@ -17,9 +17,23 @@ class SignUpForm(UserCreationForm):
         })
     )
     
+    gender = forms.ChoiceField(
+        choices=[
+            ('male', '👨 Male'),
+            ('female', '👩 Female'),
+            ('other', '🌟 Other'),
+            ('prefer_not_to_say', '🔒 Prefer not to say'),
+        ],
+        required=True,
+        help_text='Select your gender for personalized avatar',
+        widget=forms.Select(attrs={
+            'class': 'form-control'
+        })
+    )
+    
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2')
+        fields = ('username', 'email', 'gender', 'password1', 'password2')
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -42,6 +56,10 @@ class SignUpForm(UserCreationForm):
         user.email = self.cleaned_data['email']
         if commit:
             user.save()
+            # Set gender on the user's profile
+            if hasattr(user, 'profile'):
+                user.profile.gender = self.cleaned_data['gender']
+                user.profile.save()
         return user
 
 
@@ -64,12 +82,13 @@ class UserUpdateForm(forms.ModelForm):
 
 class ProfileUpdateForm(forms.ModelForm):
     """
-    Form for updating user profile information (bio, avatar, timezone)
+    Form for updating user profile information (bio, avatar, gender, timezone)
     """
     class Meta:
         model = UserProfile
-        fields = ['avatar', 'bio', 'timezone']
+        fields = ['avatar', 'gender', 'bio', 'timezone']
         widgets = {
+            'gender': forms.Select(attrs={'class': 'form-control'}),
             'bio': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 4,

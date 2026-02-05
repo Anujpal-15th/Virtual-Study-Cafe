@@ -5,23 +5,19 @@
 
 {% block extra_css %}
 <style>
-    body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-    }
-    
     .profile-container {
         max-width: 1200px;
-        margin: 40px auto;
-        padding: 0 20px;
+        margin: 0 auto;
+        padding: 2rem;
     }
     
     .profile-card {
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(26, 26, 46, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(102, 126, 234, 0.3);
         border-radius: 20px;
         padding: 40px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     }
     
     .profile-header {
@@ -53,19 +49,19 @@
     .profile-info h1 {
         font-size: 32px;
         font-weight: 700;
-        color: #2d3748;
+        color: #fff;
         margin-bottom: 8px;
     }
     
     .profile-info .username {
-        color: #667eea;
+        color: #a8b7ff;
         font-size: 18px;
         font-weight: 500;
         margin-bottom: 12px;
     }
     
     .profile-info .bio {
-        color: #4a5568;
+        color: rgba(255, 255, 255, 0.8);
         font-size: 15px;
         line-height: 1.6;
         margin-top: 12px;
@@ -78,14 +74,15 @@
     }
     
     .btn-edit-profile {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: rgba(102, 126, 234, 0.2);
         color: white;
-        padding: 12px 30px;
-        border-radius: 25px;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
         text-decoration: none;
-        font-weight: 600;
-        transition: transform 0.3s, box-shadow 0.3s;
-        border: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(102, 126, 234, 0.4);
         cursor: pointer;
         display: inline-flex;
         align-items: center;
@@ -93,12 +90,12 @@
     }
     
     .btn-edit-profile:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        background: rgba(102, 126, 234, 0.3);
+        border-color: #667eea;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
         color: white;
-    }
-    
-    .profile-stats {
+        transform: translateY(-2px);
+    }    .profile-stats {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 20px;
@@ -106,17 +103,19 @@
     }
     
     .stat-card {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        background: rgba(102, 126, 234, 0.2);
+        backdrop-filter: blur(5px);
         padding: 25px;
         border-radius: 15px;
         text-align: center;
-        border: 2px solid rgba(102, 126, 234, 0.2);
+        border: 2px solid rgba(102, 126, 234, 0.3);
         transition: transform 0.3s, box-shadow 0.3s;
     }
     
     .stat-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        border-color: rgba(102, 126, 234, 0.5);
     }
     
     .stat-card .icon {
@@ -127,13 +126,13 @@
     .stat-card .value {
         font-size: 32px;
         font-weight: 700;
-        color: #667eea;
+        color: #a8b7ff;
         margin-bottom: 8px;
     }
     
     .stat-card .label {
         font-size: 14px;
-        color: #718096;
+        color: rgba(255, 255, 255, 0.7);
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -142,13 +141,13 @@
     .profile-details {
         margin-top: 40px;
         padding-top: 40px;
-        border-top: 2px solid #e2e8f0;
+        border-top: 2px solid rgba(102, 126, 234, 0.3);
     }
     
     .detail-row {
         display: flex;
         padding: 15px 0;
-        border-bottom: 1px solid #f7fafc;
+        border-bottom: 1px solid rgba(102, 126, 234, 0.1);
     }
     
     .detail-row:last-child {
@@ -157,13 +156,13 @@
     
     .detail-label {
         font-weight: 600;
-        color: #4a5568;
+        color: rgba(255, 255, 255, 0.9);
         width: 200px;
         flex-shrink: 0;
     }
     
     .detail-value {
-        color: #2d3748;
+        color: rgba(255, 255, 255, 0.7);
         flex: 1;
     }
     

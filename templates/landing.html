@@ -221,19 +221,138 @@
         }
         
         .cafe-content p {
-            color: rgba rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+        
+        /* About Section */
+        .about-section {
+            padding: 6rem 3rem;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16162a 100%);
+        }
+        
+        .about-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .about-content {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+        
+        .about-text h2 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+        }
+        
+        .about-lead {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 3rem;
+        }
+        
+        .about-features {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            flex-shrink: 0;
+        }
+        
+        .feature-content h3 {
+            font-size: 1.4rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .feature-content p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+        
+        .about-cta {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .cta-note {
+            margin-top: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+        }
+        
+        .about-stats {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            position: sticky;
+            top: 100px;
+        }
+        
+        .stat-card {
+            background: rgba(102, 126, 234, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(102, 126, 234, 0.2);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        /* Footer */
+        .landing-footer {
+            background: rgba(26, 26, 46, 0.95);
             backdrop-filter: blur(10px);
             color: white;
             padding: 3rem;
             text-align: center;
             border-top: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .landing-footer p {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 0.95rem;
-            padding: 3rem;
-            text-align: center;
         }
         
         .landing-footer p {
@@ -247,6 +366,15 @@
             
             .nav-center {
                 display: none;
+            }
+            
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .about-stats {
+                position: relative;
+                top: 0;
             }
             
             .hero h1 {
@@ -316,6 +444,84 @@
                 <div class="cafe-content">
                     <h3>Garden Terrace</h3>
                     <p>Nature-inspired atmosphere with greenery and natural light. Study surrounded by tranquility.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="about-container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>Why Virtual Cafe?</h2>
+                    <p class="about-lead">We know the struggle. You're staring at your screen, coffee getting cold, surrounded by silence (or chaos). Sometimes, you just need that perfect study vibe.</p>
+                    
+                    <div class="about-features">
+                        <div class="feature-item">
+                            <div class="feature-icon">🎯</div>
+                            <div class="feature-content">
+                                <h3>Stay Focused, Together</h3>
+                                <p>Join study rooms with like-minded learners. No judgment, just collective focus energy. It's like having study buddies who actually show up.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">⏱️</div>
+                            <div class="feature-content">
+                                <h3>Pomodoro Made Easy</h3>
+                                <p>Built-in timers that actually help you stick to the plan. 25 minutes of deep work, 5-minute break. No more "just 5 more minutes" turning into 2 hours of procrastination.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">📊</div>
+                            <div class="feature-content">
+                                <h3>Track Your Grind</h3>
+                                <p>See your progress, build streaks, level up. Because nothing motivates like watching those study hours add up (and secretly competing with your friends).</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">🌙</div>
+                            <div class="feature-content">
+                                <h3>Study Your Way</h3>
+                                <p>Late night cram session? Early morning warrior? Aesthetic backgrounds, lofi beats, customizable everything. Make it yours.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">🤝</div>
+                            <div class="feature-content">
+                                <h3>No More Study Guilt</h3>
+                                <p>Life happens. Missed a day? It's okay. We're here to help you get back on track, not make you feel bad about it.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="about-cta">
+                        <a href="{% url 'signup' %}" class="cta-button">Start Your Journey</a>
+                        <p class="cta-note">Free forever. No credit card needed. Just you, your goals, and a virtual cup of coffee.</p>
+                    </div>
+                </div>
+                
+                <div class="about-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">10K+</div>
+                        <div class="stat-label">Active Learners</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">500K+</div>
+                        <div class="stat-label">Study Hours Logged</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">95%</div>
+                        <div class="stat-label">Productivity Boost</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Study Rooms Open</div>
+                    </div>
                 </div>
             </div>
         </div>

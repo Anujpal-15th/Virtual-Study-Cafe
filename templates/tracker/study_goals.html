@@ -8,7 +8,7 @@
     .goals-container {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 40px 20px;
+        padding: 2rem;
     }
     
     .goals-header {
@@ -21,24 +21,20 @@
     .goals-title {
         font-size: 32px;
         font-weight: 700;
-        color: #1a1a1a;
+        color: #fff;
         display: flex;
         align-items: center;
         gap: 12px;
     }
     
-    .dark-theme .goals-title {
-        color: #fff;
-    }
-    
     .add-goal-btn-main {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: rgba(102, 126, 234, 0.2);
         color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: 600;
+        border: 1px solid rgba(102, 126, 234, 0.4);
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
         cursor: pointer;
         transition: all 0.3s;
         display: flex;
@@ -47,8 +43,9 @@
     }
     
     .add-goal-btn-main:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        background: rgba(102, 126, 234, 0.3);
+        border-color: #667eea;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
     }
     
     .goals-grid {
@@ -59,27 +56,24 @@
     }
     
     .goal-card {
-        background: white;
+        background: rgba(26, 26, 46, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(102, 126, 234, 0.3);
         border-radius: 16px;
         padding: 24px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         transition: all 0.3s;
-        border: 2px solid transparent;
-    }
-    
-    .dark-theme .goal-card {
-        background: #2a2a2a;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
     
     .goal-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+        border-color: rgba(102, 126, 234, 0.6);
     }
     
     .goal-card.completed {
         border-color: #4ade80;
-        background: rgba(74, 222, 128, 0.05);
+        background: rgba(74, 222, 128, 0.1);
     }
     
     .goal-header {
@@ -121,6 +115,7 @@
         background: none;
         border: none;
         cursor: pointer;
+        color: rgba(255, 255, 255, 0.7);
         font-size: 18px;
         width: 32px;
         height: 32px;
@@ -132,50 +127,35 @@
     }
     
     .goal-action-btn:hover {
-        background: rgba(0, 0, 0, 0.05);
-    }
-    
-    .dark-theme .goal-action-btn:hover {
         background: rgba(255, 255, 255, 0.1);
+        color: #fff;
     }
     
     .goal-title-text {
         font-size: 20px;
         font-weight: 600;
-        color: #1a1a1a;
-        margin-bottom: 8px;
-    }
-    
-    .dark-theme .goal-title-text {
         color: #fff;
+        margin-bottom: 8px;
     }
     
     .goal-card.completed .goal-title-text {
         text-decoration: line-through;
-        color: #9ca3af;
+        color: rgba(255, 255, 255, 0.5);
     }
     
     .goal-notes {
-        color: #6b7280;
+        color: rgba(255, 255, 255, 0.7);
         font-size: 14px;
         line-height: 1.6;
         margin-bottom: 16px;
-    }
-    
-    .dark-theme .goal-notes {
-        color: #9ca3af;
     }
     
     .goal-meta {
         display: flex;
         gap: 16px;
         flex-wrap: wrap;
-        color: #6b7280;
+        color: rgba(255, 255, 255, 0.6);
         font-size: 13px;
-    }
-    
-    .dark-theme .goal-meta {
-        color: #9ca3af;
     }
     
     .goal-meta-item {
@@ -197,15 +177,13 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(4px);
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
         z-index: 1000;
         display: none;
         align-items: center;
         justify-content: center;
-    }
-    
-    .modal-overlay.show {
+    }    .modal-overlay.show {
         display: flex;
     }
     
@@ -220,8 +198,17 @@
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
     
-    .dark-theme .modal-content {
-        background: #2a2a2a;
+    .modal-content {
+        background: rgba(26, 26, 46, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        border-radius: 20px;
+        padding: 32px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     }
     
     .modal-header {
@@ -234,10 +221,6 @@
     .modal-title {
         font-size: 24px;
         font-weight: 700;
-        color: #1a1a1a;
-    }
-    
-    .dark-theme .modal-title {
         color: #fff;
     }
     
@@ -245,7 +228,7 @@
         background: none;
         border: none;
         font-size: 28px;
-        color: #6b7280;
+        color: rgba(255, 255, 255, 0.6);
         cursor: pointer;
         width: 36px;
         height: 36px;
@@ -257,11 +240,8 @@
     }
     
     .close-modal:hover {
-        background: rgba(0, 0, 0, 0.05);
-    }
-    
-    .dark-theme .close-modal:hover {
         background: rgba(255, 255, 255, 0.1);
+        color: #fff;
     }
     
     .form-group {
@@ -272,36 +252,30 @@
         display: block;
         font-size: 14px;
         font-weight: 600;
-        color: #374151;
+        color: rgba(255, 255, 255, 0.9);
         margin-bottom: 8px;
-    }
-    
-    .dark-theme .form-label {
-        color: #d1d5db;
     }
     
     .form-input, .form-textarea, .form-select {
         width: 100%;
         padding: 12px 16px;
-        border: 2px solid #e5e7eb;
+        border: 2px solid rgba(102, 126, 234, 0.3);
         border-radius: 12px;
         font-size: 14px;
         transition: all 0.3s;
-        background: white;
-        color: #1a1a1a;
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
     }
     
-    .dark-theme .form-input, 
-    .dark-theme .form-textarea, 
-    .dark-theme .form-select {
-        background: #1a1a1a;
-        border-color: #404040;
+    .form-select option {
+        background: #1a1a2e;
         color: #fff;
     }
     
     .form-input:focus, .form-textarea:focus, .form-select:focus {
         outline: none;
         border-color: #667eea;
+        background: rgba(255, 255, 255, 0.1);
     }
     
     .form-textarea {

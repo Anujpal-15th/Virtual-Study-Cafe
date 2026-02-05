@@ -4,250 +4,31 @@
 
 {% block extra_css %}
 <style>
-    .room-container {
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-    .room-header {
-        background: white;
-        padding: 2rem;
-        border-radius: 15px;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    .member-item {
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        gap: 10px;
+        padding: 8px;
+        border-radius: 8px;
+        transition: background 0.2s;
     }
-    .room-header h1 {
-        color: #333;
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
+    .member-item:hover {
+        background: rgba(102, 126, 234, 0.1);
     }
-    .room-code-display {
-        color: #667eea;
-        font-weight: 600;
-        margin: 0.5rem 0;
+    .member-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #667eea;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
-    .room-description {
-        color: #666;
-        margin: 0.5rem 0;
-    }
-    .members-count {
-        background: #f0f0f0;
-        padding: 1rem 2rem;
-        border-radius: 10px;
-        font-weight: 600;
+    .member-name {
+        font-weight: 500;
         color: #333;
     }
-    .room-content {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 2rem;
-    }
-    .left-column, .right-column {
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-    }
-    .video-section, .timer-section, .members-section, .chat-section {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-    .video-section h2, .timer-section h2, .members-section h3, .chat-section h3 {
-        color: #333;
-        margin-bottom: 1rem;
-    }
-    .video-status {
-        background: #f0f0f0;
-        padding: 0.8rem;
-        border-radius: 8px;
-        text-align: center;
-        color: #666;
-        margin-bottom: 1rem;
-    }
-    .video-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-    .video-container video {
-        width: 100%;
-        height: 200px;
-        background: #f0f0f0;
-        border-radius: 10px;
-    }
-    .video-controls, .timer-controls {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-    .btn {
-        padding: 0.6rem 1.2rem;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .btn:hover {
-        transform: translateY(-2px);
-    }
-    .btn-success {
-        background: #4caf50;
-        color: white;
-    }
-    .btn-danger {
-        background: #f44336;
-        color: white;
-    }
-    .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-    }
-    .btn-warning {
-        background: #ff9800;
-        color: white;
-    }
-    .btn-secondary {
-        background: #f0f0f0;
-        color: #333;
-    }
-    .timer-display {
-        font-size: 3rem;
-        font-weight: bold;
-        text-align: center;
-        color: #667eea;
-        margin: 1.5rem 0;
-    }
-    .timer-presets {
-        display: flex;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-    }
-    .preset-btn {
-        flex: 1;
-        padding: 0.6rem;
-        background: #f0f0f0;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        color: #333;
-    }
-    .preset-btn:hover {
-        background: #e0e0e0;
-    }
-    .preset-btn.active {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-color: #667eea;
-    }
-    #custom-minutes {
-        padding: 0.6rem;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 1rem;
-        width: 100px;
-    }
-    .members-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    .members-list li {
-        padding: 0.8rem;
-        background: #f0f0f0;
-        margin-bottom: 0.5rem;
-        border-radius: 8px;
-        color: #333;
-    }
-    .chat-messages {
-        height: 400px;
-        overflow-y: auto;
-        background: #f9f9f9;
-        border-radius: 10px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-    .chat-form {
-        display: flex;
-        gap: 0.5rem;
-    }
-    #chat-input {
-        flex: 1;
-        padding: 0.8rem;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 1rem;
-    }
-
-    /* Dark Theme */
-    body.dark-theme .room-header,
-    body.dark-theme .video-section,
-    body.dark-theme .timer-section,
-    body.dark-theme .members-section,
-    body.dark-theme .chat-section {
-        background: #2d2d2d;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    }
-    body.dark-theme .room-header h1,
-    body.dark-theme .video-section h2,
-    body.dark-theme .timer-section h2,
-    body.dark-theme .members-section h3,
-    body.dark-theme .chat-section h3 {
+    body.dark-theme .member-name {
         color: #e0e0e0;
-    }
-    body.dark-theme .room-description,
-    body.dark-theme .video-status {
-        color: #b0b0b0;
-    }
-    body.dark-theme .members-count {
-        background: #3d3d3d;
-        color: #e0e0e0;
-    }
-    body.dark-theme .video-container video {
-        background: #3d3d3d;
-    }
-    body.dark-theme .timer-display {
-        color: #8ba3f0;
-    }
-    body.dark-theme .preset-btn,
-    body.dark-theme .btn-secondary {
-        background: #3d3d3d;
-        color: #e0e0e0;
-        border-color: #4d4d4d;
-    }
-    body.dark-theme .preset-btn:hover,
-    body.dark-theme .btn-secondary:hover {
-        background: #4d4d4d;
-    }
-    body.dark-theme #custom-minutes,
-    body.dark-theme #chat-input {
-        background: #3d3d3d;
-        border-color: #4d4d4d;
-        color: #e0e0e0;
-    }
-    body.dark-theme .members-list li {
-        background: #3d3d3d;
-        color: #e0e0e0;
-    }
-    body.dark-theme .chat-messages {
-        background: #3d3d3d;
-    }
-    body.dark-theme .video-status {
-        background: #3d3d3d;
-    }
-
-    @media (max-width: 968px) {
-        .room-content {
-            grid-template-columns: 1fr;
-        }
-        .video-container {
-            grid-template-columns: 1fr;
-        }
     }
 </style>
 {% endblock %}
@@ -315,7 +96,10 @@
                 <h3>Members Online</h3>
                 <ul id="members-list" class="members-list">
                     {% for membership in active_members %}
-                    <li>{{ membership.user.username }}</li>
+                    <li class="member-item">
+                        <img src="{{ membership.user.profile.get_avatar_url }}" alt="{{ membership.user.username }}" class="member-avatar">
+                        <span class="member-name">{{ membership.user.username }}</span>
+                    </li>
                     {% endfor %}
                 </ul>
             </div>
