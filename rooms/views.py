@@ -9,6 +9,7 @@ from django.db.models import Q, Count
 from django.utils import timezone
 from datetime import timedelta
 from .models import Room, RoomMembership
+import json
 
 
 def landing_view(request):
@@ -29,6 +30,11 @@ def home_view(request):
     Home dashboard showing all available rooms.
     Users must be logged in to see this page.
     """
+    from tracker.models import StudySession
+    from django.db.models import Sum
+    from datetime import datetime, timedelta
+    from django.contrib.auth.models import User
+    
     # Clean up expired rooms (excluding the global room)
     expired_rooms = Room.objects.filter(
         expires_at__lte=timezone.now()
@@ -62,10 +68,78 @@ def home_view(request):
     # Get rooms the current user is a member of
     user_rooms = Room.objects.filter(memberships__user=request.user, memberships__is_active=True)
     
+    # Get active study sessions (users who studied in the last 24 hours)
+    today = timezone.now()
+    yesterday = today - timedelta(days=1)
+    
+    # Get recent study sessions grouped by user
+    recent_sessions = StudySession.objects.filter(
+        created_at__gte=yesterday
+    ).select_related('user', 'user__profile').values('user').annotate(
+        total_minutes=Sum('minutes')
+    ).order_by('-total_minutes')[:4]  # Top 4 active users
+    
+    # Enrich with user details
+    active_sessions = []
+    for session in recent_sessions:
+        user = User.objects.select_related('profile').get(id=session['user'])
+        active_sessions.append({
+            'user': user,
+            'minutes': session['total_minutes'],
+            'hours': session['total_minutes'] // 60,
+            'remaining_minutes': session['total_minutes'] % 60,
+        })
+    
+    # Get current user's weekly statistics
+    week_ago = today - timedelta(days=7)
+    user_week_sessions = StudySession.objects.filter(
+        user=request.user,
+        created_at__gte=week_ago
+    )
+    
+    # Calculate weekly total
+    week_total = user_week_sessions.aggregate(total=Sum('minutes'))['total'] or 0
+    
+    # Calculate completion percentage (40 hours = 2400 minutes = 100%)
+    weekly_goal = 2400  # 40 hours in minutes
+    completion_percent = min(100, int((week_total / weekly_goal) * 100))
+    
+    # Get daily breakdown for the last 7 days
+    daily_stats = []
+    for i in range(7):
+        day = today - timedelta(days=6-i)
+        day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
+        day_end = day_start + timedelta(days=1)
+        
+        day_sessions = user_week_sessions.filter(
+            created_at__gte=day_start,
+            created_at__lt=day_end
+        )
+        day_total = day_sessions.aggregate(total=Sum('minutes'))['total'] or 0
+        
+        daily_stats.append({
+            'day': day.strftime('%a'),  # Mon, Tue, etc.
+            'minutes': day_total,
+            'hours': round(day_total / 60, 1)
+        })
+    
+    # Get online friends (users who were active in last 30 minutes)
+    thirty_mins_ago = today - timedelta(minutes=30)
+    online_users = User.objects.filter(
+        Q(study_sessions__created_at__gte=thirty_mins_ago) |
+        Q(room_memberships__joined_at__gte=thirty_mins_ago)
+    ).exclude(id=request.user.id).distinct().select_related('profile')[:12]
+    
     context = {
         'rooms': rooms,
         'user_rooms': user_rooms,
         'search_query': search_query,
+        'active_sessions': active_sessions,
+        'week_total_minutes': week_total,
+        'week_total_hours': round(week_total / 60, 1),
+        'completion_percent': completion_percent,
+        'daily_stats': json.dumps(daily_stats),
+        'online_users': online_users,
     }
     return render(request, 'rooms/home.html', context)
 

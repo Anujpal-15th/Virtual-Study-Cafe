@@ -1,223 +1,413 @@
 {% extends 'base.html' %}
 
-{% block title %}Progress - Virtual Cafe{% endblock %}
+{% block title %}Study Statistics - Virtual Cafe{% endblock %}
 
 {% block extra_css %}
 <style>
-    .progress-container {
-        max-width: 1200px;
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: url('https://images.unsplash.com/photo-1493857671505-72967e2e2760?w=1920') center/cover no-repeat fixed;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        min-height: 100vh;
+        position: relative;
+    }
+
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(8px);
+        z-index: -1;
+    }
+
+    .stats-wrapper {
+        margin-left: 90px;
+        padding: 0;
+        min-height: 100vh;
+    }
+
+    .stats-header {
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: none;
+    }
+
+    .current-time {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #fff;
+        letter-spacing: 1px;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #fff;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .brand-logo {
+        width: 32px;
+        height: 32px;
+        background: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .stats-container {
+        max-width: 1400px;
         margin: 0 auto;
         padding: 2rem;
     }
-    .progress-container h1 {
-        color: #fff;
-        font-size: 2.5rem;
-        margin-bottom: 2rem;
+
+    .stats-title {
         text-align: center;
-        font-weight: 600;
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        margin-bottom: 2rem;
+        text-transform: uppercase;
     }
+
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 3rem;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
     }
-    .stat-card {
-        background: rgba(26, 26, 46, 0.8);
+
+    .stats-card {
+        background: rgba(0, 0, 0, 0.3);
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(102, 126, 234, 0.3);
+        border-radius: 20px;
         padding: 2rem;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .focus-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+    }
+
+    .progress-circle-container {
+        position: relative;
+        width: 200px;
+        height: 200px;
+    }
+
+    .progress-circle {
+        width: 100%;
+        height: 100%;
+    }
+
+    .progress-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         text-align: center;
-        transition: all 0.3s;
     }
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
-        border-color: rgba(102, 126, 234, 0.6);
+
+    .progress-percent {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #5FFBF1;
     }
-    .stat-card h3 {
+
+    .progress-label {
+        font-size: 0.9rem;
         color: rgba(255, 255, 255, 0.7);
-        font-size: 1rem;
-        margin-bottom: 1rem;
         text-transform: uppercase;
         letter-spacing: 1px;
     }
-    .stat-value {
-        color: #a8b7ff;
-        font-size: 3rem;
-        font-weight: bold;
-        margin: 0.5rem 0;
+
+    .subject-labels {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
     }
-    .stat-label {
+
+    .subject-item {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.95rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .chart-title {
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .hours-label {
         color: rgba(255, 255, 255, 0.6);
-        font-size: 0.9rem;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
     }
-    .chart-section, .sessions-section {
-        background: rgba(26, 26, 46, 0.8);
+
+    .chart-canvas {
+        width: 100% !important;
+        height: 250px !important;
+    }
+
+    .achievements-section {
+        background: rgba(0, 0, 0, 0.3);
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(102, 126, 234, 0.3);
+        border-radius: 20px;
         padding: 2rem;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         margin-bottom: 2rem;
     }
-    .chart-section h2, .sessions-section h2 {
+
+    .achievements-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .achievement-item {
         color: #fff;
-        margin-bottom: 1.5rem;
-        font-weight: 600;
-    }
-    .chart-container {
-        display: flex;
-        justify-content: space-around;
-        align-items: flex-end;
-        height: 300px;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 10px;
-    }
-    .chart-bar-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        flex: 1;
-    }
-    .chart-bar {
-        width: 60px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 8px 8px 0 0;
+        font-size: 0.95rem;
+        margin-bottom: 0.75rem;
+        padding-left: 1.5rem;
         position: relative;
-        min-height: 10px;
-        transition: height 0.3s;
     }
-    .bar-value {
+
+    .achievement-item::before {
+        content: '•';
         position: absolute;
-        top: -25px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-weight: 600;
-        color: #fff;
-        font-size: 0.9rem;
-    }
-    .bar-label {
-        margin-top: 0.5rem;
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 0.85rem;
-        font-weight: 500;
-    }
-    .sessions-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .sessions-table thead {
-        background: rgba(102, 126, 234, 0.2);
-    }
-    .sessions-table th {
-        padding: 1rem;
-        text-align: left;
-        color: #fff;
-        font-weight: 600;
-    }
-    .sessions-table td {
-        padding: 1rem;
-        border-bottom: 1px solid rgba(102, 126, 234, 0.2);
-        color: rgba(255, 255, 255, 0.8);
-    }
-    .sessions-table tbody tr:hover {
-        background: rgba(102, 126, 234, 0.1);
-    }
-    .no-sessions {
-        text-align: center;
-        color: rgba(255, 255, 255, 0.6);
-        padding: 2rem;
-        font-size: 1.1rem;
-    }
-        color: #e0e0e0;
-    }
-    body.dark-theme .sessions-table thead {
-        background: #3d3d3d;
-    }
-    body.dark-theme .sessions-table th {
-        color: #e0e0e0;
-    }
-    body.dark-theme .sessions-table td {
-        border-bottom-color: #4d4d4d;
-    }
-    body.dark-theme .sessions-table tbody tr:hover {
-        background: #3d3d3d;
-    }
-    body.dark-theme .no-sessions {
-        color: #777;
+        left: 0;
+        color: #5FFBF1;
+        font-weight: bold;
+        font-size: 1.2rem;
     }
 </style>
 {% endblock %}
 
+
 {% block content %}
-<div class="progress-container">
-    <h1>Your Study Progress</h1>
-    
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <h3>Today</h3>
-            <p class="stat-value">{{ today_total }}</p>
-            <p class="stat-label">minutes</p>
-        </div>
-        
-        <div class="stat-card">
-            <h3>This Week</h3>
-            <p class="stat-value">{{ week_total }}</p>
-            <p class="stat-label">minutes</p>
-        </div>
-        
-        <div class="stat-card">
-            <h3>Total Sessions</h3>
-            <p class="stat-value">{{ recent_sessions|length }}</p>
-            <p class="stat-label">completed</p>
+<div class="stats-wrapper">
+    <div class="stats-header">
+        <div class="current-time" id="currentTime">10:00 PM</div>
+        <div class="brand">
+            <div class="brand-logo">🦉</div>
+            <span>STUDYBUDDY</span>
         </div>
     </div>
 
-    <!-- Last 7 Days Chart -->
-    <div class="chart-section">
-        <h2>Last 7 Days</h2>
-        <div class="chart-container">
-            {% for day in last_7_days %}
-            <div class="chart-bar-wrapper">
-                <div class="chart-bar" style="height: {% if day.minutes > 0 %}{{ day.minutes|add:'0'|floatformat:0 }}px{% else %}10px{% endif %};">
-                    <span class="bar-value">{{ day.minutes }}</span>
+    <div class="stats-container">
+        <h1 class="stats-title">YOUR WEEKLY FOCUS</h1>
+        
+        <div class="stats-grid">
+            <!-- Left: Circular Progress with Subjects -->
+            <div class="stats-card">
+                <div class="focus-section">
+                    <div class="progress-circle-container">
+                        <canvas id="progressCircle" class="progress-circle"></canvas>
+                        <div class="progress-center">
+                            <div class="progress-percent">{{ completion_percent }}%</div>
+                            <div class="progress-label">COMPLETE</div>
+                        </div>
+                    </div>
+                    <div class="subject-labels">
+                        <div class="subject-item" style="color: #5FFBF1;">MATH</div>
+                        <div class="subject-item" style="color: #E74C3C;">READING</div>
+                        <div class="subject-item" style="color: #F39C12;">CODING</div>
+                        <div class="subject-item" style="color: #9B59B6;">DESIGN</div>
+                    </div>
                 </div>
-                <span class="bar-label">{{ day.date }}</span>
             </div>
-            {% endfor %}
-        </div>
-    </div>
 
-    <!-- Recent Sessions -->
-    <div class="sessions-section">
-        <h2>Recent Sessions</h2>
-        {% if recent_sessions %}
-        <table class="sessions-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Duration</th>
-                    <th>Room</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for session in recent_sessions %}
-                <tr>
-                    <td>{{ session.created_at|date:"M d, Y H:i" }}</td>
-                    <td>{{ session.minutes }} min</td>
-                    <td>{% if session.room %}{{ session.room.name }}{% else %}-{% endif %}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p class="no-sessions">No study sessions recorded yet. Complete a Pomodoro timer to log your first session!</p>
-        {% endif %}
+            <!-- Right: Hours Spent Chart -->
+            <div class="stats-card">
+                <h3 class="chart-title">HOURS SPENT</h3>
+                <div class="hours-label">{{ max_hours }} HRS</div>
+                <canvas id="hoursChart" class="chart-canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Productivity Trend -->
+        <div class="stats-card">
+            <h3 class="chart-title">PRODUCTIVITY TREND</h3>
+            <canvas id="productivityChart" class="chart-canvas"></canvas>
+        </div>
+
+        <!-- Top Achievements -->
+        <div class="achievements-section">
+            <h3 class="chart-title">TOP ACHIEVEMENTS:</h3>
+            <ul class="achievements-list">
+                {% if recent_achievements %}
+                    {% for achievement in recent_achievements %}
+                    <li class="achievement-item">{{ achievement.description }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li class="achievement-item">Solved 50 LeetCode problems</li>
+                    <li class="achievement-item">Finished "Dune" Part 1</li>
+                    <li class="achievement-item">Completed React Project</li>
+                {% endif %}
+            </ul>
+        </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+<script>
+    // Update time
+    function updateTime() {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const displayHours = hours % 12 || 12;
+        const displayMinutes = minutes < 10 ? '0' + minutes : minutes;
+        document.getElementById('currentTime').textContent = `${displayHours}:${displayMinutes} ${ampm}`;
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // Circular Progress Chart
+    const progressCtx = document.getElementById('progressCircle').getContext('2d');
+    new Chart(progressCtx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [{{ completion_percent }}, {{ 100|add:"-"|add:completion_percent }}],
+                backgroundColor: ['#5FFBF1', 'rgba(255, 255, 255, 0.1)'],
+                borderWidth: 0,
+                cutout: '75%'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false }
+            }
+        }
+    });
+
+    // Hours Spent Bar Chart
+    const hoursCtx = document.getElementById('hoursChart').getContext('2d');
+    new Chart(hoursCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for day in last_7_days %}'{{ day.date }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                data: [{% for day in last_7_days %}{{ day.hours }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: '#5FFBF1',
+                borderRadius: 6,
+                barThickness: 40
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleColor: '#fff',
+                    bodyColor: '#fff'
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: 'rgba(255, 255, 255, 0.7)', font: { size: 11 } }
+                },
+                y: {
+                    beginAtZero: true,
+                    max: {{ max_hours }},
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    ticks: { 
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        stepSize: 1,
+                        callback: function(value) {
+                            return value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Productivity Trend Line Chart
+    const productivityCtx = document.getElementById('productivityChart').getContext('2d');
+    new Chart(productivityCtx, {
+        type: 'line',
+        data: {
+            labels: [{% for day in last_7_days %}'{{ day.date }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                data: [{% for day in last_7_days %}{{ day.productivity }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                borderColor: '#5FFBF1',
+                backgroundColor: 'rgba(95, 251, 241, 0.1)',
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointBackgroundColor: '#5FFBF1',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleColor: '#fff',
+                    bodyColor: '#fff'
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    ticks: { color: 'rgba(255, 255, 255, 0.7)', font: { size: 11 } }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    ticks: { 
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

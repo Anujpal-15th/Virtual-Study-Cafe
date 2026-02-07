@@ -76,7 +76,7 @@
             height: 70px;
             background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
-            border-radius: 15px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -91,6 +91,7 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
+            border-radius: 50%;
         }
         
         .logo-container:hover {
@@ -147,20 +148,102 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        .user-avatar-sidebar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #667eea;
-            margin-top: auto;
+        /* Profile Section in Header */
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
         
-        .user-avatar-sidebar:hover {
+        .profile-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .user-avatar-header {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .profile-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        
+        .profile-section:hover::before {
+            animation: shimmer 1.5s infinite;
+        }
+        
+        .profile-section:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+        
+        .profile-section:hover .user-avatar-header {
             transform: scale(1.1);
-            border-color: #764ba2;
+            border-color: #fff;
+        }
+        
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .profile-username {
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            line-height: 1;
+        }
+        
+        .logout-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.75rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        
+        .logout-link:hover {
+            color: #fff;
+            transform: translateX(2px);
         }
 
         /* Main Content Area */
@@ -303,28 +386,6 @@
             font-size: 0.85rem;
         }
         
-        /* Logout Button */
-        .btn-logout {
-            background: rgba(102, 126, 234, 0.2);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            border: 1px solid rgba(102, 126, 234, 0.4);
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .btn-logout:hover {
-            background: rgba(102, 126, 234, 0.3);
-            border-color: #667eea;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-            color: white;
-        }
-        
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -363,7 +424,7 @@
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="logo-container" onclick="window.location.href='{% url 'home' %}'">
-                <img src="/static/images/logo.png" alt="Virtual Study Hub Logo">
+                <img src="/static/images/logo.jpeg" alt="Virtual Study Hub Logo">
             </div>
             
             {% if user.is_authenticated %}
@@ -410,8 +471,6 @@
                     <span>Leaderboard</span>
                 </a>
             </nav>
-            
-            <img src="{{ user.profile.get_avatar_url }}" alt="{{ user.username }}" class="user-avatar-sidebar" onclick="window.location.href='{% url 'profile' %}'">
             {% else %}
             <nav class="nav-menu">
                 <a href="{% url 'login' %}" class="nav-item">
@@ -445,7 +504,20 @@
                 <div class="top-controls">
                     <!-- Page-specific controls can be added via block -->
                     {% block top_controls %}{% endblock %}
-                    <a href="{% url 'logout' %}" class="btn-logout">Logout</a>
+                    
+                    <!-- Profile Section -->
+                    <div class="profile-section" onclick="window.location.href='{% url 'profile' %}'">
+                        <img src="{{ user.profile.get_avatar_url }}" alt="{{ user.username }}" class="user-avatar-header">
+                        <div class="profile-info">
+                            <div class="profile-username">{{ user.username }}</div>
+                            <a href="{% url 'logout' %}" class="logout-link" onclick="event.stopPropagation();">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
             {% endif %}

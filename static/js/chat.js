@@ -64,17 +64,15 @@ function handleWebSocketMessage(data) {
 // ===== MESSAGE DISPLAY =====
 
 /**
- * Display a chat message in Discord style
+ * Display a chat message in bubble style
  */
 function displayChatMessage(data) {
-    hideEmptyState();
-    
     const chatMessages = document.getElementById('chat-messages');
     const messageDiv = document.createElement('div');
-    messageDiv.className = 'message';
     
-    // Format timestamp
-    const timestamp = formatTimestamp(data.timestamp);
+    // Check if this is the current user's message
+    const isOwnMessage = data.username === USERNAME;
+    messageDiv.className = `message-bubble ${isOwnMessage ? 'own' : ''}`;
     
     // Get avatar URL (use default if not provided)
     const avatarUrl = data.avatar || USER_AVATAR;
@@ -82,10 +80,7 @@ function displayChatMessage(data) {
     messageDiv.innerHTML = `
         <img src="${avatarUrl}" alt="${data.username}" class="message-avatar">
         <div class="message-content">
-            <div class="message-header">
-                <span class="message-username">${escapeHtml(data.username)}</span>
-                <span class="message-timestamp">${timestamp}</span>
-            </div>
+            <div class="message-sender">${escapeHtml(data.username)}</div>
             <div class="message-text">${escapeHtml(data.message)}</div>
         </div>
     `;
@@ -93,29 +88,29 @@ function displayChatMessage(data) {
     chatMessages.appendChild(messageDiv);
     
     // Auto-scroll to bottom
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    scrollToBottom();
 }
 
 /**
  * Display system messages (join/leave notifications)
  */
 function displaySystemMessage(message) {
-    hideEmptyState();
-    
     const chatMessages = document.getElementById('chat-messages');
     const systemDiv = document.createElement('div');
-    systemDiv.className = 'message system-message';
+    systemDiv.className = 'system-message';
     systemDiv.style.cssText = `
         padding: 8px 16px;
         text-align: center;
-        color: rgba(255, 255, 255, 0.4);
-        font-size: 13px;
+        color: #9ca3af;
+        font-size: 12px;
         font-style: italic;
     `;
     systemDiv.textContent = message;
     
     chatMessages.appendChild(systemDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // Auto-scroll to bottom
+    scrollToBottom();
 }
 
 /**
@@ -172,6 +167,21 @@ function escapeHtml(text) {
 function updateMemberCount() {
     // Member count will be updated via WebSocket if needed
     // For now, we can leave it static as it's passed from the server
+}
+
+/**
+ * Force scroll to bottom of chat
+ */
+function scrollToBottom() {
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) {
+        setTimeout(() => {
+            chatMessages.scrollTo({
+                top: chatMessages.scrollHeight,
+                behavior: 'smooth'
+            });
+        }, 100);
+    }
 }
 
 // ===== EVENT LISTENERS =====

@@ -542,8 +542,11 @@ a {
     justify-content: space-between;
     align-items: start;
     margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #667eea;
+    padding: 1.5rem 2rem;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: none;
 }
 
 .room-info h1 {

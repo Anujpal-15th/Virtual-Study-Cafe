@@ -38,8 +38,10 @@ def progress_view(request):
     )
     week_total = week_sessions.aggregate(Sum('minutes'))['minutes__sum'] or 0
     
-    # Get last 7 days data for chart
+    # Get last 7 days data for charts
     last_7_days = []
+    max_hours = 1
+    
     for i in range(6, -1, -1):  # 6 days ago to today
         day = today - timedelta(days=i)
         day_sessions = StudySession.objects.filter(
@@ -47,19 +49,65 @@ def progress_view(request):
             created_at__date=day
         )
         day_total = day_sessions.aggregate(Sum('minutes'))['minutes__sum'] or 0
+        day_hours = round(day_total / 60, 1)
+        
+        # Calculate productivity percentage (normalized to 0-100)
+        # Assuming 8 hours = 100% productivity
+        productivity = min(100, int((day_total / 480) * 100))
+        
+        if day_hours > max_hours:
+            max_hours = int(day_hours) + 1
+        
         last_7_days.append({
-            'date': day.strftime('%a'),  # Mon, Tue, etc.
-            'minutes': day_total
+            'date': day.strftime('%a').upper(),  # MON, TUE, etc.
+            'minutes': day_total,
+            'hours': day_hours,
+            'productivity': productivity
         })
     
+    # Ensure max_hours is at least 8
+    if max_hours < 8:
+        max_hours = 8
+    
+    # Calculate completion percentage (based on weekly goal)
+    weekly_goal_hours = 40  # 40 hours per week goal
+    weekly_goal_minutes = weekly_goal_hours * 60
+    completion_percent = min(100, int((week_total / weekly_goal_minutes) * 100))
+    
     # Get recent sessions for display
-    recent_sessions = StudySession.objects.filter(user=user)[:10]
+    recent_sessions = StudySession.objects.filter(user=user).order_by('-created_at')[:10]
+    
+    # Get recent achievements
+    recent_achievements = []
+    try:
+        user_achievements = Achievement.objects.filter(
+            userachievement__user=user,
+            userachievement__unlocked_at__isnull=False
+        ).order_by('-userachievement__unlocked_at')[:3]
+        
+        for achievement in user_achievements:
+            recent_achievements.append({
+                'icon': achievement.icon,
+                'name': achievement.name,
+                'description': achievement.description,
+            })
+    except:
+        # Fallback achievements based on study data
+        if week_total > 0:
+            recent_achievements = [
+                {'icon': '🎯', 'name': 'Week Warrior', 'description': 'Completed study sessions this week'},
+                {'icon': '📚', 'name': 'Consistent Learner', 'description': 'Maintaining steady progress'},
+                {'icon': '⭐', 'name': 'Focus Master', 'description': f'Studied {week_total} minutes this week'},
+            ]
     
     context = {
         'today_total': today_total,
         'week_total': week_total,
         'last_7_days': last_7_days,
         'recent_sessions': recent_sessions,
+        'completion_percent': completion_percent,
+        'max_hours': max_hours,
+        'recent_achievements': recent_achievements,
     }
     return render(request, 'tracker/progress.html', context)
 

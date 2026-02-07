@@ -3,25 +3,14 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json
 import os
-import logging
-from google import genai
-from google.genai import types
+import google.generativeai as genai
 
-logger = logging.getLogger(__name__)
-
-# Get API key from environment variable
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+# API key directly
+GEMINI_API_KEY = 'AIzaSyAQSDQbkczqyxypaD6uB5x7qicQ7RqCQOI'
 
 # Initialize Gemini client
-client = None
-if GEMINI_API_KEY:
-    try:
-        client = genai.Client(api_key=GEMINI_API_KEY)
-        logger.info("Gemini chatbot initialized successfully")
-    except Exception as e:
-        logger.error(f"Failed to initialize Gemini client: {str(e)}")
-else:
-    logger.warning("GEMINI_API_KEY not found in environment variables")
+genai.configure(api_key=GEMINI_API_KEY)
+model = genai.GenerativeModel('gemini-pro')
 
 
 @csrf_exempt
@@ -40,27 +29,18 @@ def chatbot_api(request):
                 'reply': 'Please provide a message.'
             }, status=400)
 
-        if not client or not GEMINI_API_KEY:
+        if not model or not GEMINI_API_KEY:
             return JsonResponse({
                 'reply': 'Chatbot service is not configured. Please contact support.'
             }, status=500)
         
-        # Get response from Gemini with optimized settings
+        # Get response from Gemini
         try:
-            response = client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=user_message,
-                config=types.GenerateContentConfig(
-                    temperature=0.7,
-                    max_output_tokens=1000,
-                    top_p=0.95,
-                )
-            )
-            
+            response = model.generate_content(user_message)
             bot_reply = response.text if response.text else 'I could not generate a response. Please try again.'
 
         except Exception as e:
-            logger.error(f"Gemini API Error: {str(e)}")
+            print(f"[Chatbot] Gemini API Error: {str(e)}")
             bot_reply = 'Sorry, I encountered an error processing your request. Please try again.'
 
         return JsonResponse({
@@ -68,12 +48,11 @@ def chatbot_api(request):
         })
 
     except json.JSONDecodeError:
-        logger.warning("Invalid JSON format received in chatbot request")
         return JsonResponse({
             'reply': 'Invalid request format.'
         }, status=400)
     except Exception as e:
-        logger.error(f"Chatbot server error: {str(e)}")
+        print(f"[Chatbot] Server Error: {str(e)}")
         return JsonResponse({
             'reply': 'An error occurred. Please try again later.'
         }, status=500)
