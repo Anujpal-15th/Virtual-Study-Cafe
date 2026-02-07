@@ -52,18 +52,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    # Django Channels
+
     'channels',
     
     # Our custom apps
-    'accounts',  # User authentication with profiles
-    'rooms',  # Study rooms
-    'chat',  # Real-time chat and WebRTC
-    'tracker',  # Study progress tracking
-    'notifications',  # In-app notification system
-    'solo',  # NEW: Solo study room with timer and tasks
-    'chatbot',  # AI Chatbot powered by Gemini
+    'accounts',  
+    'rooms',
+    'tracker',  
+    'notifications', 
+    'solo',  
+    'chatbot',
 ]
 
 MIDDLEWARE = [
