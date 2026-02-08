@@ -31,45 +31,8 @@
 
     .stats-wrapper {
         margin-left: 90px;
-        padding: 0;
+        padding: 2rem 0 0 0;
         min-height: 100vh;
-    }
-
-    .stats-header {
-        background: rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(10px);
-        padding: 1rem 2rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: none;
-    }
-
-    .current-time {
-        font-size: 2rem;
-        font-weight: 600;
-        color: #fff;
-        letter-spacing: 1px;
-    }
-
-    .brand {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: #fff;
-        font-weight: 600;
-        font-size: 1.1rem;
-    }
-
-    .brand-logo {
-        width: 32px;
-        height: 32px;
-        background: #fff;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
     }
 
     .stats-container {
@@ -213,14 +176,6 @@
 
 {% block content %}
 <div class="stats-wrapper">
-    <div class="stats-header">
-        <div class="current-time" id="currentTime">10:00 PM</div>
-        <div class="brand">
-            <div class="brand-logo">🦉</div>
-            <span>STUDYBUDDY</span>
-        </div>
-    </div>
-
     <div class="stats-container">
         <h1 class="stats-title">YOUR WEEKLY FOCUS</h1>
         
@@ -300,19 +255,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 <script>
-    // Update time
-    function updateTime() {
-        const now = new Date();
-        const hours = now.getHours();
-        const minutes = now.getMinutes();
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        const displayHours = hours % 12 || 12;
-        const displayMinutes = minutes < 10 ? '0' + minutes : minutes;
-        document.getElementById('currentTime').textContent = `${displayHours}:${displayMinutes} ${ampm}`;
-    }
-    updateTime();
-    setInterval(updateTime, 1000);
-
     // Circular Progress Chart
     const progressCtx = document.getElementById('progressCircle').getContext('2d');
     new Chart(progressCtx, {

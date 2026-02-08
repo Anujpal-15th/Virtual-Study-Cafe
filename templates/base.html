@@ -347,7 +347,8 @@
         
         .profile-menu {
             position: absolute;
-            top: calc(100% + 10px);
+            top: calc(100% + 10px) !important;
+            bottom: auto !important;
             right: 0;
             background: rgba(0, 0, 0, 0.95);
             backdrop-filter: blur(10px);
@@ -359,7 +360,7 @@
             transform: translateY(-10px);
             transition: all 0.3s ease;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
+            z-index: 10000;
             overflow: hidden;
         }
         
