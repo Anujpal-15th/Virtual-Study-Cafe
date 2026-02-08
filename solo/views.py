@@ -119,7 +119,7 @@ def save_study_session(request):
 @require_POST
 def save_auto_session(request):
     """
-    Save auto-tracked study session from solo room
+    Save auto-tracked study session from solo room or group room
     Called automatically when user leaves the room or periodically
     Uses sendBeacon API for reliable delivery
     """
@@ -127,12 +127,22 @@ def save_auto_session(request):
         # Get data from request body
         data = json.loads(request.body)
         minutes = int(data.get('minutes', 0))
-        session_type = data.get('session_type', 'focus')
+        session_type = data.get('session_type','focus')
         completed = data.get('completed', True)
+        room_code = data.get('room_code', None)  # Optional room code for group study
         
         # Validate minutes (at least 1 minute to save)
         if minutes < 1:
             return JsonResponse({'success': True, 'message': 'Session too short to save'})
+        
+        # Get room if room_code provided
+        room = None
+        if room_code:
+            try:
+                from rooms.models import Room
+                room = Room.objects.get(room_code=room_code)
+            except Room.DoesNotExist:
+                pass
         
         # Create the session
         session = StudySession.objects.create(
@@ -140,6 +150,7 @@ def save_auto_session(request):
             minutes=minutes,
             session_type=session_type,
             completed=completed,
+            room=room,  # Link to room if provided
             started_at=timezone.now() - timedelta(minutes=minutes),
             ended_at=timezone.now()
         )

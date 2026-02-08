@@ -79,7 +79,7 @@ def chatbot_api(request):
 - Use emojis to make learning engaging
 - Keep responses concise but comprehensive
 - Always verify understanding before moving to next concepts
-- DO NOT start every response with greetings like \"Hey there!\" or \"Welcome to Virtual Cafe!\"
+- DO NOT start every response with greetings like "Hey there!" or "Welcome to Virtual Cafe!"
 - Jump straight to answering the question or teaching the concept
 
 📝 FORMATTING RULES (CRITICAL - FOLLOW STRICTLY):
@@ -88,7 +88,7 @@ def chatbot_api(request):
   • Numbered lists (1., 2., 3.) for steps or sequences
   • Emoji bullets (✓, 📌, 💡, etc.) for key points and concepts
   • NEVER use plain asterisks (*) for bullet points
-- Add double line breaks (\\n\\n) between:
+- Add double line breaks (\n\n) between:
   • Each main section
   • Before and after lists
   • Between concept explanations
