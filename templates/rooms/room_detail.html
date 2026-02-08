@@ -1098,6 +1098,84 @@
             });
         }
     }
+    
+    // ============================================
+    // Study Session Tracking for Room
+    // ============================================
+    let roomSessionStartTime = null;
+    let roomSessionInterval = null;
+    
+    function startRoomSessionTracking() {
+        if (!roomSessionStartTime) {
+            roomSessionStartTime = Date.now();
+            console.log('Started tracking room study session');
+            
+            // Log session tracking every 30 seconds
+            roomSessionInterval = setInterval(() => {
+                const currentMinutes = Math.floor((Date.now() - roomSessionStartTime) / 1000 / 60);
+                console.log(`Room session in progress: ${currentMinutes} minutes`);
+            }, 30000);
+        }
+    }
+    
+    function saveRoomSessionTime() {
+        if (!roomSessionStartTime) return;
+        
+        const sessionEndTime = Date.now();
+        const sessionDurationMs = sessionEndTime - roomSessionStartTime;
+        const sessionMinutes = Math.floor(sessionDurationMs / 1000 / 60);
+        
+        // Only save if session is at least 1 minute
+        if (sessionMinutes < 1) return;
+        
+        console.log(`Saving room session: ${sessionMinutes} minutes`);
+        
+        // Send to server using sendBeacon for reliable delivery
+        const data = JSON.stringify({
+            minutes: sessionMinutes,
+            session_type: 'focus',
+            completed: true,
+            room_code: "{{ room.room_code }}"
+        });
+        
+        const blob = new Blob([data], { type: 'application/json' });
+        const success = navigator.sendBeacon('/study/api/save-session/', blob);
+        console.log(`Room session saved via sendBeacon: ${success}`);
+    }
+    
+    // Start tracking when page loads
+    startRoomSessionTracking();
+    
+    // Save session when user leaves the page
+    window.addEventListener('beforeunload', function(event) {
+        saveRoomSessionTime();
+    });
+    
+    // Save on page visibility change (when tab becomes hidden)
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            saveRoomSessionTime();
+            if (roomSessionInterval) {
+                clearInterval(roomSessionInterval);
+            }
+        } else {
+            // Restart tracking when user comes back
+            startRoomSessionTracking();
+        }
+    });
+    
+    // Also save periodically (every 5 minutes) to prevent data loss
+    setInterval(() => {
+        if (roomSessionStartTime) {
+            const currentMinutes = Math.floor((Date.now() - roomSessionStartTime) / 1000 / 60);
+            if (currentMinutes >= 5) {
+                // Save current session
+                saveRoomSessionTime();
+                // Restart tracking for next interval
+                roomSessionStartTime = Date.now();
+            }
+        }
+    }, 5 * 60 * 1000); // Check every 5 minutes
 </script>
 {% endblock %}
 

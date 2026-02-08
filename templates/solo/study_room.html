@@ -2292,6 +2292,9 @@
         function startTimer() {
             if (!timerInterval) {
                 timerRunning = true;
+                const timerStartTime = Date.now(); // Track when this specific timer session started
+                const initialMinutes = isBreakTime ? breakMinutes : focusMinutes;
+                
                 timerInterval = setInterval(() => {
                     if (remainingSeconds > 0) {
                         remainingSeconds--;
@@ -2300,6 +2303,12 @@
                         clearInterval(timerInterval);
                         timerInterval = null;
                         timerRunning = false;
+                        
+                        // Save completed timer session (only for focus sessions, not breaks)
+                        if (!isBreakTime && initialMinutes >= 1) {
+                            console.log(`Timer completed: ${initialMinutes} minutes`);
+                            saveTimerSession(initialMinutes);
+                        }
                         
                         if (isBreakTime) {
                             if (loopEnabled) {
@@ -2319,6 +2328,55 @@
                     }
                 }, 1000);
             }
+        }
+        
+        // Save a completed timer session to the backend
+        function saveTimerSession(minutes) {
+            if (minutes < 1) return;
+            
+            const data = JSON.stringify({
+                minutes: minutes,
+                session_type: 'focus',
+                completed: true
+            });
+            
+            fetch('/study/save-session/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: data
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log(`✓ Timer session saved: ${minutes} minutes`);
+                    // Optionally update UI with new stats
+                    if (data.total_minutes) {
+                        console.log(`Total study time: ${data.total_minutes} minutes`);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error saving timer session:', error);
+            });
+        }
+        
+        // Helper function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
         }
         
         function stopTimer() {
@@ -3045,7 +3103,8 @@
             });
             
             const blob = new Blob([data], { type: 'application/json' });
-            navigator.sendBeacon('/solo/api/save-session/', blob);
+            const success = navigator.sendBeacon('/study/api/save-session/', blob);
+            console.log(`Session saved via sendBeacon: ${success}`);
         }
         
         // Start tracking when page loads
