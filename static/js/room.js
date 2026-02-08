@@ -80,14 +80,32 @@ function handleWebSocketMessage(data) {
             displayChatMessage(data);
             break;
         
-        case 'join':
+        case 'user_join':
             displayNotification(`${data.username} joined the room`);
             updateMembersList();
+            // If we have local stream and no peer connection, create the offer
+            // This ensures the existing user initiates the connection
+            if (localStream && !peerConnection && data.username !== USERNAME) {
+                console.log('Creating peer connection for new user:', data.username);
+                setTimeout(() => createPeerConnection(), 1500);
+            }
             break;
         
-        case 'leave':
+        case 'user_leave':
             displayNotification(`${data.username} left the room`);
             updateMembersList();
+            // Reset peer connection when user leaves
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+                const remoteVideo = document.getElementById('remote-video');
+                const remotePlaceholder = document.getElementById('remote-placeholder');
+                const remoteOverlay = document.getElementById('remote-overlay');
+                if (remoteVideo) remoteVideo.srcObject = null;
+                if (remotePlaceholder) remotePlaceholder.style.display = 'flex';
+                if (remoteOverlay) remoteOverlay.style.display = 'none';
+                updateVideoStatus('Peer disconnected - Waiting for others');
+            }
             break;
         
         case 'webrtc_offer':
@@ -182,33 +200,98 @@ function escapeHtml(text) {
 
 /**
  * Start a video call
- * Gets user media (camera + mic) and creates peer connection
+ * Gets user media (camera + mic) and makes it ready for connection
+ * Works even when user is alone in the room
+ * Does NOT create peer connection - waits for user_join event to handle that
  */
 async function startCall() {
+    console.log('Starting call for user:', USERNAME);
+    
     try {
         // Get user's camera and microphone
+        console.log('Requesting camera and microphone access...');
         localStream = await navigator.mediaDevices.getUserMedia({
             video: true,
             audio: true
         });
         
+        console.log('Media access granted');
+        
         // Display local video
         const localVideo = document.getElementById('local-video');
+        const localPlaceholder = document.getElementById('local-placeholder');
         localVideo.srcObject = localStream;
         
+        // Hide placeholder when video starts
+        localVideo.onloadedmetadata = () => {
+            localPlaceholder.style.display = 'none';
+            console.log('Local video loaded');
+        };
+        
+        isCallActive = true;
+        console.log('Setting isCallActive to true and updating buttons');
+        
+        // Try to update buttons immediately
+        updateCallButtons();
+        
+        // Also retry after a short delay to ensure DOM is ready
+        setTimeout(() => {
+            console.log('Retry: Updating call buttons after delay');
+            updateCallButtons();
+        }, 500);
+        
+        const memberCount = parseInt(document.getElementById('members-count').textContent);
+        if (memberCount > 1) {
+            updateVideoStatus('Ready - Connecting to peer...');
+        } else {
+            updateVideoStatus('Ready - Waiting for others to join');
+        }
+        
+    } catch (error) {
+        console.error('Error starting call:', error);
+        alert('Could not access camera/microphone. Please check permissions and ensure you\'re using HTTPS or localhost.');
+        updateVideoStatus('Error: ' + error.message);
+        isCallActive = false;
+    }
+}
+
+/**
+ * Create peer connection and send offer
+ */
+async function createPeerConnection() {
+    // Prevent creating multiple peer connections
+    if (peerConnection) {
+        console.log('Peer connection already exists');
+        return;
+    }
+    
+    try {
+        console.log('Creating new peer connection...');
         // Create peer connection
         peerConnection = new RTCPeerConnection(rtcConfig);
         
         // Add local stream tracks to peer connection
         localStream.getTracks().forEach(track => {
+            console.log('Adding track to peer connection:', track.kind);
             peerConnection.addTrack(track, localStream);
         });
         
         // Handle incoming remote stream
         peerConnection.ontrack = function(event) {
+            console.log('Received remote track:', event.track.kind);
             remoteStream = event.streams[0];
             const remoteVideo = document.getElementById('remote-video');
+            const remotePlaceholder = document.getElementById('remote-placeholder');
+            const remoteOverlay = document.getElementById('remote-overlay');
+            
             remoteVideo.srcObject = remoteStream;
+            
+            // Hide placeholder and show overlay when remote video starts
+            remoteVideo.onloadedmetadata = () => {
+                remotePlaceholder.style.display = 'none';
+                remoteOverlay.style.display = 'flex';
+            };
+            
             updateVideoStatus('Connected with peer');
         };
         
@@ -233,14 +316,11 @@ async function startCall() {
             offer: offer
         }));
         
-        isCallActive = true;
-        updateCallButtons();
         updateVideoStatus('Calling...');
         
     } catch (error) {
-        console.error('Error starting call:', error);
-        alert('Could not access camera/microphone. Please check permissions.');
-        updateVideoStatus('Error: ' + error.message);
+        console.error('Error creating peer connection:', error);
+        updateVideoStatus('Ready - Waiting for others');
     }
 }
 
@@ -253,38 +333,66 @@ async function handleWebRTCOffer(data) {
         return;
     }
     
+    console.log('Received WebRTC offer from:', data.username);
+    
     try {
         // Get user media if not already have it
         if (!localStream) {
+            console.log('Getting local media for answering offer...');
             localStream = await navigator.mediaDevices.getUserMedia({
                 video: true,
                 audio: true
             });
             
             const localVideo = document.getElementById('local-video');
+            const localPlaceholder = document.getElementById('local-placeholder');
             localVideo.srcObject = localStream;
+            
+            // Hide placeholder when video starts
+            localVideo.onloadedmetadata = () => {
+                localPlaceholder.style.display = 'none';
+            };
+            
+            isCallActive = true;
+            updateCallButtons();
         }
         
         // Create peer connection if not exists
         if (!peerConnection) {
+            console.log('Creating peer connection for answering offer...');
             peerConnection = new RTCPeerConnection(rtcConfig);
             
             // Add local tracks
             localStream.getTracks().forEach(track => {
+                console.log('Adding local track to peer connection:', track.kind);
                 peerConnection.addTrack(track, localStream);
             });
             
             // Handle remote stream
             peerConnection.ontrack = function(event) {
+                console.log('Received remote track:', event.track.kind);
                 remoteStream = event.streams[0];
                 const remoteVideo = document.getElementById('remote-video');
+                const remotePlaceholder = document.getElementById('remote-placeholder');
+                const remoteOverlay = document.getElementById('remote-overlay');
+                const remoteName = document.getElementById('remote-name');
+                
                 remoteVideo.srcObject = remoteStream;
+                if (remoteName) remoteName.textContent = data.username;
+                
+                // Hide placeholder and show overlay when remote video starts
+                remoteVideo.onloadedmetadata = () => {
+                    remotePlaceholder.style.display = 'none';
+                    remoteOverlay.style.display = 'flex';
+                };
+                
                 updateVideoStatus('Connected with peer');
             };
             
             // Handle ICE candidates
             peerConnection.onicecandidate = function(event) {
                 if (event.candidate) {
+                    console.log('Sending ICE candidate');
                     chatSocket.send(JSON.stringify({
                         type: 'webrtc_ice',
                         candidate: event.candidate
@@ -294,21 +402,33 @@ async function handleWebRTCOffer(data) {
         }
         
         // Set remote description (offer)
+        console.log('Setting remote description (offer)');
         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
         
         // Create answer
+        console.log('Creating answer...');
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
         
         // Send answer back
+        console.log('Sending answer back');
         chatSocket.send(JSON.stringify({
             type: 'webrtc_answer',
             answer: answer
         }));
         
         isCallActive = true;
+        console.log('Set isCallActive to true after handling offer');
+        console.log('Calling updateCallButtons from handleWebRTCOffer');
         updateCallButtons();
-        updateVideoStatus('Call connected');
+        
+        // Retry after delay
+        setTimeout(() => {
+            console.log('Retry: Updating buttons after handling offer');
+            updateCallButtons();
+        }, 500);
+        
+        updateVideoStatus('Connecting...');
         
     } catch (error) {
         console.error('Error handling offer:', error);
@@ -325,11 +445,19 @@ async function handleWebRTCAnswer(data) {
         return;
     }
     
+    console.log('Received WebRTC answer from:', data.username);
+    
     try {
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-        updateVideoStatus('Call connected');
+        if (peerConnection) {
+            console.log('Setting remote description (answer)');
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+            updateVideoStatus('Call connected');
+        } else {
+            console.error('No peer connection exists to set answer');
+        }
     } catch (error) {
         console.error('Error handling answer:', error);
+        updateVideoStatus('Error connecting: ' + error.message);
     }
 }
 
@@ -343,8 +471,11 @@ async function handleWebRTCICE(data) {
     }
     
     try {
-        if (peerConnection) {
+        if (peerConnection && data.candidate) {
+            console.log('Adding ICE candidate from:', data.username);
             await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+        } else if (!peerConnection) {
+            console.warn('Received ICE candidate but no peer connection exists yet');
         }
     } catch (error) {
         console.error('Error handling ICE candidate:', error);
@@ -355,9 +486,14 @@ async function handleWebRTCICE(data) {
  * End the video call
  */
 function endCall() {
+    console.log('Ending call...');
+    
     // Stop all local tracks
     if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
+        localStream.getTracks().forEach(track => {
+            console.log('Stopping track:', track.kind);
+            track.stop();
+        });
         localStream = null;
     }
     
@@ -367,9 +503,30 @@ function endCall() {
         peerConnection = null;
     }
     
-    // Clear video elements
-    document.getElementById('local-video').srcObject = null;
-    document.getElementById('remote-video').srcObject = null;
+    // Clear video elements and show placeholders
+    const localVideo = document.getElementById('local-video');
+    const remoteVideo = document.getElementById('remote-video');
+    const localPlaceholder = document.getElementById('local-placeholder');
+    const remotePlaceholder = document.getElementById('remote-placeholder');
+    const remoteOverlay = document.getElementById('remote-overlay');
+    const localMicIcon = document.getElementById('local-mic-icon');
+    const localCamIcon = document.getElementById('local-cam-icon');
+    
+    if (localVideo) localVideo.srcObject = null;
+    if (remoteVideo) remoteVideo.srcObject = null;
+    if (localPlaceholder) localPlaceholder.style.display = 'flex';
+    if (remotePlaceholder) remotePlaceholder.style.display = 'flex';
+    if (remoteOverlay) remoteOverlay.style.display = 'none';
+    
+    // Reset icons
+    if (localMicIcon) {
+        localMicIcon.textContent = '🎤';
+        localMicIcon.classList.remove('muted');
+    }
+    if (localCamIcon) {
+        localCamIcon.textContent = '📹';
+        localCamIcon.classList.remove('muted');
+    }
     
     isCallActive = false;
     isMicOn = true;
@@ -389,8 +546,18 @@ function toggleMic() {
             isMicOn = audioTrack.enabled;
             
             const micBtn = document.getElementById('toggle-mic-btn');
-            micBtn.textContent = isMicOn ? '🎤 Mic' : '🎤 Mic (Off)';
-            micBtn.style.background = isMicOn ? '' : '#e74c3c';
+            const localMicIcon = document.getElementById('local-mic-icon');
+            
+            if (isMicOn) {
+                micBtn.classList.remove('off');
+                localMicIcon.textContent = '🎤';
+                localMicIcon.classList.remove('muted');
+            } else {
+                micBtn.classList.add('off');
+                localMicIcon.textContent = '🔇';
+                localMicIcon.classList.add('muted');
+            }
+            console.log('Microphone:', isMicOn ? 'ON' : 'OFF');
         }
     }
 }
@@ -406,8 +573,24 @@ function toggleCamera() {
             isCameraOn = videoTrack.enabled;
             
             const cameraBtn = document.getElementById('toggle-camera-btn');
-            cameraBtn.textContent = isCameraOn ? '📹 Camera' : '📹 Camera (Off)';
-            cameraBtn.style.background = isCameraOn ? '' : '#e74c3c';
+            const localCamIcon = document.getElementById('local-cam-icon');
+            const localPlaceholder = document.getElementById('local-placeholder');
+            const localVideo = document.getElementById('local-video');
+            
+            if (isCameraOn) {
+                cameraBtn.classList.remove('off');
+                localCamIcon.textContent = '📹';
+                localCamIcon.classList.remove('muted');
+                if (localVideo && localVideo.srcObject) {
+                    localPlaceholder.style.display = 'none';
+                }
+            } else {
+                cameraBtn.classList.add('off');
+                localCamIcon.textContent = '📵';
+                localCamIcon.classList.add('muted');
+                localPlaceholder.style.display = 'flex';
+            }
+            console.log('Camera:', isCameraOn ? 'ON' : 'OFF');
         }
     }
 }
@@ -425,22 +608,86 @@ function updateVideoStatus(message) {
 /**
  * Update call button visibility based on call state
  */
+/**
+ * Update call button visibility based on call state
+ */
 function updateCallButtons() {
-    const startBtn = document.getElementById('start-call-btn');
     const endBtn = document.getElementById('end-call-btn');
     const micBtn = document.getElementById('toggle-mic-btn');
     const cameraBtn = document.getElementById('toggle-camera-btn');
     
+    console.log('Updating call buttons. isCallActive:', isCallActive);
+    console.log('Button elements found:', {
+        endBtn: !!endBtn,
+        micBtn: !!micBtn,
+        cameraBtn: !!cameraBtn
+    });
+    
     if (isCallActive) {
-        startBtn.style.display = 'none';
-        endBtn.style.display = 'inline-block';
-        micBtn.style.display = 'inline-block';
-        cameraBtn.style.display = 'inline-block';
+        if (endBtn) {
+            endBtn.classList.remove('hidden');
+            console.log('Showing end call button - classes:', endBtn.className);
+        } else {
+            console.error('End call button not found in DOM!');
+        }
+        if (micBtn) {
+            micBtn.classList.remove('hidden');
+            console.log('Showing mic button - classes:', micBtn.className);
+        } else {
+            console.error('Mic button not found in DOM!');
+        }
+        if (cameraBtn) {
+            cameraBtn.classList.remove('hidden');
+            console.log('Showing camera button - classes:', cameraBtn.className);
+        } else {
+            console.error('Camera button not found in DOM!');
+        }
     } else {
-        startBtn.style.display = 'inline-block';
-        endBtn.style.display = 'none';
-        micBtn.style.display = 'none';
-        cameraBtn.style.display = 'none';
+        if (endBtn) endBtn.classList.add('hidden');
+        if (micBtn) micBtn.classList.add('hidden');
+        if (cameraBtn) cameraBtn.classList.add('hidden');
+    }
+}
+
+/**
+ * Leave the room and return to dashboard
+ */
+function leaveRoom() {
+    console.log('Leave room button clicked by:', USERNAME);
+    
+    // Confirm before leaving
+    if (confirm('Are you sure you want to leave this room?')) {
+        console.log('Leaving room confirmed');
+        
+        // End call properly
+        if (isCallActive) {
+            console.log('Ending active call before leaving');
+            // Don't call endCall() to avoid cleanup, just stop media
+            if (localStream) {
+                localStream.getTracks().forEach(track => {
+                    console.log('Stopping track:', track.kind);
+                    track.stop();
+                });
+            }
+        }
+        
+        // Close WebSocket connection
+        if (chatSocket) {
+            console.log('Closing WebSocket connection');
+            chatSocket.close();
+        }
+        
+        // Close peer connection
+        if (peerConnection) {
+            console.log('Closing peer connection');
+            peerConnection.close();
+        }
+        
+        console.log('Redirecting to home page');
+        // Redirect to home page
+        window.location.href = '/';
+    } else {
+        console.log('Leave room cancelled');
     }
 }
 
@@ -615,8 +862,25 @@ function handleTimerEvent(data) {
 // ===== EVENT LISTENERS =====
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded. Initializing room for user:', USERNAME);
+    console.log('Room code:', ROOM_CODE);
+    
     // Initialize WebSocket
     initWebSocket();
+    
+    // Auto-start video call when page loads
+    setTimeout(() => {
+        console.log('Auto-starting video call...');
+        console.log('Current isCallActive before start:', isCallActive);
+        startCall();
+    }, 1500); // Increased delay to ensure DOM is fully ready
+    
+    // Verify all buttons exist
+    console.log('Verifying button elements:');
+    console.log('- End call button:', document.getElementById('end-call-btn') ? 'Found' : 'NOT FOUND');
+    console.log('- Toggle mic button:', document.getElementById('toggle-mic-btn') ? 'Found' : 'NOT FOUND');
+    console.log('- Toggle camera button:', document.getElementById('toggle-camera-btn') ? 'Found' : 'NOT FOUND');
+    console.log('- Leave room button:', document.getElementById('leave-room-btn') ? 'Found' : 'NOT FOUND');
     
     // Chat form submission
     const chatForm = document.getElementById('chat-form');
@@ -632,16 +896,54 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Video call buttons
-    document.getElementById('start-call-btn').addEventListener('click', startCall);
-    document.getElementById('end-call-btn').addEventListener('click', endCall);
-    document.getElementById('toggle-mic-btn').addEventListener('click', toggleMic);
-    document.getElementById('toggle-camera-btn').addEventListener('click', toggleCamera);
+    // Video call buttons (removed start-call-btn listener, auto-starts now)
+    const endCallBtn = document.getElementById('end-call-btn');
+    const toggleMicBtn = document.getElementById('toggle-mic-btn');
+    const toggleCameraBtn = document.getElementById('toggle-camera-btn');
+    const leaveRoomBtn = document.getElementById('leave-room-btn');
+    
+    if (endCallBtn) {
+        endCallBtn.addEventListener('click', endCall);
+        console.log('End call button listener attached');
+    } else {
+        console.error('End call button not found');
+    }
+    
+    if (toggleMicBtn) {
+        toggleMicBtn.addEventListener('click', toggleMic);
+        console.log('Toggle mic button listener attached');
+    } else {
+        console.error('Toggle mic button not found');
+    }
+    
+    if (toggleCameraBtn) {
+        toggleCameraBtn.addEventListener('click', toggleCamera);
+        console.log('Toggle camera button listener attached');
+    } else {
+        console.error('Toggle camera button not found');
+    }
+    
+    if (leaveRoomBtn) {
+        leaveRoomBtn.addEventListener('click', leaveRoom);
+        console.log('Leave room button listener attached');
+    } else {
+        console.error('Leave room button not found');
+    }
     
     // Timer buttons
-    document.getElementById('start-timer-btn').addEventListener('click', startTimer);
-    document.getElementById('pause-timer-btn').addEventListener('click', pauseTimer);
-    document.getElementById('reset-timer-btn').addEventListener('click', resetTimer);
+    const startTimerBtn = document.getElementById('start-timer-btn');
+    const pauseTimerBtn = document.getElementById('pause-timer-btn');
+    const resetTimerBtn = document.getElementById('reset-timer-btn');
+    
+    if (startTimerBtn) {
+        startTimerBtn.addEventListener('click', startTimer);
+    }
+    if (pauseTimerBtn) {
+        pauseTimerBtn.addEventListener('click', pauseTimer);
+    }
+    if (resetTimerBtn) {
+        resetTimerBtn.addEventListener('click', resetTimer);
+    }
     
     // Timer presets
     document.querySelectorAll('.preset-btn').forEach(btn => {

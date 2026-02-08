@@ -80,13 +80,75 @@
         justify-content: center;
     }
     
-    /* Study Sessions Section */
-    .study-sessions-container {
+    /* Action Buttons Section */
+    .action-buttons-section {
         background: rgba(26, 26, 46, 0.6);
         backdrop-filter: blur(20px);
         border: 1px solid rgba(0, 212, 255, 0.3);
         border-radius: 15px;
         padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .action-btn-card {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+        border: 2px solid rgba(102, 126, 234, 0.4);
+        border-radius: 12px;
+        padding: 1.25rem 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .action-btn-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .action-btn-card:hover::before {
+        left: 100%;
+    }
+    
+    .action-btn-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(102, 126, 234, 0.8);
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+    }
+    
+    .action-btn-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+        filter: drop-shadow(0 2px 8px rgba(102, 126, 234, 0.5));
+    }
+    
+    .action-btn-label {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.35rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .action-btn-desc {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.7);
+        line-height: 1.4;
     }
     
     .section-title {
@@ -96,62 +158,6 @@
         text-transform: uppercase;
         letter-spacing: 0.1em;
         font-weight: 600;
-    }
-    
-    .sessions-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-    
-    .session-card {
-        background: rgba(102, 126, 234, 0.1);
-        border: 1px solid rgba(102, 126, 234, 0.3);
-        border-radius: 12px;
-        padding: 1rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.8rem;
-        transition: all 0.3s ease;
-    }
-    
-    .session-card:hover {
-        transform: translateY(-5px);
-        border-color: rgba(0, 212, 255, 0.5);
-        box-shadow: 0 8px 20px rgba(0, 212, 255, 0.2);
-    }
-    
-    .session-avatar {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        border: 3px solid rgba(0, 212, 255, 0.5);
-        object-fit: cover;
-    }
-    
-    .session-user {
-        font-size: 0.9rem;
-        color: #fff;
-        font-weight: 600;
-        text-align: center;
-    }
-    
-    .session-time {
-        font-size: 1.1rem;
-        color: #00d4ff;
-        font-weight: 700;
-        font-family: 'Courier New', monospace;
-    }
-    
-    .session-status {
-        padding: 0.3rem 0.8rem;
-        background: rgba(0, 212, 255, 0.2);
-        border-radius: 20px;
-        font-size: 0.75rem;
-        color: #00d4ff;
-        font-weight: 600;
-        text-transform: uppercase;
     }
     
     /* Weekly Focus Section */
@@ -332,6 +338,13 @@
         transform: translateX(5px);
     }
     
+    .room-card:hover {
+        background: rgba(0, 212, 255, 0.15) !important;
+        border-color: rgba(0, 212, 255, 0.5) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3);
+    }
+    
     .room-icon {
         width: 40px;
         height: 40px;
@@ -407,6 +420,160 @@
         margin-top: 0.3rem;
     }
     
+    
+    /* Join Room Modal */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    }
+    
+    .modal-content {
+        background: rgba(26, 26, 46, 0.95);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(0, 212, 255, 0.3);
+        border-radius: 20px;
+        padding: 2.5rem;
+        max-width: 450px;
+        width: 90%;
+        box-shadow: 0 10px 50px rgba(0, 212, 255, 0.3);
+        animation: modalSlideIn 0.3s ease;
+    }
+    
+    @keyframes modalSlideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .modal-title {
+        font-size: 1.5rem;
+        color: #fff;
+        font-weight: 700;
+    }
+    
+    .modal-close {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: rgba(255, 71, 87, 0.2);
+        border: 1px solid rgba(255, 71, 87, 0.3);
+        color: #ff4757;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-close:hover {
+        background: rgba(255, 71, 87, 0.4);
+        transform: rotate(90deg);
+    }
+    
+    .modal-body {
+        margin-bottom: 1.5rem;
+    }
+    
+    .modal-description {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+    
+    .modal-input-group {
+        position: relative;
+    }
+    
+    .modal-input {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(0, 212, 255, 0.3);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1.2rem;
+        text-align: center;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .modal-input:focus {
+        outline: none;
+        border-color: #00d4ff;
+        background: rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+    }
+    
+    .modal-input::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+        letter-spacing: 0.2em;
+    }
+    
+    .modal-footer {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .modal-btn {
+        flex: 1;
+        padding: 0.9rem;
+        border-radius: 12px;
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .modal-btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #00d4ff 100%);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+    }
+    
+    .modal-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+    }
+    
+    .modal-btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .modal-btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+    }
+
     /* Responsive */
     @media (max-width: 1200px) {
         .dashboard-container {
@@ -454,71 +621,56 @@
             <div class="hero-overlay"></div>
         </div>
         
-        <!-- Your Study Sessions -->
-        <div class="study-sessions-container">
-            <div class="section-title">Your Study Sessions</div>
-            <div class="sessions-grid">
-                {% if active_sessions %}
-                    {% for session in active_sessions %}
-                    <div class="session-card">
-                        <img src="{{ session.user.profile.get_avatar_url }}" alt="{{ session.user.username }}" class="session-avatar">
-                        <div class="session-user">{{ session.user.username }}</div>
-                        <div class="session-time">{{ session.hours }}:{{ session.remaining_minutes|stringformat:"02d" }}:00</div>
-                        <div class="session-status">Active</div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
-                        <p>No active study sessions today</p>
-                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">Start studying to see your sessions here!</p>
-                    </div>
-                {% endif %}
+        <!-- Quick Actions Section -->
+        <div class="action-buttons-section">
+            <div class="action-buttons">
+                <div class="action-btn-card" onclick="window.location.href='{% url 'create_room' %}'">
+                    <div class="action-btn-icon">🏠</div>
+                    <div class="action-btn-label">Create Study Room</div>
+                    <div class="action-btn-desc">Start a new study room</div>
+                </div>
+                <div class="action-btn-card" onclick="showJoinRoomModal()">
+                    <div class="action-btn-icon">🔑</div>
+                    <div class="action-btn-label">Join Study Room</div>
+                    <div class="action-btn-desc">Enter room code to join</div>
+                </div>
             </div>
         </div>
         
-        <!-- Weekly Focus Section -->
-        <div class="weekly-focus-container">
-            <div class="weekly-stats-row">
-                <div class="section-title">Weekly Focus: {{ completion_percent }}%</div>
-                <div class="weekly-percentage">{{ week_total_hours }}h</div>
-            </div>
-            
-            <div class="chart-container">
-                <canvas id="weeklyChart"></canvas>
-            </div>
-            
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <div class="action-btn" onclick="window.location.href='{% url 'solo:study_room' %}'" title="Start Study Session">
-                    📚
+        <!-- Public Study Rooms Section -->
+        <div class="action-buttons-section">
+            <div class="section-title">🌍 Public Study Rooms</div>
+            {% if rooms %}
+                <div style="display: grid; gap: 1rem; margin-top: 1rem;">
+                    {% for room in rooms %}
+                    <a href="{% url 'room_detail' room.room_code %}" class="room-card" style="text-decoration: none; display: block; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 1rem; transition: all 0.3s ease; cursor: pointer;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div class="action-btn-icon" style="font-size: 2rem; margin: 0;">🏠</div>
+                            <div style="flex: 1;">
+                                <div style="color: #fff; font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem;">{{ room.name }}</div>
+                                <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.25rem;">{{ room.description|truncatechars:60 }}</div>
+                                <div style="display: flex; gap: 1rem; font-size: 0.8rem; color: rgba(255,255,255,0.5);">
+                                    <span>👤 {{ room.member_count }} member{{ room.member_count|pluralize }}</span>
+                                    <span>👨‍💼 {{ room.created_by.username }}</span>
+                                    <span style="color: #00d4ff;">📋 {{ room.room_code }}</span>
+                                </div>
+                            </div>
+                            <div style="padding: 0.5rem 1.25rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">Join</div>
+                        </div>
+                    </a>
+                    {% endfor %}
                 </div>
-                <div class="action-btn" onclick="window.location.href='{% url 'global_chat' %}'" title="Video Call">
-                    📹
+            {% else %}
+                <div style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5); font-size: 0.9rem;">
+                    <p>No public rooms available right now</p>
+                    <a href="{% url 'create_room' %}" style="color: #00d4ff; text-decoration: none; font-size: 0.85rem; margin-top: 0.5rem; display: inline-block;">Create the first public room</a>
                 </div>
-                <div class="action-btn" onclick="window.location.href='{% url 'create_room' %}'" title="Create Room">
-                    👥
-                </div>
-                <div class="action-btn" onclick="window.location.href='{% url 'progress' %}'" title="View Stats">
-                    📊
-                </div>
-                <div class="action-btn" onclick="shareProgress()" title="Share Progress">
-                    🔗
-                </div>
-            </div>
+            {% endif %}
         </div>
     </div>
     
     <!-- Sidebar -->
     <div class="dashboard-sidebar">
-        <!-- Weekly Focus Circle -->
-        <div class="weekly-focus-circle">
-            <div class="section-title">Weekly Focus</div>
-            <div class="circle-chart-container">
-                <canvas id="circleChart"></canvas>
-                <div class="circle-percentage">{{ completion_percent }}%</div>
-            </div>
-        </div>
-        
         <!-- Friends Online -->
         <div class="friends-online-container">
             <div class="section-title">Friends Online</div>
@@ -587,6 +739,36 @@
     </div>
 </div>
 
+<!-- Join Room Modal -->
+<div id="joinRoomModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">🔑 Join Study Room</h2>
+            <button class="modal-close" onclick="hideJoinRoomModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-description">
+                Enter the 6-character room code to join a study session with your friends.
+            </p>
+            <div class="modal-input-group">
+                <input 
+                    type="text" 
+                    id="room-code-input" 
+                    class="modal-input" 
+                    placeholder="ABC123" 
+                    maxlength="6"
+                    autocomplete="off"
+                    onkeypress="if(event.key === 'Enter') joinRoomByCode()"
+                >
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-secondary" onclick="hideJoinRoomModal()">Cancel</button>
+            <button class="modal-btn modal-btn-primary" onclick="joinRoomByCode()">Join Room</button>
+        </div>
+    </div>
+</div>
+
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
@@ -612,83 +794,24 @@
     updateClock();
     setInterval(updateClock, 1000);
     
-    // Weekly Bar Chart
-    const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
-    const dailyData = {{ daily_stats|safe }};
+    // Join Room Modal Functions
+    function showJoinRoomModal() {
+        document.getElementById('joinRoomModal').style.display = 'flex';
+    }
     
-    new Chart(weeklyCtx, {
-        type: 'bar',
-        data: {
-            labels: dailyData.map(d => d.day),
-            datasets: [{
-                label: 'Hours',
-                data: dailyData.map(d => d.hours),
-                backgroundColor: 'rgba(0, 212, 255, 0.6)',
-                borderColor: 'rgba(0, 212, 255, 1)',
-                borderWidth: 2,
-                borderRadius: 5
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    },
-                    ticks: {
-                        color: 'rgba(255, 255, 255, 0.7)'
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        color: 'rgba(255, 255, 255, 0.7)'
-                    }
-                }
-            }
+    function hideJoinRoomModal() {
+        document.getElementById('joinRoomModal').style.display = 'none';
+        document.getElementById('room-code-input').value = '';
+    }
+    
+    function joinRoomByCode() {
+        const roomCode = document.getElementById('room-code-input').value.trim().toUpperCase();
+        if (roomCode.length === 6) {
+            window.location.href = `/rooms/join/${roomCode}/`;
+        } else {
+            alert('Please enter a valid 6-character room code');
         }
-    });
-    
-    // Circular Progress Chart
-    const circleCtx = document.getElementById('circleChart').getContext('2d');
-    const completionPercent = {{ completion_percent }};
-    
-    new Chart(circleCtx, {
-        type: 'doughnut',
-        data: {
-            datasets: [{
-                data: [completionPercent, 100 - completionPercent],
-                backgroundColor: [
-                    'rgba(0, 212, 255, 0.8)',
-                    'rgba(102, 126, 234, 0.2)'
-                ],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            cutout: '75%',
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    enabled: false
-                }
-            }
-        }
-    });
+    }
     
     // Share Progress Function
     function shareProgress() {
@@ -705,6 +828,20 @@
             });
         }
     }
+    
+    // Close modal on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            hideJoinRoomModal();
+        }
+    });
+    
+    // Close modal on background click
+    document.getElementById('joinRoomModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            hideJoinRoomModal();
+        }
+    });
 </script>
 {% endblock %}
 

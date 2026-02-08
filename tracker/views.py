@@ -102,7 +102,9 @@ def progress_view(request):
     
     context = {
         'today_total': today_total,
+        'today_hours': round(today_total / 60, 1),
         'week_total': week_total,
+        'week_hours': round(week_total / 60, 1),
         'last_7_days': last_7_days,
         'recent_sessions': recent_sessions,
         'completion_percent': completion_percent,

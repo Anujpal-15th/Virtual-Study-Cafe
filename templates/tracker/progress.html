@@ -224,6 +224,28 @@
     <div class="stats-container">
         <h1 class="stats-title">YOUR WEEKLY FOCUS</h1>
         
+        <!-- Study Time Summary Cards -->
+        <div class="stats-grid" style="margin-bottom: 1.5rem;">
+            <div class="stats-card" style="text-align: center;">
+                <h3 class="chart-title" style="margin-bottom: 1rem;">TODAY'S STUDY TIME</h3>
+                <div style="font-size: 3rem; font-weight: 700; color: #5FFBF1; margin-bottom: 0.5rem;">
+                    {{ today_hours }} <span style="font-size: 1.5rem; color: rgba(255,255,255,0.6);">hrs</span>
+                </div>
+                <div style="font-size: 1.2rem; color: rgba(255,255,255,0.7);">
+                    {{ today_total }} minutes total
+                </div>
+            </div>
+            <div class="stats-card" style="text-align: center;">
+                <h3 class="chart-title" style="margin-bottom: 1rem;">THIS WEEK'S TOTAL</h3>
+                <div style="font-size: 3rem; font-weight: 700; color: #5FFBF1; margin-bottom: 0.5rem;">
+                    {{ week_hours }} <span style="font-size: 1.5rem; color: rgba(255,255,255,0.6);">hrs</span>
+                </div>
+                <div style="font-size: 1.2rem; color: rgba(255,255,255,0.7);">
+                    {{ week_total }} minutes / {{ completion_percent }}% of weekly goal
+                </div>
+            </div>
+        </div>
+        
         <div class="stats-grid">
             <!-- Left: Circular Progress with Subjects -->
             <div class="stats-card">

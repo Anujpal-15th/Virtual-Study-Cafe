@@ -7,8 +7,8 @@ from . import views
 urlpatterns = [
     path('', views.landing_view, name='landing'),
     path('dashboard/', views.home_view, name='home'),
-    path('chat/', views.global_chat_view, name='global_chat'),
     path('rooms/create/', views.create_room_view, name='create_room'),
     path('rooms/join/', views.join_room_by_code_view, name='join_room_by_code'),
     path('rooms/<str:room_code>/', views.room_detail_view, name='room_detail'),
+    path('rooms/<str:room_code>/delete/', views.delete_room_view, name='delete_room'),
 ]

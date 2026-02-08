@@ -35,21 +35,20 @@ def home_view(request):
     from datetime import datetime, timedelta
     from django.contrib.auth.models import User
     
-    # Clean up expired rooms (excluding the global room)
+    # Clean up expired rooms
     expired_rooms = Room.objects.filter(
         expires_at__lte=timezone.now()
-    ).exclude(room_code='GLOBAL')
+    )
     expired_count = expired_rooms.count()
     if expired_count > 0:
         expired_rooms.delete()
         messages.info(request, f'{expired_count} empty room(s) expired and removed.')
     
-    # Get all active PUBLIC rooms created by the current user
+    # Get all active PUBLIC rooms (visible to everyone, )
     rooms = Room.objects.filter(
         Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now()),
-        is_public=True,
-        created_by=request.user  # Only show rooms created by current user
-    )
+        is_public=True
+    ).exclude(room_code='GLOBAL')
     
     # Get search query from GET parameters
     search_query = request.GET.get('search', '').strip()
@@ -62,35 +61,25 @@ def home_view(request):
             Q(description__icontains=search_query)
         )
     
-    # Annotate with member count for display
+    # Annotate with member count for display and order by popularity
     rooms = rooms.annotate(
         member_count=Count('memberships', filter=Q(memberships__is_active=True))
-    ).select_related('created_by')
+    ).select_related('created_by').order_by('-member_count', '-created_at')
     
-    # Get rooms the current user is a member of
-    user_rooms = Room.objects.filter(memberships__user=request.user, memberships__is_active=True)
+    # Get rooms the current user is a member of (excluding GLOBAL room if it exists)
+    user_rooms = Room.objects.filter(
+        memberships__user=request.user, 
+        memberships__is_active=True
+    ).exclude(room_code='GLOBAL').annotate(
+        member_count=Count('memberships', filter=Q(memberships__is_active=True))
+    ).select_related('created_by')
     
     # Get active study sessions (users who studied in the last 24 hours)
     today = timezone.now()
     yesterday = today - timedelta(days=1)
     
-    # Get recent study sessions grouped by user
-    recent_sessions = StudySession.objects.filter(
-        created_at__gte=yesterday
-    ).select_related('user', 'user__profile').values('user').annotate(
-        total_minutes=Sum('minutes')
-    ).order_by('-total_minutes')[:4]  # Top 4 active users
-    
-    # Enrich with user details
-    active_sessions = []
-    for session in recent_sessions:
-        user = User.objects.select_related('profile').get(id=session['user'])
-        active_sessions.append({
-            'user': user,
-            'minutes': session['total_minutes'],
-            'hours': session['total_minutes'] // 60,
-            'remaining_minutes': session['total_minutes'] % 60,
-        })
+    # Get recent study sessions grouped by user (removed - not displayed)
+    # active_sessions = []
     
     # Get current user's weekly statistics
     week_ago = today - timedelta(days=7)
@@ -136,7 +125,6 @@ def home_view(request):
         'rooms': rooms,
         'user_rooms': user_rooms,
         'search_query': search_query,
-        'active_sessions': active_sessions,
         'week_total_minutes': week_total,
         'week_total_hours': round(week_total / 60, 1),
         'completion_percent': completion_percent,
@@ -184,57 +172,6 @@ def create_room_view(request):
     
     # GET request - show form
     return render(request, 'rooms/create_room.html')
-
-
-@login_required
-def global_chat_view(request):
-    """
-    Global chat room where anyone can join and chat with everyone.
-    Requires the global room to be created first.
-    """
-    # Try to get the global chat room (do not auto-create)
-    try:
-        global_room = Room.objects.get(room_code='GLOBAL')
-    except Room.DoesNotExist:
-        messages.error(request, 'Global chat room has not been created yet. Please contact administrator.')
-        return redirect('home')
-    
-    # Check if user is already a member
-    existing_membership = RoomMembership.objects.filter(
-        user=request.user,
-        room=global_room
-    ).first()
-    
-    # If already a member, reactivate if needed
-    if existing_membership:
-        if not existing_membership.is_active:
-            existing_membership.is_active = True
-            existing_membership.save()
-    else:
-        # Create new membership
-        RoomMembership.objects.create(
-            user=request.user,
-            room=global_room,
-            is_active=True
-        )
-    
-    # Update room activity
-    global_room.update_activity()
-    
-    # Get all active members in the room
-    active_members = RoomMembership.objects.filter(
-        room=global_room,
-        is_active=True
-    ).select_related('user')
-    
-    context = {
-        'room': global_room,
-        'active_members': active_members,
-        'members_count': active_members.count(),
-        'is_owner': global_room.created_by == request.user,
-        'is_global': True,  # Flag to indicate this is the global room
-    }
-    return render(request, 'rooms/chat_room.html', context)
 
 
 @login_required
@@ -334,3 +271,35 @@ def room_detail_view(request, room_code):
         'is_owner': room.created_by == request.user,
     }
     return render(request, 'rooms/room_detail.html', context)
+
+
+@login_required
+def delete_room_view(request, room_code):
+    """
+    Delete a room. Only the room owner can delete their room.
+    Returns JSON response for AJAX calls.
+    """
+    from django.http import JsonResponse
+    from django.views.decorators.http import require_http_methods
+    
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'POST method required'}, status=405)
+    
+    # Get the room or return 404
+    room = get_object_or_404(Room, room_code=room_code)
+    
+    # Check if the user is the owner
+    if room.created_by != request.user:
+        return JsonResponse({
+            'success': False,
+            'error': 'Only the room owner can delete this room.'
+        }, status=403)
+    
+    # Delete the room (this will cascade delete memberships)
+    room_name = room.name
+    room.delete()
+    
+    return JsonResponse({
+        'success': True,
+        'message': f'Room "{room_name}" has been deleted successfully.'
+    })

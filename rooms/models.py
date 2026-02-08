@@ -58,14 +58,10 @@ class Room(models.Model):
     def update_activity(self):
         """
         Update last activity time and clear expiration if room has members.
-        Global room (room_code='GLOBAL') never expires.
         """
         self.last_activity = timezone.now()
         
-        # Global room never expires
-        if self.room_code == 'GLOBAL':
-            self.expires_at = None
-        elif not self.is_empty():
+        if not self.is_empty():
             self.expires_at = None  # Clear expiration when room has members
         else:
             # Set expiration for 15 minutes from now if room is empty
