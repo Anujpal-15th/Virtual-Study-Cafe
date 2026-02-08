@@ -128,13 +128,35 @@ CHANNEL_LAYERS = {
 # DATABASE CONFIGURATION
 # ========================================
 
-# Database selection: PostgreSQL or SQLite
+# Database selection: MySQL, PostgreSQL, or SQLite
 # Default: SQLite (for development, no setup needed)
+# If USE_MYSQL=True in .env, switch to MySQL
 # If USE_POSTGRES=True in .env, switch to PostgreSQL
 
+USE_MYSQL = os.getenv('USE_MYSQL', 'False') == 'True'
 USE_POSTGRES = os.getenv('USE_POSTGRES', 'False') == 'True'
 
-if USE_POSTGRES:
+if USE_MYSQL:
+    # MySQL Configuration
+    # Requires: MySQL server installed and database created
+    # Example: CREATE DATABASE virtualcafe_db; CREATE USER 'virtualcafe_user'@'localhost' IDENTIFIED BY 'password';
+    #          GRANT ALL PRIVILEGES ON virtualcafe_db.* TO 'virtualcafe_user'@'localhost';
+    DATABASES = {
+        'default': {
+            'ENGINE': 'virtualcafe.mysql_backend',  # Custom backend for MySQL 5.7 compatibility
+            'NAME': os.getenv('DB_NAME', 'virtualcafe_db'),          # Database name
+            'USER': os.getenv('DB_USER', 'root'),                    # Database user
+            'PASSWORD': os.getenv('DB_PASSWORD', ''),                # Database password
+            'HOST': os.getenv('DB_HOST', 'localhost'),               # Database host
+            'PORT': os.getenv('DB_PORT', '3306'),                    # Database port
+            'OPTIONS': {
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+                'charset': 'utf8mb4',
+            },
+        }
+    }
+    logger.info("Using MySQL database")
+elif USE_POSTGRES:
     # PostgreSQL Configuration (Production/Advanced)
     # Requires: PostgreSQL server installed and database created
     # Example: CREATE DATABASE virtualcafe_db; CREATE USER virtualcafe_user WITH PASSWORD 'password';

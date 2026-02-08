@@ -16,6 +16,7 @@ urlpatterns = [
     
     # Session management
     path('save-session/', views.save_study_session, name='save_session'),
+    path('api/save-session/', views.save_auto_session, name='save_auto_session'),
     path('update-preferences/', views.update_preferences, name='update_preferences'),
     
     # Stats API

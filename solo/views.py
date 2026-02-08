@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Sum
 from datetime import datetime, timedelta
 import json
@@ -63,6 +64,10 @@ def save_study_session(request):
         task_id = data.get('task_id', None)  # optional
         completed = data.get('completed', True)  # False if stopped early
         
+        # Validate minutes (at least 1 minute to save)
+        if minutes < 1:
+            return JsonResponse({'success': False, 'error': 'Session too short'}, status=400)
+        
         # Create the session
         session = StudySession.objects.create(
             user=request.user,
@@ -105,6 +110,76 @@ def save_study_session(request):
         
         return JsonResponse({'success': True})
         
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+
+@csrf_exempt
+@login_required
+@require_POST
+def save_auto_session(request):
+    """
+    Save auto-tracked study session from solo room
+    Called automatically when user leaves the room or periodically
+    Uses sendBeacon API for reliable delivery
+    """
+    try:
+        # Get data from request body
+        data = json.loads(request.body)
+        minutes = int(data.get('minutes', 0))
+        session_type = data.get('session_type', 'focus')
+        completed = data.get('completed', True)
+        
+        # Validate minutes (at least 1 minute to save)
+        if minutes < 1:
+            return JsonResponse({'success': True, 'message': 'Session too short to save'})
+        
+        # Create the session
+        session = StudySession.objects.create(
+            user=request.user,
+            minutes=minutes,
+            session_type=session_type,
+            completed=completed,
+            started_at=timezone.now() - timedelta(minutes=minutes),
+            ended_at=timezone.now()
+        )
+        
+        # Update profile stats (only for focus sessions)
+        if session_type == 'focus':
+            profile = request.user.profile
+            profile.update_study_stats(minutes)
+            
+            return JsonResponse({
+                'success': True,
+                'total_minutes': profile.total_study_minutes,
+                'message': f'Saved {minutes} minutes to your profile'
+            })
+        
+        return JsonResponse({'success': True})
+        
+    except json.JSONDecodeError:
+        # Handle sendBeacon data format
+        try:
+            # Try to parse as form data
+            minutes = int(request.POST.get('minutes', 0))
+            if minutes < 1:
+                return JsonResponse({'success': True})
+            
+            session = StudySession.objects.create(
+                user=request.user,
+                minutes=minutes,
+                session_type='focus',
+                completed=True,
+                started_at=timezone.now() - timedelta(minutes=minutes),
+                ended_at=timezone.now()
+            )
+            
+            profile = request.user.profile
+            profile.update_study_stats(minutes)
+            
+            return JsonResponse({'success': True})
+        except Exception as inner_e:
+            return JsonResponse({'success': False, 'error': str(inner_e)}, status=400)
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
@@ -292,10 +367,34 @@ def get_study_stats(request):
     
     rank = users_with_more_time + 1
     
+    # Get recent sessions (last 5 sessions in the period)
+    recent_sessions = sessions.order_by('-created_at')[:5].values(
+        'minutes',
+        'created_at',
+        'completed'
+    )
+    
+    # Format recent sessions for JSON
+    recent_sessions_list = []
+    for session in recent_sessions:
+        # Format the date/time
+        session_date = session['created_at']
+        if timezone.now().date() == session_date.date():
+            time_str = session_date.strftime('%I:%M %p')
+        else:
+            time_str = session_date.strftime('%b %d, %I:%M %p')
+        
+        recent_sessions_list.append({
+            'minutes': session['minutes'],
+            'time': time_str,
+            'completed': session['completed']
+        })
+    
     return JsonResponse({
         'success': True,
         'period': period_label,
         'study_hours': study_hours,
+        'total_minutes': total_minutes,
         'level_name': level_name,
         'next_level': next_level,
         'progress_percentage': round(progress_percentage, 1),
@@ -304,4 +403,5 @@ def get_study_stats(request):
         'completed_goals': completed_goals,
         'total_goals': total_goals,
         'rank': rank,
+        'recent_sessions': recent_sessions_list,
     })

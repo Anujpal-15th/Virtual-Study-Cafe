@@ -44,11 +44,11 @@ def home_view(request):
         expired_rooms.delete()
         messages.info(request, f'{expired_count} empty room(s) expired and removed.')
     
-    # Get all active PUBLIC rooms (visible to everyone, )
+    # Get all active rooms created by the current user (both public and private)
     rooms = Room.objects.filter(
         Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now()),
-        is_public=True
-    ).exclude(room_code='GLOBAL')
+        created_by=request.user  # Only show rooms created by current user
+    )
     
     # Get search query from GET parameters
     search_query = request.GET.get('search', '').strip()
