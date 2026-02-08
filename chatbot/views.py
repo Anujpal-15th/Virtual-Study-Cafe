@@ -50,7 +50,7 @@ def chatbot_api(request):
             }, status=503)
         
         # Educational AI Tutor System Prompt
-        system_prompt = \"\"\"You are an expert AI tutor and study companion in Virtual Cafe. Your role is to:
+        system_prompt = """You are an expert AI tutor and study companion in Virtual Cafe. Your role is to:
 
 🎓 TEACHING APPROACH:
 - Explain concepts clearly using examples, analogies, and step-by-step breakdowns
@@ -107,13 +107,13 @@ Steps to solve:
 
 **What part would you like me to explain in more detail?**
 
-When a student asks about a topic, first assess their current level, then teach step-by-step using the formatting rules above.\"\"\"
+When a student asks about a topic, first assess their current level, then teach step-by-step using the formatting rules above."""
 
         # Get response from Gemini with educational tutor configuration
         try:
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
-                contents=f\"{system_prompt}\\n\\nStudent Question: {user_message}\",
+                contents=f"{system_prompt}\n\nStudent Question: {user_message}",
                 config=types.GenerateContentConfig(
                     temperature=0.8,  # Slightly higher for more engaging responses
                     max_output_tokens=2000,  # More tokens for detailed explanations
