@@ -4,6 +4,7 @@ Handles room listing, creation, and detail pages.
 """
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Q, Count
 from django.utils import timezone
@@ -180,6 +181,44 @@ def browse_rooms_view(request):
         'search_query': search_query,
     }
     return render(request, 'rooms/browse_rooms.html', context)
+
+
+@login_required
+def ready_for_study_view(request):
+    """
+    View all users who are online and ready for study.
+    Shows users who share rooms with the current user and are currently online.
+    """
+    # Find users who share rooms with the current user
+    user_room_ids = RoomMembership.objects.filter(
+        user=request.user,
+        is_active=True
+    ).values_list('room_id', flat=True)
+    
+    # Consider users online if they've been active in the last 10 minutes
+    time_threshold = timezone.now() - timedelta(minutes=10)
+    
+    # Get all study partners (users in same rooms) who are currently online
+    study_partners = User.objects.filter(
+        room_memberships__room_id__in=user_room_ids,
+        room_memberships__is_active=True,
+        last_login__gte=time_threshold  # Only show users active in last 10 minutes
+    ).exclude(id=request.user.id).distinct().select_related('profile')
+    
+    # Get search query if provided
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        study_partners = study_partners.filter(
+            Q(username__icontains=search_query) |
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query)
+        )
+    
+    context = {
+        'study_partners': study_partners,
+        'search_query': search_query,
+    }
+    return render(request, 'rooms/ready_for_study.html', context)
 
 
 @login_required

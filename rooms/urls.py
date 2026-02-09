@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.landing_view, name='landing'),
     path('dashboard/', views.home_view, name='home'),
     path('rooms/', views.browse_rooms_view, name='browse_rooms'),
+    path('ready-for-study/', views.ready_for_study_view, name='ready_for_study'),
     path('rooms/create/', views.create_room_view, name='create_room'),
     path('rooms/join/', views.join_room_by_code_view, name='join_room_by_code'),
     path('rooms/join/<str:room_code>/', views.join_room_by_code_view, name='join_room_direct'),
