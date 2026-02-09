@@ -175,12 +175,35 @@ def create_room_view(request):
 
 
 @login_required
-def join_room_by_code_view(request):
+def join_room_by_code_view(request, room_code=None):
     """
     Handle joining a room by entering a room code.
-    GET: Display join room form
-    POST: Join the room by code and redirect to room detail
+    GET with room_code: Direct join via URL (e.g., /rooms/join/ABC123/)
+    POST: Join the room by code from form and redirect to room detail
     """
+    # Handle GET request with room_code in URL
+    if request.method == 'GET' and room_code:
+        room_code = room_code.strip().upper()
+        
+        # Try to find the room
+        try:
+            room = Room.objects.get(room_code=room_code)
+            
+            # Check if room has expired
+            if room.is_expired():
+                room.delete()
+                messages.error(request, 'This room has expired due to inactivity.')
+                return redirect('home')
+            
+            # Redirect to room detail (which handles membership creation)
+            messages.success(request, f'Joining room "{room.name}"...')
+            return redirect('room_detail', room_code=room.room_code)
+            
+        except Room.DoesNotExist:
+            messages.error(request, f'Room with code "{room_code}" not found. Please check the code and try again.')
+            return redirect('home')
+    
+    # Handle POST request with room_code in form
     if request.method == 'POST':
         room_code = request.POST.get('room_code', '').strip().upper()
         
@@ -207,7 +230,7 @@ def join_room_by_code_view(request):
             messages.error(request, f'Room with code "{room_code}" not found. Please check the code and try again.')
             return redirect('home')
     
-    # GET request - redirect to home
+    # GET request without room_code - redirect to home
     return redirect('home')
 
 
