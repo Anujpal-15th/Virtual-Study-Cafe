@@ -178,6 +178,44 @@
         font-weight: 600;
         cursor: pointer;
     }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 2.5rem 0 1.5rem 0;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #E2E8F0;
+    }
+    
+    .section-header:first-of-type {
+        margin-top: 0;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1A202C;
+    }
+    
+    .section-count {
+        background: #EFF6FF;
+        color: #5B7FFF;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    .no-rooms-message {
+        text-align: center;
+        padding: 2rem;
+        color: #94A3B8;
+        background: #F9FAFB;
+        border-radius: 8px;
+        border: 1px dashed #E2E8F0;
+    }
+
 </style>
 {% endblock %}
 
@@ -201,14 +239,17 @@
         <button type="submit" class="search-btn">🔍 Search</button>
     </form>
     
-    {% if rooms %}
+    <!-- Global Rooms Section -->
+    {% if global_rooms %}
+        <div class="section-header">
+            <span class="section-title">🌍 Available Study Rooms</span>
+            <span class="section-count">{{ global_rooms.count }}</span>
+        </div>
         <div class="rooms-grid">
-            {% for room in rooms %}
+            {% for room in global_rooms %}
             <div class="room-card" onclick="window.location.href='{% url 'room_detail' room.room_code %}'">
                 <div class="room-header">
-                    <div class="room-icon">
-                        {% if room.room_code == 'GLOBAL' %}🌍{% else %}📖{% endif %}
-                    </div>
+                    <div class="room-icon">📚</div>
                     <div class="room-info">
                         <div class="room-name">{{ room.name }}</div>
                         <div class="room-meta">by {{ room.created_by.username }}</div>
@@ -234,7 +275,56 @@
             </div>
             {% endfor %}
         </div>
-    {% else %}
+    {% endif %}
+    
+    <!-- Rooms Created By You Section -->
+    {% if user_rooms %}
+        <div class="section-header">
+            <span class="section-title">📚 Rooms Created By You</span>
+            <span class="section-count">{{ user_rooms.count }}</span>
+        </div>
+        <div class="rooms-grid">
+            {% for room in user_rooms %}
+            <div class="room-card" onclick="window.location.href='{% url 'room_detail' room.room_code %}'">
+                <div class="room-header">
+                    <div class="room-icon">📖</div>
+                    <div class="room-info">
+                        <div class="room-name">{{ room.name }}</div>
+                        <div class="room-meta">by {{ room.created_by.username }}</div>
+                    </div>
+                </div>
+                
+                {% if room.description %}
+                <div class="room-description">
+                    {{ room.description|truncatewords:20 }}
+                </div>
+                {% else %}
+                <div class="room-description">No description provided</div>
+                {% endif %}
+                
+                <div class="room-footer">
+                    <div class="room-members">
+                        👥 {{ room.member_count }} member{{ room.member_count|pluralize }}
+                    </div>
+                    <div class="room-status {% if room.member_count > 3 %}status-active{% elif room.member_count > 1 %}status-progress{% else %}status-waiting{% endif %}">
+                        {% if room.member_count > 3 %}Active{% elif room.member_count > 1 %}In Progress{% else %}Join Now{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% elif not search_query %}
+        <div class="section-header">
+            <span class="section-title">📚 Rooms Created By You</span>
+            <span class="section-count">0</span>
+        </div>
+        <div class="no-rooms-message">
+            <p>You haven't created any rooms yet. Start by creating your first study room!</p>
+        </div>
+    {% endif %}
+    
+    <!-- Empty State (when both sections are empty) -->
+    {% if not global_rooms and not user_rooms %}
         <div class="empty-state">
             <div class="empty-icon">🏫</div>
             <h2>No Rooms Available</h2>
