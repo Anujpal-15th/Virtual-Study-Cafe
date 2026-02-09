@@ -1,15 +1,3 @@
-/**
- * room.js - Virtual Cafe Room Functionality
- * 
- * This file handles:
- * - WebSocket connection for real-time chat
- * - Join/leave notifications
- * - WebRTC video calling (1-to-1)
- * - Pomodoro timer functionality
- */
-
-// ===== GLOBAL VARIABLES =====
-
 let chatSocket = null;
 let peerConnection = null;
 let localStream = null;
@@ -31,7 +19,6 @@ const rtcConfig = {
     ]
 };
 
-// ===== WEBSOCKET SETUP =====
 
 /**
  * Initialize WebSocket connection to the room

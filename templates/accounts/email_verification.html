@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - {{ site_name }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 30px;
+            color: #333;
+            line-height: 1.6;
+        }
+        .welcome-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .verify-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 14px 40px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+        .verify-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+        .alternative-link {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .alternative-link p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .alternative-link a {
+            color: #667eea;
+            word-break: break-all;
+            text-decoration: none;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 25px 30px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 13px;
+            border-top: 1px solid #e9ecef;
+        }
+        .features {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .features h3 {
+            color: #667eea;
+            margin-top: 0;
+            font-size: 18px;
+        }
+        .features ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .features li {
+            margin: 8px 0;
+            color: #555;
+        }
+        .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        .expiry-notice {
+            margin-top: 20px;
+            padding: 12px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="icon">☕📚</div>
+            <h1>Welcome to {{ site_name }}!</h1>
+        </div>
+        
+        <div class="content">
+            <p class="welcome-text">Hi <strong>{{ user.username }}</strong>,</p>
+            
+            <p>Thank you for signing up for VirtualCafe! We're excited to have you join our community of focused learners and productive students.</p>
+            
+            <p>To get started and access all features, please verify your email address by clicking the button below:</p>
+            
+            <center>
+                <a href="{{ verification_url }}" class="verify-button">✓ Verify Email Address</a>
+            </center>
+            
+            <div class="expiry-notice">
+                ⏱️ <strong>Important:</strong> This verification link will expire in 24 hours.
+            </div>
+            
+            <div class="features">
+                <h3>🎉 What's waiting for you:</h3>
+                <ul>
+                    <li>🏠 Create and join study rooms with video chat</li>
+                    <li>⏱️ Track your study sessions and progress</li>
+                    <li>🏆 Unlock achievements and level up</li>
+                    <li>📊 View detailed analytics and leaderboards</li>
+                    <li>🤖 Get help from our AI study assistant</li>
+                    <li>👥 Connect with other learners</li>
+                </ul>
+            </div>
+            
+            <div class="alternative-link">
+                <p><strong>Button not working?</strong> Copy and paste this link into your browser:</p>
+                <p><a href="{{ verification_url }}">{{ verification_url }}</a></p>
+            </div>
+            
+            <p style="margin-top: 30px; color: #6c757d; font-size: 14px;">
+                If you didn't create an account with VirtualCafe, you can safely ignore this email.
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p><strong>VirtualCafe - Study Together, Achieve Together</strong></p>
+            <p>This is an automated message, please do not reply to this email.</p>
+            <p style="margin-top: 15px;">
+                Need help? Contact us or visit our help center.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

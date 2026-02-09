@@ -5,7 +5,6 @@ Django settings for virtualcafe project.
 from pathlib import Path
 import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables from .env file
@@ -21,13 +20,6 @@ except Exception as e:
     # Fallback: load from system environment
     pass
 
-# Note: For production, use environment variables
-# For now, settings are configured directly below
-
-
-# ========================================
-# SECURITY SETTINGS
-# ========================================
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-h5j#k7@x^2v&m*9p$q!r+s_t%u(w)z~a3b4c5d6e7f8g9h0i'
@@ -113,75 +105,14 @@ CHANNEL_LAYERS = {
     }
 }
 
-# For production with Redis, uncomment below and comment above:
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-#         'CONFIG': {
-#             "hosts": [REDIS_URL],
-#         },
-#     },
-# }
 
 
-# ========================================
-# DATABASE CONFIGURATION
-# ========================================
-
-# Database selection: MySQL, PostgreSQL, or SQLite
-# Default: SQLite (for development, no setup needed)
-# If USE_MYSQL=True in .env, switch to MySQL
-# If USE_POSTGRES=True in .env, switch to PostgreSQL
-
-USE_MYSQL = os.getenv('USE_MYSQL', 'False') == 'True'
-USE_POSTGRES = os.getenv('USE_POSTGRES', 'False') == 'True'
-
-if USE_MYSQL:
-    # MySQL Configuration
-    # Requires: MySQL server installed and database created
-    # Example: CREATE DATABASE virtualcafe_db; CREATE USER 'virtualcafe_user'@'localhost' IDENTIFIED BY 'password';
-    #          GRANT ALL PRIVILEGES ON virtualcafe_db.* TO 'virtualcafe_user'@'localhost';
-    DATABASES = {
-        'default': {
-            'ENGINE': 'virtualcafe.mysql_backend',  # Custom backend for MySQL 5.7 compatibility
-            'NAME': os.getenv('DB_NAME', 'virtualcafe_db'),          # Database name
-            'USER': os.getenv('DB_USER', 'root'),                    # Database user
-            'PASSWORD': os.getenv('DB_PASSWORD', ''),                # Database password
-            'HOST': os.getenv('DB_HOST', 'localhost'),               # Database host
-            'PORT': os.getenv('DB_PORT', '3306'),                    # Database port
-            'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-                'charset': 'utf8mb4',
-            },
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-    logger.info("Using MySQL database")
-elif USE_POSTGRES:
-    # PostgreSQL Configuration (Production/Advanced)
-    # Requires: PostgreSQL server installed and database created
-    # Example: CREATE DATABASE virtualcafe_db; CREATE USER virtualcafe_user WITH PASSWORD 'password';
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME', 'virtualcafe_db'),          # Database name
-            'USER': os.getenv('DB_USER', 'virtualcafe_user'),        # Database user
-            'PASSWORD': os.getenv('DB_PASSWORD', 'VirtualCafe@123'), # Database password
-            'HOST': os.getenv('DB_HOST', 'localhost'),               # Database host
-            'PORT': os.getenv('DB_PORT', '5432'),                    # Database port
-        }
-    }
-    logger.info("Using PostgreSQL database")
-else:
-    # SQLite Configuration (Development/Default)
-    # SQLite is a file-based database, perfect for development
-    # No server needed, database stored in db.sqlite3 file
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-    logger.info("Using SQLite database")
+}
 
 
 # Password validation
@@ -230,10 +161,6 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
-
-# ========================================
-# EMAIL SETTINGS (for password reset)
-# ========================================
 
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')

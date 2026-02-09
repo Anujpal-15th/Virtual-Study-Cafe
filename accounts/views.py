@@ -9,25 +9,40 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.http import JsonResponse
+from django.conf import settings
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.urls import reverse
 from .forms import SignUpForm, UserUpdateForm, ProfileUpdateForm
-from .models import UserProfile
+from .models import UserProfile, EmailVerification
 
 
 def signup_view(request):
     """
-    Handle user registration with email
+    Handle user registration with email verification
     GET: Display signup form
-    POST: Create new user and log them in
+    POST: Create new user and send verification email
     """
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            # Save the new user
+            # Save the new user (but don't log them in yet)
             user = form.save()
-            # Log the user in automatically
-            login(request, user)
-            messages.success(request, f'Welcome {user.username}! Your account has been created.')
-            return redirect('home')  # Redirect to home dashboard
+            user.is_active = True  # Keep active but require email verification
+            user.save()
+            
+            # Create verification token
+            verification = EmailVerification.create_for_user(user)
+            
+            # Send verification email
+            send_verification_email(request, user, verification)
+            
+            messages.success(
+                request, 
+                f'Account created! Please check your email ({user.email}) to verify your account.'
+            )
+            return redirect('verification_sent')
         else:
             # Show form errors to the user
             for field, errors in form.errors.items():
@@ -54,7 +69,17 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                messages.success(request, f'Welcome back, {username}!')
+                
+                # Check if email is verified
+                if hasattr(user, 'profile') and not user.profile.email_verified:
+                    messages.warning(
+                        request, 
+                        f'Welcome back, {username}! Please verify your email to access all features. '
+                        '<a href="/resend-verification/" style="color: white; text-decoration: underline;">Resend verification email</a>'
+                    )
+                else:
+                    messages.success(request, f'Welcome back, {username}!')
+                
                 return redirect('home')
         else:
             messages.error(request, 'Invalid username or password.')
@@ -404,3 +429,143 @@ def api_update_profile(request):
             'success': False,
             'error': str(e)
         }, status=400)
+
+
+# ===== EMAIL VERIFICATION VIEWS =====
+
+def send_verification_email(request, user, verification):
+    """
+    Send verification email to user with verification link
+    """
+    verification_url = request.build_absolute_uri(
+        reverse('verify_email', args=[verification.token])
+    )
+    
+    subject = 'Verify Your VirtualCafe Account'
+    html_message = render_to_string('accounts/email_verification.html', {
+        'user': user,
+        'verification_url': verification_url,
+        'site_name': 'VirtualCafe',
+    })
+    plain_message = strip_tags(html_message)
+    
+    try:
+        send_mail(
+            subject,
+            plain_message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        return True
+    except Exception as e:
+        print(f"Error sending verification email: {e}")
+        return False
+
+
+def verification_sent_view(request):
+    """
+    Display after signup - tells user to check email
+    """
+    return render(request, 'accounts/verification_sent.html')
+
+
+def verify_email_view(request, token):
+    """
+    Handle email verification link clicks
+    Verifies the token and activates the user account
+    """
+    try:
+        verification = get_object_or_404(EmailVerification, token=token)
+        
+        if verification.verified:
+            messages.info(request, 'Your email has already been verified. You can log in.')
+            return redirect('login')
+        
+        if verification.is_expired():
+            messages.error(
+                request, 
+                'This verification link has expired. Please request a new one.'
+            )
+            return redirect('resend_verification')
+        
+        # Mark as verified
+        verification.verified = True
+        verification.save()
+        
+        # Update user profile
+        user = verification.user
+        if hasattr(user, 'profile'):
+            from django.utils import timezone
+            user.profile.email_verified = True
+            user.profile.email_verified_at = timezone.now()
+            user.profile.save()
+        
+        messages.success(
+            request, 
+            'Email verified successfully! You can now log in and access all features.'
+        )
+        return redirect('login')
+        
+    except EmailVerification.DoesNotExist:
+        messages.error(request, 'Invalid verification link.')
+        return redirect('login')
+
+
+def resend_verification_view(request):
+    """
+    Allow user to request a new verification email
+    """
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        
+        try:
+            user = User.objects.get(email=email)
+            
+            # Check if already verified
+            if hasattr(user, 'profile') and user.profile.email_verified:
+                messages.info(request, 'Your email is already verified. You can log in.')
+                return redirect('login')
+            
+            # Invalidate old tokens
+            EmailVerification.objects.filter(user=user, verified=False).update(verified=True)
+            
+            # Create new verification token
+            verification = EmailVerification.create_for_user(user)
+            
+            # Send new email
+            if send_verification_email(request, user, verification):
+                messages.success(
+                    request, 
+                    f'A new verification email has been sent to {email}. Please check your inbox.'
+                )
+            else:
+                messages.error(request, 'Failed to send email. Please try again later.')
+            
+        except User.DoesNotExist:
+            # Don't reveal whether email exists for security
+            messages.info(
+                request, 
+                'If an account exists with that email, a verification link will be sent.'
+            )
+        
+        return redirect('resend_verification')
+    
+    return render(request, 'accounts/resend_verification.html')
+
+
+@login_required
+def check_verification_status(request):
+    """
+    API endpoint to check if user's email is verified
+    """
+    is_verified = False
+    if hasattr(request.user, 'profile'):
+        is_verified = request.user.profile.email_verified
+    
+    return JsonResponse({
+        'email_verified': is_verified,
+        'email': request.user.email
+    })
+

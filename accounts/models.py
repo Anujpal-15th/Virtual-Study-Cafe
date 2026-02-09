@@ -5,6 +5,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
+from datetime import timedelta
+import uuid
 
 
 class UserProfile(models.Model):
@@ -55,6 +58,10 @@ class UserProfile(models.Model):
     # Social features
     favorite_rooms = models.ManyToManyField('rooms.Room', blank=True, related_name='favorited_by',
                                            help_text="Rooms this user has favorited")
+    
+    # Email verification
+    email_verified = models.BooleanField(default=False, help_text="Has user verified their email?")
+    email_verified_at = models.DateTimeField(null=True, blank=True, help_text="When email was verified")
     
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
@@ -224,4 +231,43 @@ def save_user_preferences(sender, instance, **kwargs):
     """
     if hasattr(instance, 'preferences'):
         instance.preferences.save()
+
+
+class EmailVerification(models.Model):
+    """
+    Email verification tokens for new user registrations
+    Tokens expire after 24 hours
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='email_verifications')
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    verified = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Email Verification'
+        verbose_name_plural = 'Email Verifications'
+    
+    def __str__(self):
+        return f"Verification for {self.user.username} - {'Verified' if self.verified else 'Pending'}"
+    
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            # Token expires in 24 hours
+            self.expires_at = timezone.now() + timedelta(hours=24)
+        super().save(*args, **kwargs)
+    
+    def is_expired(self):
+        """Check if verification token has expired"""
+        return timezone.now() > self.expires_at
+    
+    def is_valid(self):
+        """Check if token is valid (not expired and not already used)"""
+        return not self.verified and not self.is_expired()
+    
+    @classmethod
+    def create_for_user(cls, user):
+        """Create a new verification token for a user"""
+        return cls.objects.create(user=user)
 
