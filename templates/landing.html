@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Virtual Cafe - Your Digital Escape</title>
+    <title>Virtual Study Cafe - Your Virtual Study Space</title>
     <style>
         * {
             margin: 0;
@@ -14,6 +14,9 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             overflow-x: hidden;
+            scroll-behavior: smooth;
+            background: #ffffff;
+            color: #1e293b;
         }
         
         /* Navigation */
@@ -29,334 +32,600 @@
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
+            border-bottom: 1px solid rgba(30, 58, 138, 0.1);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
         
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
         .nav-center {
+            flex: 1;
             display: flex;
-            gap: 3rem;
+            gap: 2.5rem;
+            align-items: center;
+            justify-content: center;
         }
         
         .nav-center a {
-            color: #333;
+            color: rgba(30, 41, 59, 0.85);
             text-decoration: none;
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 500;
             transition: color 0.3s;
         }
         
         .nav-center a:hover {
-            color: #667eea;
+            color: #1e3a8a;
         }
         
         .nav-right {
             display: flex;
-            gap: 1.5rem;
+            gap: 1rem;
             align-items: center;
         }
         
-        .icon-btn {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
+        .join-btn {
+            padding: 0.75rem 1.75rem;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
             border: none;
-            background: transparent;
-        }
-        
-        .icon-btn.video {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .icon-btn.video:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        
-        .icon-btn.profile {
-            color: #667eea;
-        }
-        
-        .icon-btn svg {
-            width: 24px;
-            height: 24px;
-        }
-        
-        /* Hero Section */
-        .hero {
-            height: 100vh;
-            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), 
-                        url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1920') center/cover;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: white;
-            position: relative;
-        }
-        
-        .hero-clock {
-            font-size: 4rem;
-            font-weight: 300;
-            margin-bottom: 3rem;
-            letter-spacing: 0.05em;
-        }
-        
-        .hero h1 {
-            font-size: 4.5rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
-        }
-        
-        .hero p {
-            font-size: 1.3rem;
-            max-width: 700px;
-            line-height: 1.8;
-            margin-bottom: 3rem;
-            color: rgba(255, 255, 255, 0.95);
-        }
-        
-        .cta-button {
-            padding: 1.2rem 3rem;
-            font-size: 1.1rem;
+            border-radius: 25px;
             font-weight: 600;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-            color: white;
-            border: none;
-            border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s;
             text-decoration: none;
             display: inline-block;
         }
         
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(255, 154, 158, 0.4);
+        .join-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.4);
         }
         
-        /* Cafes Section */
-        .cafes-section {
-            padding: 5rem 3rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .section-title {
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            background: radial-gradient(ellipse at top, rgba(30, 58, 138, 0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at bottom, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
+                        #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
+            color: #1e293b;
+            position: relative;
+            padding: 8rem 2rem 4rem;
+        }
+        
+        .hero h1 {
+            font-size: 5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+        
+        .hero h1 .gradient-text {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            max-width: 650px;
+            line-height: 1.7;
+            margin-bottom: 3rem;
+            color: rgba(30, 41, 59, 0.7);
+        }
+        
+        .hero-subtitle strong {
+            color: rgba(30, 41, 59, 0.95);
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
             margin-bottom: 4rem;
         }
         
-        .section-title h2 {
-            font-size: 3rem;
+        .cta-button {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .cta-primary {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+        }
+        
+        .cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(30, 58, 138, 0.4);
+        }
+        
+        .cta-secondary {
+            background: rgba(30, 58, 138, 0.08);
+            color: #1e3a8a;
+            border: 1px solid rgba(30, 58, 138, 0.2);
+        }
+        
+        .cta-secondary:hover {
+            background: rgba(30, 58, 138, 0.12);
+        }
+        
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            justify-content: center;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
             font-weight: 700;
-            color: #fff;
+            color: #1e3a8a;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+        
+        .stat-icon {
+            font-size: 1.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.95rem;
+            color: rgba(30, 41, 59, 0.6);
+            margin-top: 0.25rem;
+        }
+        
+        /* Live Rooms Section */
+        .live-rooms-section {
+            padding: 5rem 3rem;
+            background: #f8fafc;
+            position: relative;
+        }
+        
+        .live-rooms-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(30, 58, 138, 0.1), transparent);
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-header h2 {
+            font-size: 3.5rem;
+            font-weight: 700;
             margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
         
-        .title-underline {
-            width: 80px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.5);
+        .section-header h2 .gradient-text {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section-header p {
+            font-size: 1.15rem;
+            color: rgba(30, 41, 59, 0.6);
+            max-width: 600px;
             margin: 0 auto;
-            border-radius: 2px;
         }
         
-        .cafes-grid {
+        .rooms-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2.5rem;
-            max-width: 1400px;
-            margin: 0 auto;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto 3rem;
         }
         
-        .cafe-card {
-            background: rgba(255, 255, 255, 0.15);
+        .room-card {
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(30, 58, 138, 0.1);
             border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
             transition: all 0.3s;
             cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
         
-        .cafe-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-            background: rgba(255, 255, 255, 0.2);
+        .room-card.animate {
+            opacity: 1;
+            transform: translateY(0);
         }
         
-        .cafe-image {
-            height: 250px;
-            background-size: cover;
-            background-position: center;
+        .room-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(30, 58, 138, 0.4);
+            box-shadow: 0 20px 40px rgba(30, 58, 138, 0.15);
         }
         
-        .cafe-content {
-            padding: 2rem;
+        .room-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
         }
         
-        .cafe-content h3 {
+        .badge-hot {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+        
+        .badge-vibes {
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
+        }
+        
+        .badge-popular {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        }
+        
+        .room-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .room-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(30, 58, 138, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 1.5rem;
-            color: #fff;
-            margin-bottom: 0.8rem;
+        }
+        
+        .room-info h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.25rem;
+            color: #1e293b;
+        }
+        
+        .room-activity {
+            font-size: 0.9rem;
+            color: rgba(30, 41, 59, 0.6);
+        }
+        
+        .room-description {
+            color: rgba(30, 41, 59, 0.7);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .room-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .room-users {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .user-avatars {
+            display: flex;
+        }
+        
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            border: 2px solid #ffffff;
+            margin-left: -10px;
+        }
+        
+        .user-avatar:first-child {
+            margin-left: 0;
+        }
+        
+        .user-count {
+            font-size: 0.9rem;
+            color: rgba(30, 41, 59, 0.6);
+        }
+        
+        .live-count {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #10b981;
             font-weight: 600;
         }
         
-        .cafe-content p {
-            color: rgba(255, 255, 255, 0.9);
+        .live-count::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s ease infinite;
+        }
+        
+        .browse-all-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: rgba(30, 58, 138, 0.05);
+            border: 1px solid rgba(30, 58, 138, 0.15);
+            border-radius: 30px;
+            color: #1e3a8a;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 0 auto;
+            text-decoration: none;
+        }
+        
+        .browse-all-btn:hover {
+            background: rgba(30, 58, 138, 0.1);
+            border-color: rgba(30, 58, 138, 0.4);
+            transform: translateX(5px);
+        }
+        
+        /* Footer */
+        /* Landing Footer */
+        .landing-footer {
+            background: rgba(30, 58, 138, 0.05);
+            color: #1e293b;
+            padding: 3rem;
+            text-align: center;
+            border-top: 1px solid rgba(30, 58, 138, 0.1);
+        }
+        
+        .landing-footer p {
+            color: rgba(30, 41, 59, 0.6);
+            font-size: 0.95rem;
+        }
+        
+        /* Features Section */
+        .features-section {
+            padding: 5rem 3rem;
+            background: #ffffff;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: 2.5rem 2rem;
+            background: rgba(30, 58, 138, 0.03);
+            border-radius: 20px;
+            transition: all 0.3s;
+            border: 1px solid rgba(30, 58, 138, 0.1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(30, 58, 138, 0.15);
+            background: rgba(30, 58, 138, 0.05);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+        
+        .feature-card p {
+            color: rgba(30, 41, 59, 0.7);
             line-height: 1.6;
         }
         
         /* About Section */
         .about-section {
-            padding: 6rem 3rem;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16162a 100%);
-        }
-        
-        .about-container {
-            max-width: 1400px;
-            margin: 0 auto;
+            padding: 5rem 3rem;
+            background: #f8fafc;
         }
         
         .about-content {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 4rem;
-            align-items: start;
-        }
-        
-        .about-text h2 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1.5rem;
-        }
-        
-        .about-lead {
-            font-size: 1.3rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 3rem;
-        }
-        
-        .about-features {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-        
-        .feature-item {
-            display: flex;
-            gap: 1.5rem;
-            align-items: flex-start;
-        }
-        
-        .feature-icon {
-            font-size: 2.5rem;
-            flex-shrink: 0;
-        }
-        
-        .feature-content h3 {
-            font-size: 1.4rem;
-            color: #fff;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-        
-        .feature-content p {
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.7;
-            font-size: 1rem;
-        }
-        
-        .about-cta {
+            max-width: 900px;
+            margin: 0 auto;
             text-align: center;
-            padding: 2rem;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 20px;
-            border: 1px solid rgba(102, 126, 234, 0.2);
         }
         
-        .cta-note {
-            margin-top: 1rem;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.95rem;
+        .about-content h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: #1e293b;
+        }
+        
+        .about-content p {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: rgba(30, 41, 59, 0.7);
+            margin-bottom: 1.5rem;
         }
         
         .about-stats {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            position: sticky;
-            top: 100px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
         }
         
-        .stat-card {
-            background: rgba(102, 126, 234, 0.15);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 20px;
+        .about-stat {
             padding: 2rem;
-            text-align: center;
-            transition: all 0.3s;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
         
-        .stat-card:hover {
-            transform: translateY(-5px);
-            background: rgba(102, 126, 234, 0.2);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-        }
-        
-        .stat-number {
-            font-size: 3rem;
+        .about-stat-number {
+            font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #1e3a8a;
             margin-bottom: 0.5rem;
         }
         
-        .stat-label {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1rem;
-            font-weight: 500;
+        .about-stat-label {
+            color: rgba(30, 41, 59, 0.6);
+            font-size: 0.95rem;
         }
         
-        /* Footer */
-        .landing-footer {
-            background: rgba(26, 26, 46, 0.95);
-            backdrop-filter: blur(10px);
-            color: white;
-            padding: 3rem;
+        /* Contact Section */
+        .contact-section {
+            padding: 5rem 3rem;
+            background: #ffffff;
+        }
+        
+        .contact-content {
+            max-width: 800px;
+            margin: 0 auto;
             text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
         
-        .landing-footer p {
-            color: rgba(255, 255, 255, 0.8);
+        .contact-content h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+        
+        .contact-content p {
+            font-size: 1.15rem;
+            color: rgba(30, 41, 59, 0.7);
+            margin-bottom: 3rem;
+        }
+        
+        .contact-methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .contact-method {
+            padding: 2rem;
+            background: rgba(30, 58, 138, 0.03);
+            border-radius: 15px;
+            transition: all 0.3s;
+            border: 1px solid rgba(30, 58, 138, 0.1);
+        }
+        
+        .contact-method:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(30, 58, 138, 0.15);
+        }
+        
+        .contact-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .contact-method h4 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #1e293b;
+        }
+        
+        .contact-method p {
+            font-size: 0.95rem;
+            color: rgba(30, 41, 59, 0.6);
+            margin: 0;
+        }
+        
+        /* Chat Bubble */
+        .chat-bubble {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.4);
+            transition: all 0.3s;
+            z-index: 999;
+        }
+        
+        .chat-bubble:hover {
+            transform: scale(1.1);
+        }
+        
+        .chat-bubble::after {
+            content: "💬";
+            font-size: 1.5rem;
+        }
+        
+        .chat-bubble-dot {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            background: #10b981;
+            border-radius: 50%;
+            border: 2px solid #3b82f6;
+        }
+        
+        @media (max-width: 1200px) {
+            .rooms-grid {
+                grid-template-columns: repeat(1, 1fr);
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-methods {
+                grid-template-columns: 1fr;
+            }
+            
+            .about-stats {
+                grid-template-columns: 1fr;
+            }
         }
         
         @media (max-width: 768px) {
@@ -365,28 +634,44 @@
             }
             
             .nav-center {
-                display: none;
-            }
-            
-            .about-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .about-stats {
-                position: relative;
-                top: 0;
+                gap: 1rem;
+                font-size: 0.9rem;
             }
             
             .hero h1 {
                 font-size: 2.5rem;
             }
             
-            .hero-clock {
-                font-size: 2.5rem;
+            .cta-buttons {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
             }
             
-            .cafes-grid {
+            .cta-button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
+            .rooms-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .section-header h2 {
+                font-size: 2rem;
+            }
+            
+            .about-content h2 {
+                font-size: 2rem;
+            }
+            
+            .contact-content h2 {
+                font-size: 2rem;
             }
         }
     </style>
@@ -394,175 +679,311 @@
 <body>
     <!-- Navigation -->
     <nav class="landing-nav">
-        <div class="logo">The Virtual Cafe</div>
         <div class="nav-center">
             <a href="#home">Home</a>
+            <a href="#rooms">Rooms</a>
             <a href="#about">About</a>
-            <a href="#features">Features</a>
-            <a href="{% url 'login' %}" class="icon-btn">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                </svg>
-            </a fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-                </svg>
-            </button>
+            <a href="#contact">Contact</a>
+        </div>
+        <div class="nav-right">
+            <a href="{% url 'login' %}" class="join-btn">Join Now</a>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="hero" id="home">
-        <div class="hero-clock" id="clock">09:49 PM</div>
-        <h1>Your Digital Escape</h1>
-        <p>Sip, socialize, and play in a virtual space designed just for you. Boot up.<br>Brew's ready.</p>
-        <a href="{% url 'login' %}" class="cta-button">Explore Cafes</a>
+        <h1><span class="gradient-text">Virtual Study Cafe</span></h1>
+        
+        <p class="hero-subtitle">
+            Your virtual study space where <strong>focus meets community</strong>. Join study rooms, track your progress, and stay motivated with fellow learners from around the world.
+        </p>
+        
+        <div class="cta-buttons">
+            <a href="{% url 'signup' %}" class="cta-button cta-primary">
+                Start for free →
+            </a>
+        </div>
+        
+        <div class="hero-stats">
+            <div class="stat-item">
+                <div class="stat-number">
+                    <span class="stat-icon">👥</span>
+                    2K+
+                </div>
+                <div class="stat-label">Active Students</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">
+                    <span class="stat-icon">🌍</span>
+                    58+
+                </div>
+                <div class="stat-label">Countries</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">
+                    <span class="stat-icon">⚡</span>
+                    24/7
+                </div>
+                <div class="stat-label">Always Open</div>
+            </div>
+        </div>
     </section>
 
-    <!-- Cafes Section -->
-    <section class="cafes-section" id="features">
-        <div class="section-title">
-            <h2>Explore Our Cafe Worlds</h2>
-            <div class="title-underline"></div>
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="section-header">
+            <h2>Why Choose <span class="gradient-text">Virtual Study Cafe</span></h2>
+            <p>Everything you need to stay focused and motivated in your learning journey</p>
         </div>
-        <div class="cafes-grid">
-            <div class="cafe-card">
-                <div class="cafe-image" style="background-image: url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600');"></div>
-                <div class="cafe-content">
-                    <h3>Cozy Corner Cafe</h3>
-                    <p>A warm, inviting space with soft lighting and comfortable seating. Perfect for focused study sessions.</p>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Focused Study Rooms</h3>
+                <p>Join dedicated study spaces designed to help you concentrate and achieve your academic goals with minimal distractions.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Track Your Progress</h3>
+                <p>Monitor your study sessions, set goals, and visualize your progress with comprehensive analytics and insights.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3>Study Together</h3>
+                <p>Connect with motivated learners worldwide. Share notes, collaborate on projects, and stay accountable together.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎵</div>
+                <h3>Lo-fi Music</h3>
+                <p>Enjoy curated lo-fi playlists and ambient sounds to create the perfect study atmosphere and boost productivity.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🏆</div>
+                <h3>Achievements</h3>
+                <p>Earn badges and achievements as you hit study milestones. Stay motivated with our gamified learning system.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔔</div>
+                <h3>Smart Reminders</h3>
+                <p>Never miss a study session with intelligent notifications and personalized reminders tailored to your schedule.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Rooms Section -->
+    <section class="live-rooms-section" id="rooms">
+        <div class="section-header">
+            <h2>Join a <span class="gradient-text">Study Room</span></h2>
+            <p>Connect with focused learners in real-time. Pick a room and start studying together.</p>
+        </div>
+        
+        <div class="rooms-grid">
+            <!-- Music Lounge -->
+            <div class="room-card">
+                <div class="room-badge badge-vibes">VIBES</div>
+                <div class="room-header">
+                    <div class="room-icon">🎵</div>
+                    <div class="room-info">
+                        <h3>Music Lounge</h3>
+                        <div class="room-activity">Lo-fi beats playing</div>
+                    </div>
+                </div>
+                <div class="room-description">Study with relaxing lo-fi music and ambient sounds. Perfect for deep focus sessions and maintaining concentration throughout your study time.</div>
+                <div class="room-footer">
+                    <div class="room-users">
+                        <div class="user-avatars">
+                            <div class="user-avatar"></div>
+                            <div class="user-avatar"></div>
+                            <div class="user-avatar"></div>
+                            <div class="user-avatar"></div>
+                        </div>
+                        <span class="user-count">+31 more</span>
+                    </div>
+                    <div class="live-count">35</div>
                 </div>
             </div>
-            <div class="cafe-card">
-                <div class="cafe-image" style="background-image: url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600');"></div>
-                <div class="cafe-content">
-                    <h3>Modern Study Hub</h3>
-                    <p>Sleek, minimalist design with high-speed vibes. Ideal for productivity and collaboration.</p>
+            
+            <!-- Social Hub -->
+            <div class="room-card">
+                <div class="room-badge badge-popular">POPULAR</div>
+                <div class="room-header">
+                    <div class="room-icon">👥</div>
+                    <div class="room-info">
+                        <h3>Social Hub</h3>
+                        <div class="room-activity">Break time activities</div>
+                    </div>
+                </div>
+                <div class="room-description">Take a break and socialize! Join trivia games, casual discussions, and connect with fellow students during study breaks.</div>
+                <div class="room-footer">
+                    <div class="room-users">
+                        <div class="user-avatars">
+                            <div class="user-avatar"></div>
+                            <div class="user-avatar"></div>
+                            <div class="user-avatar"></div>
+                            <div class="user-avatar"></div>
+                        </div>
+                        <span class="user-count">+41 more</span>
+                    </div>
+                    <div class="live-count">45</div>
                 </div>
             </div>
-            <div class="cafe-card">
-                <div class="cafe-image" style="background-image: url('https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=600');"></div>
-                <div class="cafe-content">
-                    <h3>Garden Terrace</h3>
-                    <p>Nature-inspired atmosphere with greenery and natural light. Study surrounded by tranquility.</p>
+            
+            <!-- Study Room -->
+            <div class="room-card">
+                <div class="room-header">
+                    <div class="room-icon">📚</div>
+                    <div class="room-info">
+                        <h3>Study Room</h3>
+                        <div class="room-activity">Focused studying</div>
+                    </div>
+                </div>
+                <div class="room-description">Pure focus mode - a quiet, distraction-free environment for serious study sessions. Pomodoro timers and productivity tools included.</div>
+                <div class="room-footer">
+                    <div class="room-users">
+                        <div class="user-avatars">
+                            <div class="user-avatar"></div>
+                            <div class="user-avatar"></div>
+                        </div>
+                        <span class="user-count">+13 more</span>
+                    </div>
+                    <div class="live-count">15</div>
                 </div>
             </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="{% url 'home' %}" class="browse-all-btn">Browse all study rooms →</a>
         </div>
     </section>
 
     <!-- About Section -->
     <section class="about-section" id="about">
-        <div class="about-container">
-            <div class="about-content">
-                <div class="about-text">
-                    <h2>Why Virtual Cafe?</h2>
-                    <p class="about-lead">We know the struggle. You're staring at your screen, coffee getting cold, surrounded by silence (or chaos). Sometimes, you just need that perfect study vibe.</p>
-                    
-                    <div class="about-features">
-                        <div class="feature-item">
-                            <div class="feature-icon">🎯</div>
-                            <div class="feature-content">
-                                <h3>Stay Focused, Together</h3>
-                                <p>Join study rooms with like-minded learners. No judgment, just collective focus energy. It's like having study buddies who actually show up.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="feature-item">
-                            <div class="feature-icon">⏱️</div>
-                            <div class="feature-content">
-                                <h3>Pomodoro Made Easy</h3>
-                                <p>Built-in timers that actually help you stick to the plan. 25 minutes of deep work, 5-minute break. No more "just 5 more minutes" turning into 2 hours of procrastination.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="feature-item">
-                            <div class="feature-icon">📊</div>
-                            <div class="feature-content">
-                                <h3>Track Your Grind</h3>
-                                <p>See your progress, build streaks, level up. Because nothing motivates like watching those study hours add up (and secretly competing with your friends).</p>
-                            </div>
-                        </div>
-                        
-                        <div class="feature-item">
-                            <div class="feature-icon">🌙</div>
-                            <div class="feature-content">
-                                <h3>Study Your Way</h3>
-                                <p>Late night cram session? Early morning warrior? Aesthetic backgrounds, lofi beats, customizable everything. Make it yours.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="feature-item">
-                            <div class="feature-icon">🤝</div>
-                            <div class="feature-content">
-                                <h3>No More Study Guilt</h3>
-                                <p>Life happens. Missed a day? It's okay. We're here to help you get back on track, not make you feel bad about it.</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="about-cta">
-                        <a href="{% url 'signup' %}" class="cta-button">Start Your Journey</a>
-                        <p class="cta-note">Free forever. No credit card needed. Just you, your goals, and a virtual cup of coffee.</p>
-                    </div>
+        <div class="about-content">
+            <h2>About <span class="gradient-text">Virtual Study Cafe</span></h2>
+            <p>
+                Virtual Study Cafe is more than just a study platform - it's a global community of learners dedicated to achieving their academic goals together. Founded on the belief that studying doesn't have to be lonely, we've created a space where students can find motivation, accountability, and support.
+            </p>
+            <p>
+                Whether you're preparing for exams, working on projects, or just need a focused environment to get work done, Virtual Study Cafe provides the tools and community to help you succeed. Join thousands of students worldwide who are transforming their study habits and achieving their dreams.
+            </p>
+            
+            <div class="about-stats">
+                <div class="about-stat">
+                    <div class="about-stat-number">10K+</div>
+                    <div class="about-stat-label">Study Hours Logged</div>
+                </div>
+                <div class="about-stat">
+                    <div class="about-stat-number">500+</div>
+                    <div class="about-stat-label">Daily Active Users</div>
+                </div>
+                <div class="about-stat">
+                    <div class="about-stat-number">95%</div>
+                    <div class="about-stat-label">Satisfaction Rate</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="contact-content">
+            <h2>Get in <span class="gradient-text">Touch</span></h2>
+            <p>Have questions, suggestions, or just want to say hi? We'd love to hear from you!</p>
+            
+            <div class="contact-methods">
+                <div class="contact-method">
+                    <div class="contact-icon">📧</div>
+                    <h4>Email Us</h4>
+                    <p>support@virtualstudycafe.com</p>
                 </div>
                 
-                <div class="about-stats">
-                    <div class="stat-card">
-                        <div class="stat-number">10K+</div>
-                        <div class="stat-label">Active Learners</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">500K+</div>
-                        <div class="stat-label">Study Hours Logged</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">95%</div>
-                        <div class="stat-label">Productivity Boost</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">24/7</div>
-                        <div class="stat-label">Study Rooms Open</div>
-                    </div>
+                <div class="contact-method">
+                    <div class="contact-icon">💬</div>
+                    <h4>Live Chat</h4>
+                    <p>Available 24/7 for instant help</p>
                 </div>
+                
+                <div class="contact-method">
+                    <div class="contact-icon">🌐</div>
+                    <h4>Social Media</h4>
+                    <p>Follow us for updates & tips</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <a href="{% url 'signup' %}" class="cta-button cta-primary" style="display: inline-flex;">
+                    Join Our Community →
+                </a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer class="landing-footer">
-        <p>&copy; 2026 The Virtual Cafe - Your Digital Study Space</p>
+        <p>&copy; 2026 Virtual Study Cafe - Your Virtual Study Space</p>
     </footer>
+    
+    <!-- Chat Bubble -->
+    <div class="chat-bubble">
+        <div class="chat-bubble-dot"></div>
+    </div>
 
     <script>
-        // Update clock every second
-        function updateClock() {
-            const now = new Date();
-            const hours = now.getHours();
-            const minutes = now.getMinutes();
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            const displayHours = hours % 12 || 12;
-            const displayMinutes = minutes.toString().padStart(2, '0');
-            
-            document.getElementById('clock').textContent = 
-                `${displayHours.toString().padStart(2, '0')}:${displayMinutes} ${ampm}`;
-        }
-        
-        updateClock();
-        setInterval(updateClock, 1000);
-        
         // Smooth scroll for navigation
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
         });
         
-        // Theme toggle (placeholder)
-        function toggleTheme() {
-            alert('Dark mode coming soon!');
+        // Animate room cards on load
+        window.addEventListener('load', function() {
+            const cards = document.querySelectorAll('.room-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('animate');
+                }, index * 150);
+            });
+        });
+        
+        // Animate elements on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Observe feature cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'all 0.6s ease';
+            observer.observe(card);
+        });
+        
+        // Chat bubble click handler
+        const chatBubble = document.querySelector('.chat-bubble');
+        if (chatBubble) {
+            chatBubble.addEventListener('click', function() {
+                window.location.href = "{% url 'login' %}";
+            });
         }
     </script>
 </body>
