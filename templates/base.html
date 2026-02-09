@@ -16,151 +16,159 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #F7F9FC;
+            background: #000;
             min-height: 100vh;
-            color: #1A202C;
+            color: #fff;
             overflow-x: hidden;
             position: relative;
         }
         
-        /* Background Image - Hidden for white theme */
+        /* Background Image */
         .background-image {
-            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            object-fit: cover;
+            filter: blur(8px);
+            opacity: 0.4;
         }
         
         .background-overlay {
-            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+            z-index: 1;
         }
 
-        /* Navbar Navigation */
+        /* Sidebar Navigation */
         .app-container {
             display: flex;
-            flex-direction: column;
             min-height: 100vh;
             position: relative;
             z-index: 2;
         }
         
         .sidebar {
-            width: 100%;
-            height: 70px;
-            background: rgba(255, 255, 255, 0.95);
+            width: 90px;
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid #E2E8F0;
+            border-right: none;
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             align-items: center;
-            padding: 0 32px;
+            padding: 20px 0;
             position: fixed;
             left: 0;
             top: 0;
-            right: 0;
+            bottom: 0;
             z-index: 1000;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: none;
         }
         
         .logo-container {
-            width: 50px;
-            height: 50px;
-            background: white;
-            border-radius: 12px;
+            width: 70px;
+            height: 70px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 32px;
+            margin-bottom: 30px;
             cursor: pointer;
             transition: all 0.3s ease;
-            padding: 6px;
-            border: 2px solid #667eea;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+            padding: 8px;
+            border-radius: 50%;
         }
         
         .logo-container img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            border-radius: 8px;
-        }
+            border-radius: 50%;
+        }  
         
         .logo-container:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transform: scale(1.1);
+            border-color: rgba(102, 126, 234, 0.5);
         }
         
         .nav-menu {
             flex: 1;
             display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 8px;
+            flex-direction: column;
+            gap: 20px;
         }
         
         .nav-item {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             align-items: center;
             gap: 8px;
             cursor: pointer;
-            padding: 10px 16px;
-            border-radius: 10px;
+            padding: 12px;
+            border-radius: 12px;
             transition: all 0.3s ease;
-            color: #4A5568;
+            color: rgba(255, 255, 255, 0.6);
             text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 600;
-            white-space: nowrap;
+            font-size: 11px;
+            font-weight: 500;
         }
         
         .nav-item:hover {
-            background: #F7FAFC;
-            color: #667eea;
-            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transform: translateX(2px);
         }
         
         .nav-item.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            background: rgba(102, 126, 234, 0.3);
+            color: #fff;
         }
         
         .nav-item:hover svg {
-            stroke: #667eea;
+            stroke: #fff;
         }
         
         .nav-item.active svg {
-            stroke: white;
+            stroke: #fff;
         }
         
         .nav-item svg {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             stroke: currentColor;
             fill: none;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .user-avatar-sidebar {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #667eea;
-            margin-left: 16px;
+            margin-top: auto;
             cursor: pointer;
             transition: all 0.3s;
         }
         
         .user-avatar-sidebar:hover {
             transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            border-color: #764ba2;
         }
 
         /* Main Content Area */
         .main-wrapper {
-            margin-left: 0;
-            margin-top: 70px;
-            width: 100%;
-            min-height: calc(100vh - 70px);
+            margin-left: 90px;
+            width: calc(100% - 90px);
+            min-height: 100vh;
             position: relative;
             display: flex;
             flex-direction: column;
@@ -172,9 +180,10 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 32px;
-            background: #FFFFFF;
-            border-bottom: 1px solid #E2E8F0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-bottom: none;
+            box-shadow: none;
         }
         
         .top-widgets {
@@ -183,33 +192,32 @@
         }
         
         .widget {
-            background: #FFFFFF;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
             padding: 12px 20px;
             border-radius: 12px;
-            border: 1px solid #E2E8F0;
+            border: none;
             display: flex;
             align-items: center;
             gap: 10px;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
         
         .widget:hover {
-            background: #F7FAFC;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.5);
+            transform: scale(1.02);
         }
         
         .widget-label {
             font-size: 0.8rem;
-            color: #64748B;
+            color: rgba(255, 255, 255, 0.7);
         }
         
         .widget-value {
             font-size: 1.3rem;
             font-weight: bold;
-            color: #1A202C;
+            color: #fff;
         }
         
         .top-controls {
@@ -220,24 +228,22 @@
         .control-btn {
             width: 45px;
             height: 45px;
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: none;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #4A5568;
+            color: #fff;
             font-size: 1.2rem;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
         
         .control-btn:hover {
-            background: #F7FAFC;
-            color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
         }
 
         /* Main Content */
@@ -257,15 +263,15 @@
         }
         
         .message {
-            background: #FFFFFF;
-            color: #1A202C;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            color: #fff;
             padding: 1rem 1.5rem;
             border-radius: 12px;
             margin-bottom: 1rem;
             border-left: 4px solid #667eea;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: none;
             animation: slideIn 0.3s ease;
-            border: 1px solid #E2E8F0;
         }
         
         .message.success {
@@ -287,11 +293,110 @@
             }
         }
         
+        /* Email Verification Banner */
+        .verification-banner {
+            background: linear-gradient(135deg, #FFA726 0%, #FF7043 100%);
+            border-left: 5px solid #FF5722;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
+            animation: slideDown 0.4s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .verification-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .verification-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        
+        .verification-text {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .verification-text strong {
+            color: #fff;
+            font-size: 16px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .verification-text p {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .verification-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .btn-verify {
+            background: rgba(255, 255, 255, 0.95);
+            color: #FF5722;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-verify:hover {
+            background: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-dismiss {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            line-height: 1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-dismiss:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
         /* Footer */
         .footer {
-            background: #FFFFFF;
-            border-top: 1px solid #E2E8F0;
-            color: #64748B;
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
             text-align: center;
             padding: 1rem;
             font-size: 0.85rem;
@@ -306,27 +411,26 @@
         .profile-trigger {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
             cursor: pointer;
-            padding: 4px 12px 4px 4px;
-            border-radius: 25px;
+            padding: 8px 12px;
+            border-radius: 8px;
             transition: all 0.3s;
-            background: white;
-            border: 2px solid #E2E8F0;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(102, 126, 234, 0.3);
         }
         
         .profile-trigger:hover {
-            background: #F7FAFC;
-            border-color: #667eea;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+            background: rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.5);
         }
         
         .profile-trigger img {
-            width: 36px;
-            height: 36px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             object-fit: cover;
-            border: none;
+            border: 2px solid #667eea;
         }
         
         .profile-trigger svg {
@@ -345,15 +449,16 @@
             top: calc(100% + 10px) !important;
             bottom: auto !important;
             right: 0;
-            background: white;
-            border: 1px solid #E2E8F0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(102, 126, 234, 0.3);
             border-radius: 12px;
             min-width: 180px;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.3s ease;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
             z-index: 10000;
             overflow: hidden;
         }
@@ -384,11 +489,12 @@
         
         .profile-menu-item:last-child {
             border-bottom: none;
+            border-radius: 0 0 12px 12px;
         }
         
         .profile-menu-item:hover {
-            background: #F0F9FF;
-            color: #667eea;
+            background: rgba(102, 126, 234, 0.3);
+            color: white;
         }
         
         .profile-menu-item svg {
@@ -399,32 +505,25 @@
         }
         
         .profile-menu-item.logout:hover {
-            background: #FEF2F2;
+            background: rgba(239, 68, 68, 0.2);
             color: #ef4444;
         }
         
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
-                padding: 0 16px;
-            }
-            
-            .logo-container {
-                width: 40px;
-                height: 40px;
-                margin-right: 16px;
+                width: 70px;
             }
             
             .main-wrapper {
-                margin-top: 70px;
-            }
-            
-            .nav-item span {
-                display: none;
+                margin-left: 70px;
+                width: calc(100% - 70px);
             }
             
             .nav-item {
-                padding: 10px;
+                width: 60px;
+                height: 60px;
+                font-size: 0.65rem;
             }
             
             .top-bar {
@@ -505,32 +604,6 @@
                 </a>
             </nav>
             {% endif %}
-            
-            <!-- Profile Dropdown in Navbar -->
-            {% if user.is_authenticated %}
-            <div class="profile-dropdown" id="profileDropdown" style="margin-left: auto;">
-                <div class="profile-trigger" onclick="toggleProfileMenu()">
-                    <img src="{{ user.profile.get_avatar_url }}" alt="{{ user.username }}" class="user-avatar-sidebar">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; margin-left: 4px; stroke: #4A5568;">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </div>
-                <div class="profile-menu">
-                    <a href="{% url 'profile' %}" class="profile-menu-item">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                        </svg>
-                        <span>Edit Profile</span>
-                    </a>
-                    <a href="{% url 'logout' %}" class="profile-menu-item logout">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                        </svg>
-                        <span>Logout</span>
-                    </a>
-                </div>
-            </div>
-            {% endif %}
         </aside>
 
         {% block main_content %}
@@ -547,12 +620,53 @@
                 <div class="top-controls">
                     <!-- Page-specific controls can be added via block -->
                     {% block top_controls %}{% endblock %}
+                    
+                    <!-- Profile Dropdown -->
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="profile-trigger" onclick="toggleProfileMenu()">
+                            <img src="{{ user.profile.get_avatar_url }}" alt="{{ user.username }}">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                        <div class="profile-menu">
+                            <a href="{% url 'profile' %}" class="profile-menu-item">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                                <span>Edit Profile</span>
+                            </a>
+                            <a href="{% url 'logout' %}" class="profile-menu-item logout">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
             {% endif %}
 
             <!-- Main Content Area -->
             <main class="content-area">
+                <!-- Email Verification Banner -->
+                {% if user.is_authenticated and user.profile and not user.profile.email_verified %}
+                <div class="verification-banner" id="verificationBanner">
+                    <div class="verification-content">
+                        <span class="verification-icon">⚠️</span>
+                        <div class="verification-text">
+                            <strong>Email Not Verified</strong>
+                            <p>Please verify your email address to access all features.</p>
+                        </div>
+                        <div class="verification-actions">
+                            <a href="{% url 'resend_verification' %}" class="btn-verify">Resend Email</a>
+                            <button onclick="dismissBanner()" class="btn-dismiss">×</button>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
                 {% block content %}
                 {% endblock %}
             </main>
@@ -579,6 +693,26 @@
                 dropdown.classList.remove('active');
             }
         });
+        
+        // Dismiss verification banner
+        function dismissBanner() {
+            const banner = document.getElementById('verificationBanner');
+            if (banner) {
+                banner.style.animation = 'slideUp 0.3s ease';
+                setTimeout(() => banner.remove(), 300);
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+        }
         
         // Page-specific scripts via blocks
         {% block page_scripts %}{% endblock %}

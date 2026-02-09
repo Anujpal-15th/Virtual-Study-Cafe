@@ -20,7 +20,7 @@ def start_scheduler():
     """
     global scheduler
     
-    # Prevent starting multiple schedulers
+    # Pre multiple schedulers
     if scheduler is not None:
         logger.info("Scheduler already running, skipping initialization")
         return

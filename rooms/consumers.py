@@ -9,10 +9,7 @@ from django.contrib.auth.models import User
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
-    """
-    WebSocket consumer for handling real-time chat in study rooms.
-    Manages user connections, message broadcasting, and room membership.
-    """
+    
     
     async def connect(self):
         """
