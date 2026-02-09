@@ -22,14 +22,21 @@ except Exception as e:
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h5j#k7@x^2v&m*9p$q!r+s_t%u(w)z~a3b4c5d6e7f8g9h0i'
+# MUST be set in .env file - no default provided for security
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY must be set in .env file")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Read from environment variable, default to False for safety
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 # Allowed hosts for security
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+# MUST be explicitly set - no wildcards allowed
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# Add testserver for Django testing
+if DEBUG:
+    ALLOWED_HOSTS.append('testserver')
 
 
 # Application definition
@@ -162,11 +169,16 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 
+# Email Configuration - All values from environment variables
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'sout.anujpal@gmail.com')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'ppirnmtyjqedsvxb')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'true').lower() == 'true'
-EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() == 'true'
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'false').lower() == 'true'
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'no-reply@virtualcafe.com')
+
+# Validate email configuration
+if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
+    logger.warning("Email credentials not configured. Email features will not work.")

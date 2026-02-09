@@ -1063,7 +1063,7 @@
     function joinRoomByCode() {
         const roomCode = document.getElementById('room-code-input').value.trim().toUpperCase();
         if (roomCode.length === 6) {
-            window.location.href = `/rooms/join/${roomCode}/`;
+            window.location.href = `/rooms/${roomCode}/`;
         } else {
             alert('Please enter a valid 6-character room code');
         }

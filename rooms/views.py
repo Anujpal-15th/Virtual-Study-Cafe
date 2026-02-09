@@ -207,7 +207,7 @@ def join_room_by_code_view(request):
             messages.error(request, f'Room with code "{room_code}" not found. Please check the code and try again.')
             return redirect('home')
     
-    # GET request - redirect to home
+    # If GET request, redirect to home
     return redirect('home')
 
 
