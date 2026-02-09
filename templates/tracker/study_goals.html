@@ -21,16 +21,16 @@
     .goals-title {
         font-size: 32px;
         font-weight: 700;
-        color: #fff;
+        color: #1A202C;
         display: flex;
         align-items: center;
         gap: 12px;
     }
     
     .add-goal-btn-main {
-        background: rgba(102, 126, 234, 0.2);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        border: 1px solid rgba(102, 126, 234, 0.4);
+        border: none;
         padding: 0.6rem 1.5rem;
         border-radius: 8px;
         font-size: 0.9rem;
@@ -43,9 +43,8 @@
     }
     
     .add-goal-btn-main:hover {
-        background: rgba(102, 126, 234, 0.3);
-        border-color: #667eea;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
     
     .goals-grid {
@@ -56,24 +55,23 @@
     }
     
     .goal-card {
-        background: rgba(26, 26, 46, 0.8);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(102, 126, 234, 0.3);
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
         border-radius: 16px;
         padding: 24px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         transition: all 0.3s;
     }
     
     .goal-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
-        border-color: rgba(102, 126, 234, 0.6);
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+        border-color: #667eea;
     }
     
     .goal-card.completed {
         border-color: #4ade80;
-        background: rgba(74, 222, 128, 0.1);
+        background: rgba(74, 222, 128, 0.05);
     }
     
     .goal-header {
@@ -115,7 +113,7 @@
         background: none;
         border: none;
         cursor: pointer;
-        color: rgba(255, 255, 255, 0.7);
+        color: #64748B;
         font-size: 18px;
         width: 32px;
         height: 32px;
@@ -127,24 +125,24 @@
     }
     
     .goal-action-btn:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: #fff;
+        background: #F7FAFC;
+        color: #1A202C;
     }
     
     .goal-title-text {
         font-size: 20px;
         font-weight: 600;
-        color: #fff;
+        color: #1A202C;
         margin-bottom: 8px;
     }
     
     .goal-card.completed .goal-title-text {
         text-decoration: line-through;
-        color: rgba(255, 255, 255, 0.5);
+        color: #94A3B8;
     }
     
     .goal-notes {
-        color: rgba(255, 255, 255, 0.7);
+        color: #64748B;
         font-size: 14px;
         line-height: 1.6;
         margin-bottom: 16px;
@@ -154,7 +152,7 @@
         display: flex;
         gap: 16px;
         flex-wrap: wrap;
-        color: rgba(255, 255, 255, 0.6);
+        color: #64748B;
         font-size: 13px;
     }
     
@@ -199,16 +197,15 @@
     }
     
     .modal-content {
-        background: rgba(26, 26, 46, 0.95);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(102, 126, 234, 0.3);
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
         border-radius: 20px;
         padding: 32px;
         max-width: 500px;
         width: 90%;
         max-height: 90vh;
         overflow-y: auto;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     }
     
     .modal-header {
@@ -221,14 +218,14 @@
     .modal-title {
         font-size: 24px;
         font-weight: 700;
-        color: #fff;
+        color: #1A202C;
     }
     
     .close-modal {
         background: none;
         border: none;
         font-size: 28px;
-        color: rgba(255, 255, 255, 0.6);
+        color: #64748B;
         cursor: pointer;
         width: 36px;
         height: 36px;
@@ -240,8 +237,8 @@
     }
     
     .close-modal:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: #fff;
+        background: #F7FAFC;
+        color: #1A202C;
     }
     
     .form-group {
@@ -252,30 +249,30 @@
         display: block;
         font-size: 14px;
         font-weight: 600;
-        color: rgba(255, 255, 255, 0.9);
+        color: #1A202C;
         margin-bottom: 8px;
     }
     
     .form-input, .form-textarea, .form-select {
         width: 100%;
         padding: 12px 16px;
-        border: 2px solid rgba(102, 126, 234, 0.3);
+        border: 2px solid #E2E8F0;
         border-radius: 12px;
         font-size: 14px;
         transition: all 0.3s;
-        background: rgba(255, 255, 255, 0.05);
-        color: #fff;
+        background: #FFFFFF;
+        color: #1A202C;
     }
     
     .form-select option {
-        background: #1a1a2e;
-        color: #fff;
+        background: #FFFFFF;
+        color: #1A202C;
     }
     
     .form-input:focus, .form-textarea:focus, .form-select:focus {
         outline: none;
         border-color: #667eea;
-        background: rgba(255, 255, 255, 0.1);
+        background: #F7FAFC;
     }
     
     .form-textarea {
@@ -311,21 +308,14 @@
     }
     
     .btn-secondary {
-        background: #e5e7eb;
-        color: #374151;
-    }
-    
-    .dark-theme .btn-secondary {
-        background: #404040;
-        color: #d1d5db;
+        background: #F7FAFC;
+        color: #4A5568;
+        border: 1px solid #E2E8F0;
     }
     
     .btn-secondary:hover {
-        background: #d1d5db;
-    }
-    
-    .dark-theme .btn-secondary:hover {
-        background: #505050;
+        background: #EDF2F7;
+        border-color: #CBD5E0;
     }
     
     .empty-state {
@@ -341,16 +331,12 @@
     .empty-state-title {
         font-size: 24px;
         font-weight: 600;
-        color: #1a1a1a;
+        color: #1A202C;
         margin-bottom: 8px;
     }
     
-    .dark-theme .empty-state-title {
-        color: #fff;
-    }
-    
     .empty-state-text {
-        color: #6b7280;
+        color: #64748B;
         font-size: 16px;
     }
     

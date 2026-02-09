@@ -18,12 +18,6 @@ redis==5.0.1
 # Background task scheduler for room cleanup
 APScheduler==3.10.4
 
-# PostgreSQL support (optional for production)
-psycopg[binary]==3.3.2
-
-# MySQL support (optional)
-mysqlclient==2.2.0
-
 # Environment variables management
 python-dotenv==1.0.0
 

@@ -16,158 +16,151 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #000;
+            background: #F7F9FC;
             min-height: 100vh;
-            color: #fff;
+            color: #1A202C;
             overflow-x: hidden;
             position: relative;
         }
         
-        /* Background Image */
+        /* Background Image - Hidden for white theme */
         .background-image {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            object-fit: cover;
-            filter: blur(8px);
-            opacity: 0.4;
+            display: none;
         }
         
         .background-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
-            z-index: 1;
+            display: none;
         }
 
-        /* Sidebar Navigation */
+        /* Navbar Navigation */
         .app-container {
             display: flex;
+            flex-direction: column;
             min-height: 100vh;
             position: relative;
             z-index: 2;
         }
         
         .sidebar {
-            width: 90px;
-            background: rgba(0, 0, 0, 0.5);
+            width: 100%;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border-right: none;
+            border-bottom: 1px solid #E2E8F0;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-            padding: 20px 0;
+            padding: 0 32px;
             position: fixed;
             left: 0;
             top: 0;
-            bottom: 0;
+            right: 0;
             z-index: 1000;
-            box-shadow: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
         
         .logo-container {
-            width: 70px;
-            height: 70px;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 30px;
+            margin-right: 32px;
             cursor: pointer;
             transition: all 0.3s ease;
-            padding: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px;
+            border: 2px solid #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
         }
         
         .logo-container img {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            border-radius: 8px;
         }
         
         .logo-container:hover {
-            transform: scale(1.1);
-            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
         
         .nav-menu {
             flex: 1;
             display: flex;
-            flex-direction: column;
-            gap: 20px;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
         }
         
         .nav-item {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
             gap: 8px;
             cursor: pointer;
-            padding: 12px;
-            border-radius: 12px;
+            padding: 10px 16px;
+            border-radius: 10px;
             transition: all 0.3s ease;
-            color: rgba(255, 255, 255, 0.6);
+            color: #4A5568;
             text-decoration: none;
-            font-size: 11px;
-            font-weight: 500;
+            font-size: 0.875rem;
+            font-weight: 600;
+            white-space: nowrap;
         }
         
         .nav-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            transform: translateX(2px);
+            background: #F7FAFC;
+            color: #667eea;
+            transform: translateY(-2px);
         }
         
         .nav-item.active {
-            background: rgba(102, 126, 234, 0.3);
-            color: #fff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
         
         .nav-item:hover svg {
-            stroke: #fff;
+            stroke: #667eea;
         }
         
         .nav-item.active svg {
-            stroke: #fff;
+            stroke: white;
         }
         
         .nav-item svg {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             stroke: currentColor;
             fill: none;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .user-avatar-sidebar {
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #667eea;
-            margin-top: auto;
+            margin-left: 16px;
             cursor: pointer;
             transition: all 0.3s;
         }
         
         .user-avatar-sidebar:hover {
             transform: scale(1.1);
-            border-color: #764ba2;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
         /* Main Content Area */
         .main-wrapper {
-            margin-left: 90px;
-            width: calc(100% - 90px);
-            min-height: 100vh;
+            margin-left: 0;
+            margin-top: 70px;
+            width: 100%;
+            min-height: calc(100vh - 70px);
             position: relative;
             display: flex;
             flex-direction: column;
@@ -179,10 +172,9 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 32px;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border-bottom: none;
-            box-shadow: none;
+            background: #FFFFFF;
+            border-bottom: 1px solid #E2E8F0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
         
         .top-widgets {
@@ -191,32 +183,33 @@
         }
         
         .widget {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
+            background: #FFFFFF;
             padding: 12px 20px;
             border-radius: 12px;
-            border: none;
+            border: 1px solid #E2E8F0;
             display: flex;
             align-items: center;
             gap: 10px;
             cursor: pointer;
             transition: all 0.3s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
         
         .widget:hover {
-            background: rgba(0, 0, 0, 0.5);
-            transform: scale(1.02);
+            background: #F7FAFC;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         
         .widget-label {
             font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748B;
         }
         
         .widget-value {
             font-size: 1.3rem;
             font-weight: bold;
-            color: #fff;
+            color: #1A202C;
         }
         
         .top-controls {
@@ -227,22 +220,24 @@
         .control-btn {
             width: 45px;
             height: 45px;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border: none;
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
+            color: #4A5568;
             font-size: 1.2rem;
             cursor: pointer;
             transition: all 0.3s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
         
         .control-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
+            background: #F7FAFC;
+            color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         /* Main Content */
@@ -262,15 +257,15 @@
         }
         
         .message {
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            color: #fff;
+            background: #FFFFFF;
+            color: #1A202C;
             padding: 1rem 1.5rem;
             border-radius: 12px;
             margin-bottom: 1rem;
             border-left: 4px solid #667eea;
-            box-shadow: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             animation: slideIn 0.3s ease;
+            border: 1px solid #E2E8F0;
         }
         
         .message.success {
@@ -294,10 +289,9 @@
         
         /* Footer */
         .footer {
-            background: rgba(26, 26, 46, 0.7);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.6);
+            background: #FFFFFF;
+            border-top: 1px solid #E2E8F0;
+            color: #64748B;
             text-align: center;
             padding: 1rem;
             font-size: 0.85rem;
@@ -312,26 +306,27 @@
         .profile-trigger {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
             cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 4px 12px 4px 4px;
+            border-radius: 25px;
             transition: all 0.3s;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(102, 126, 234, 0.3);
+            background: white;
+            border: 2px solid #E2E8F0;
         }
         
         .profile-trigger:hover {
-            background: rgba(102, 126, 234, 0.2);
-            border-color: rgba(102, 126, 234, 0.5);
+            background: #F7FAFC;
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
         }
         
         .profile-trigger img {
-            width: 35px;
-            height: 35px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #667eea;
+            border: none;
         }
         
         .profile-trigger svg {
@@ -350,16 +345,15 @@
             top: calc(100% + 10px) !important;
             bottom: auto !important;
             right: 0;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(102, 126, 234, 0.3);
+            background: white;
+            border: 1px solid #E2E8F0;
             border-radius: 12px;
             min-width: 180px;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.3s ease;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
             z-index: 10000;
             overflow: hidden;
         }
@@ -390,12 +384,11 @@
         
         .profile-menu-item:last-child {
             border-bottom: none;
-            border-radius: 0 0 12px 12px;
         }
         
         .profile-menu-item:hover {
-            background: rgba(102, 126, 234, 0.3);
-            color: white;
+            background: #F0F9FF;
+            color: #667eea;
         }
         
         .profile-menu-item svg {
@@ -406,25 +399,32 @@
         }
         
         .profile-menu-item.logout:hover {
-            background: rgba(239, 68, 68, 0.2);
+            background: #FEF2F2;
             color: #ef4444;
         }
         
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
-                width: 70px;
+                padding: 0 16px;
+            }
+            
+            .logo-container {
+                width: 40px;
+                height: 40px;
+                margin-right: 16px;
             }
             
             .main-wrapper {
-                margin-left: 70px;
-                width: calc(100% - 70px);
+                margin-top: 70px;
+            }
+            
+            .nav-item span {
+                display: none;
             }
             
             .nav-item {
-                width: 60px;
-                height: 60px;
-                font-size: 0.65rem;
+                padding: 10px;
             }
             
             .top-bar {
@@ -448,7 +448,7 @@
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="logo-container" onclick="window.location.href='{% url 'home' %}'">
-                <img src="/static/images/logo.png" alt="Virtual Study Hub Logo">
+                <img src="/static/images/logo.jpeg" alt="Virtual Study Hub Logo">
             </div>
             
             {% if user.is_authenticated %}
@@ -505,6 +505,32 @@
                 </a>
             </nav>
             {% endif %}
+            
+            <!-- Profile Dropdown in Navbar -->
+            {% if user.is_authenticated %}
+            <div class="profile-dropdown" id="profileDropdown" style="margin-left: auto;">
+                <div class="profile-trigger" onclick="toggleProfileMenu()">
+                    <img src="{{ user.profile.get_avatar_url }}" alt="{{ user.username }}" class="user-avatar-sidebar">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; margin-left: 4px; stroke: #4A5568;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </div>
+                <div class="profile-menu">
+                    <a href="{% url 'profile' %}" class="profile-menu-item">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        <span>Edit Profile</span>
+                    </a>
+                    <a href="{% url 'logout' %}" class="profile-menu-item logout">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
         </aside>
 
         {% block main_content %}
@@ -521,30 +547,6 @@
                 <div class="top-controls">
                     <!-- Page-specific controls can be added via block -->
                     {% block top_controls %}{% endblock %}
-                    
-                    <!-- Profile Dropdown -->
-                    <div class="profile-dropdown" id="profileDropdown">
-                        <div class="profile-trigger" onclick="toggleProfileMenu()">
-                            <img src="{{ user.profile.get_avatar_url }}" alt="{{ user.username }}">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
-                        <div class="profile-menu">
-                            <a href="{% url 'profile' %}" class="profile-menu-item">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                </svg>
-                                <span>Edit Profile</span>
-                            </a>
-                            <a href="{% url 'logout' %}" class="profile-menu-item logout">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                                </svg>
-                                <span>Logout</span>
-                            </a>
-                        </div>
-                    </div>
                 </div>
             </div>
             {% endif %}
