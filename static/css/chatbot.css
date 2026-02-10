@@ -193,6 +193,62 @@
     border-bottom-left-radius: 4px;
 }
 
+/* Bot message wrapper for actions */
+.chatbot-message-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 75%;
+}
+
+/* Action buttons container - horizontal layout */
+.chatbot-message-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    align-items: center;
+    opacity: 1;
+    transition: opacity 0.2s;
+}
+
+/* Individual action buttons */
+.action-btn {
+    background: rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: #667eea;
+}
+
+.action-btn:hover {
+    background: rgba(102, 126, 234, 0.2);
+    border-color: rgba(102, 126, 234, 0.4);
+    transform: translateY(-1px);
+}
+
+.action-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: white;
+}
+
+.action-btn.success {
+    background: rgba(72, 187, 120, 0.2);
+    border-color: rgba(72, 187, 120, 0.4);
+    color: #48bb78;
+}
+
+.action-btn svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+}
+
 .chatbot-typing {
     display: flex;
     gap: 4px;

@@ -4,6 +4,7 @@ Handles room listing, creation, and detail pages.
 """
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Q, Count
 from django.utils import timezone
@@ -47,13 +48,11 @@ def home_view(request):
     # Get rooms that meet any of these criteria:
     # 1. Created by current user
     # 2. User is a member of (joined)
-    # 3. Global rooms (room_code = 'GLOBAL')
     rooms = Room.objects.filter(
         Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now())
     ).filter(
         Q(created_by=request.user) |  # Rooms created by user
-        Q(memberships__user=request.user) |  # Rooms user has joined
-        Q(room_code='GLOBAL')  # Global rooms
+        Q(memberships__user=request.user)  # Rooms user has joined
     ).distinct()
     
     # Get search query from GET parameters
@@ -72,11 +71,11 @@ def home_view(request):
         member_count=Count('memberships', filter=Q(memberships__is_active=True))
     ).select_related('created_by').order_by('-member_count', '-created_at')
     
-    # Get rooms the current user is a member of (excluding GLOBAL room if it exists)
+    # Get rooms the current user is a member of
     user_rooms = Room.objects.filter(
         memberships__user=request.user, 
         memberships__is_active=True
-    ).exclude(room_code='GLOBAL').annotate(
+    ).annotate(
         member_count=Count('memberships', filter=Q(memberships__is_active=True))
     ).select_related('created_by')
     
@@ -149,7 +148,7 @@ def home_view(request):
 def browse_rooms_view(request):
     """
     Browse all available study rooms.
-    Shows all public rooms that users can join.
+    Shows global rooms (all public rooms) and rooms created by the user in separate sections.
     """
     # Clean up expired rooms
     expired_rooms = Room.objects.filter(
@@ -159,27 +158,72 @@ def browse_rooms_view(request):
     if expired_count > 0:
         expired_rooms.delete()
     
-    # Get all available public rooms
-    rooms = Room.objects.filter(
+    # Base queryset for public rooms
+    base_query = Room.objects.filter(
         Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now()),
         is_public=True
     ).annotate(
         member_count=Count('memberships', filter=Q(memberships__is_active=True))
-    ).select_related('created_by').order_by('-member_count', '-created_at')
+    ).select_related('created_by')
     
     # Get search query
     search_query = request.GET.get('search', '').strip()
     if search_query:
-        rooms = rooms.filter(
+        base_query = base_query.filter(
             Q(name__icontains=search_query) |
             Q(description__icontains=search_query)
         )
     
+    # Separate global rooms from user-created rooms
+    # Global rooms: all public rooms created by other users
+    global_rooms = base_query.exclude(created_by=request.user).order_by('-member_count', '-created_at')
+    # User rooms: rooms created by current user
+    user_rooms = base_query.filter(created_by=request.user).order_by('-member_count', '-created_at')
+    
     context = {
-        'rooms': rooms,
+        'global_rooms': global_rooms,
+        'user_rooms': user_rooms,
         'search_query': search_query,
     }
     return render(request, 'rooms/browse_rooms.html', context)
+
+
+@login_required
+def ready_for_study_view(request):
+    """
+    View all users who are online and ready for study.
+    Shows users who share rooms with the current user and are currently online.
+    """
+    # Find users who share rooms with the current user
+    user_room_ids = RoomMembership.objects.filter(
+        user=request.user,
+        is_active=True
+    ).values_list('room_id', flat=True)
+    
+    # Consider users online if they've been active in the last 10 minutes
+    time_threshold = timezone.now() - timedelta(minutes=10)
+    
+    # Get all study partners (users in same rooms) who are currently online
+    study_partners = User.objects.filter(
+        room_memberships__room_id__in=user_room_ids,
+        room_memberships__is_active=True,
+        last_login__gte=time_threshold  # Only show users active in last 10 minutes
+    ).exclude(id=request.user.id).distinct().select_related('profile')
+    
+    # Get search query if provided
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        study_partners = study_partners.filter(
+            Q(username__icontains=search_query) |
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query)
+        )
+    
+    context = {
+        'study_partners': study_partners,
+        'search_query': search_query,
+    }
+    return render(request, 'rooms/ready_for_study.html', context)
 
 
 @login_required

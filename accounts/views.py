@@ -153,18 +153,22 @@ def profile_view(request, username=None):
 
 
 @login_required
+@login_required
 def edit_profile_view(request):
     """
     Edit current user's profile
     Handles both user account info and profile info in one form
     """
+    # Ensure user has a profile
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
     if request.method == 'POST':
         # Two forms: one for User model, one for UserProfile model
         user_form = UserUpdateForm(request.POST, instance=request.user)
         profile_form = ProfileUpdateForm(
             request.POST, 
             request.FILES,  # Important for file uploads (avatar)
-            instance=request.user.profile
+            instance=profile
         )
         
         if user_form.is_valid() and profile_form.is_valid():
@@ -178,7 +182,7 @@ def edit_profile_view(request):
     else:
         # GET request - show forms with current data
         user_form = UserUpdateForm(instance=request.user)
-        profile_form = ProfileUpdateForm(instance=request.user.profile)
+        profile_form = ProfileUpdateForm(instance=profile)
     
     context = {
         'user_form': user_form,
@@ -521,7 +525,16 @@ def resend_verification_view(request):
         email = request.POST.get('email', '').strip()
         
         try:
-            user = User.objects.get(email=email)
+            # Use filter().first() to handle multiple users with same email
+            user = User.objects.filter(email=email).first()
+            
+            if not user:
+                # Don't reveal whether email exists for security
+                messages.info(
+                    request, 
+                    'If an account exists with that email, a verification link will be sent.'
+                )
+                return redirect('resend_verification')
             
             # Check if already verified
             if hasattr(user, 'profile') and user.profile.email_verified:
@@ -543,12 +556,9 @@ def resend_verification_view(request):
             else:
                 messages.error(request, 'Failed to send email. Please try again later.')
             
-        except User.DoesNotExist:
-            # Don't reveal whether email exists for security
-            messages.info(
-                request, 
-                'If an account exists with that email, a verification link will be sent.'
-            )
+        except Exception as e:
+            # Generic error handling
+            messages.error(request, 'An error occurred. Please try again later.')
         
         return redirect('resend_verification')
     

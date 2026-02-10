@@ -66,19 +66,15 @@ class ChatbotWidget {
                         <small>Ask me anything about your studies!</small>
                     </div>
                     <div class="chatbot-header-controls">
-                        <button class="chatbot-speaker-btn" title="Toggle auto-speak responses">
-                            <span class="speaker-icon">🔇</span>
-                        </button>
                         <button class="chatbot-close-btn">✕</button>
                     </div>
                 </div>
                 <div class="chatbot-messages"></div>
                 <div class="chatbot-input-area">
-                    <button class="chatbot-voice-btn" title="Voice input">🎤</button>
                     <input 
                         type="text" 
                         class="chatbot-input" 
-                        placeholder="Type or speak your question..."
+                        placeholder="Type your question..."
                         autocomplete="off"
                     />
                     <button class="chatbot-send-btn">📤</button>
@@ -93,15 +89,11 @@ class ChatbotWidget {
         const toggleBtn = this.container.querySelector('.chatbot-toggle-btn');
         const closeBtn = this.container.querySelector('.chatbot-close-btn');
         const sendBtn = this.container.querySelector('.chatbot-send-btn');
-        const voiceBtn = this.container.querySelector('.chatbot-voice-btn');
-        const speakerBtn = this.container.querySelector('.chatbot-speaker-btn');
         const input = this.container.querySelector('.chatbot-input');
 
         toggleBtn.addEventListener('click', () => this.toggleChat());
         closeBtn.addEventListener('click', () => this.closeChat());
         sendBtn.addEventListener('click', () => this.sendMessage());
-        voiceBtn.addEventListener('click', () => this.toggleVoiceInput());
-        speakerBtn.addEventListener('click', () => this.toggleAutoSpeak());
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.sendMessage();
         });
@@ -136,23 +128,7 @@ class ChatbotWidget {
         }
     }
 
-    toggleAutoSpeak() {
-        this.autoSpeak = !this.autoSpeak;
-        const speakerBtn = this.container.querySelector('.chatbot-speaker-btn');
-        const icon = speakerBtn.querySelector('.speaker-icon');
-        
-        if (this.autoSpeak) {
-            icon.textContent = '🔊';
-            speakerBtn.title = 'Auto-speak ON';
-        } else {
-            icon.textContent = '🔇';
-            speakerBtn.title = 'Auto-speak OFF';
-            // Stop any ongoing speech
-            if (this.synthesis) {
-                this.synthesis.cancel();
-            }
-        }
-    }
+
 
     speak(text) {
         if (!this.synthesis) return;
@@ -404,28 +380,28 @@ class ChatbotWidget {
                     <div class="chatbot-message-content">${formattedMessage}</div>
                     <div class="chatbot-message-actions">
                         <button class="action-btn copy-btn" title="Copy message">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                             </svg>
                         </button>
                         <button class="action-btn speak-btn" title="Read aloud">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"></path>
                             </svg>
                         </button>
                         <button class="action-btn like-btn" title="Good response">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
                             </svg>
                         </button>
                         <button class="action-btn dislike-btn" title="Bad response">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
                             </svg>
                         </button>
                         <button class="action-btn regenerate-btn" title="Regenerate response">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"></path>
                             </svg>
                         </button>
