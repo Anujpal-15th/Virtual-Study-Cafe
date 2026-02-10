@@ -27,7 +27,7 @@ class NotificationAdmin(admin.ModelAdmin):
     
     def has_add_permission(self, request):
         # Notifications should be created programmatically, not manually
-        return True
+        return False
     
     actions = ['mark_as_read', 'mark_as_unread']
     

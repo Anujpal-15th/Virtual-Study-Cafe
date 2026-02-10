@@ -2,7 +2,7 @@
 Admin configuration for tracker app.
 """
 from django.contrib import admin
-from .models import StudySession, Task, Achievement, UserAchievement
+from .models import StudySession, Task, Achievement, UserAchievement, StudySchedule
 
 
 @admin.register(StudySession)
@@ -46,4 +46,15 @@ class UserAchievementAdmin(admin.ModelAdmin):
     list_filter = ['unlocked_at']
     search_fields = ['user__username', 'achievement__name']
     date_hierarchy = 'unlocked_at'
+
+
+@admin.register(StudySchedule)
+class StudyScheduleAdmin(admin.ModelAdmin):
+    """
+    Admin interface for StudySchedule model.
+    """
+    list_display = ['user', 'title', 'date', 'start_time', 'end_time', 'category', 'is_completed']
+    list_filter = ['category', 'is_completed', 'date']
+    search_fields = ['user__username', 'title']
+    date_hierarchy = 'date'
 

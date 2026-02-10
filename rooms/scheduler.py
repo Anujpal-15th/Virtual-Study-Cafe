@@ -4,7 +4,6 @@ Runs cleanup every 5 minutes to remove inactive rooms.
 """
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
-from django.conf import settings
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,7 +19,7 @@ def start_scheduler():
     """
     global scheduler
     
-    # Pre multiple schedulers
+    # Prevent multiple schedulers
     if scheduler is not None:
         logger.info("Scheduler already running, skipping initialization")
         return

@@ -25,6 +25,6 @@ def update_room_on_member_leave(sender, instance, **kwargs):
     if instance.room:
         try:
             instance.room.update_activity()
-        except:
+        except Exception:
             # Room might have been deleted
             pass

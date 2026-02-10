@@ -1,12 +1,13 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm, PasswordResetForm
+from django.contrib.auth.forms import UserCreationForm
 from .models import UserProfile
 
 
 class SignUpForm(UserCreationForm):
     """
-    Extended signup form with email and gender (required)
+    Extended signup form with email and gender (required).
+    Allows reclaiming usernames/emails from unverified accounts.
     """
     email = forms.EmailField(
         required=True,
@@ -34,6 +35,23 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'email', 'gender', 'password1', 'password2')
+    
+    def clean_username(self):
+        """
+        Allow reclaiming a username if the existing account is unverified.
+        Deletes the old unverified user so the new signup can proceed.
+        """
+        username = self.cleaned_data.get('username')
+        try:
+            existing_user = User.objects.get(username=username)
+            # If the existing user never verified their email, delete them
+            if hasattr(existing_user, 'profile') and not existing_user.profile.email_verified:
+                existing_user.delete()
+                return username
+            # Otherwise it's a real taken username
+            raise forms.ValidationError('A user with that username already exists.')
+        except User.DoesNotExist:
+            return username
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

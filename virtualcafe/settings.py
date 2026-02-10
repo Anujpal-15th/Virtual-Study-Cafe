@@ -101,9 +101,6 @@ ASGI_APPLICATION = 'virtualcafe.asgi.application'
 
 # Django Channels Layer Configuration
 # This uses Redis as the messaging backend for WebSocket communication
-# Get Redis URL from environment variable
-REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379')
-
 # Development: Using InMemoryChannelLayer (no Redis needed)
 # Production: Use RedisChannelLayer with proper Redis server
 CHANNEL_LAYERS = {
@@ -170,15 +167,25 @@ LOGOUT_REDIRECT_URL = '/login/'
 
 
 # Email Configuration - All values from environment variables
-EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'true').lower() == 'true'
 EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'false').lower() == 'true'
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'no-reply@virtualcafe.com')
+
+# Use the authenticated email as FROM address (Gmail requires this)
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER or 'no-reply@virtualcafe.com')
+
+# Email backend: use console in DEBUG if SMTP credentials are missing/invalid
+if os.environ.get('EMAIL_BACKEND'):
+    EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
+elif DEBUG and (not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD):
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    logger.info("Using console email backend (DEBUG mode, no SMTP credentials)")
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Validate email configuration
-if not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD:
+if EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend' and (not EMAIL_HOST_USER or not EMAIL_HOST_PASSWORD):
     logger.warning("Email credentials not configured. Email features will not work.")

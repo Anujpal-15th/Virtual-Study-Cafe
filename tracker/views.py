@@ -5,7 +5,7 @@ Handles study progress tracking and saving study sessions.
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Sum, Count
+from django.db.models import Sum
 from django.utils import timezone
 from datetime import timedelta
 from .models import StudySession, Achievement
@@ -91,7 +91,7 @@ def progress_view(request):
                 'name': achievement.name,
                 'description': achievement.description,
             })
-    except:
+    except Exception:
         # Fallback achievements based on study data
         if week_total > 0:
             recent_achievements = [
@@ -108,6 +108,7 @@ def progress_view(request):
         'last_7_days': last_7_days,
         'recent_sessions': recent_sessions,
         'completion_percent': completion_percent,
+        'remaining_percent': 100 - completion_percent,
         'max_hours': max_hours,
         'recent_achievements': recent_achievements,
     }
@@ -161,7 +162,7 @@ def save_session_view(request):
         # Redirect back to room or progress page
         if room_code:
             return redirect('room_detail', room_code=room_code)
-        return redirect('progress')
+        return redirect('tracker:progress')
     
     return redirect('home')
 
@@ -260,3 +261,130 @@ def leaderboard_view(request):
     }
     
     return render(request, 'tracker/leaderboard.html', context)
+
+
+@login_required
+def get_schedules(request):
+    """
+    API: Get schedules for a date range.
+    GET params: start (YYYY-MM-DD), end (YYYY-MM-DD)
+    """
+    from .models import StudySchedule
+    from django.http import JsonResponse
+    import json
+
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+
+    if not start or not end:
+        return JsonResponse({'error': 'start and end params required'}, status=400)
+
+    schedules = StudySchedule.objects.filter(
+        user=request.user,
+        date__gte=start,
+        date__lte=end
+    )
+
+    data = [{
+        'id': s.id,
+        'title': s.title,
+        'date': s.date.isoformat(),
+        'start_time': s.start_time.strftime('%H:%M'),
+        'end_time': s.end_time.strftime('%H:%M'),
+        'category': s.category,
+        'notes': s.notes,
+        'is_completed': s.is_completed,
+    } for s in schedules]
+
+    return JsonResponse({'schedules': data})
+
+
+@login_required
+def create_schedule(request):
+    """
+    API: Create a new study schedule.
+    POST JSON: title, date, start_time, end_time, category, notes
+    """
+    from .models import StudySchedule
+    from django.http import JsonResponse
+    import json
+
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+
+    try:
+        body = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    title = body.get('title', '').strip()
+    date = body.get('date')
+    start_time = body.get('start_time')
+    end_time = body.get('end_time')
+    category = body.get('category', 'study')
+    notes = body.get('notes', '')
+
+    if not title or not date or not start_time or not end_time:
+        return JsonResponse({'error': 'title, date, start_time, end_time are required'}, status=400)
+
+    schedule = StudySchedule.objects.create(
+        user=request.user,
+        title=title,
+        date=date,
+        start_time=start_time,
+        end_time=end_time,
+        category=category,
+        notes=notes,
+    )
+
+    return JsonResponse({
+        'id': schedule.id,
+        'title': schedule.title,
+        'date': schedule.date.isoformat(),
+        'start_time': schedule.start_time.strftime('%H:%M'),
+        'end_time': schedule.end_time.strftime('%H:%M'),
+        'category': schedule.category,
+        'notes': schedule.notes,
+        'is_completed': schedule.is_completed,
+    }, status=201)
+
+
+@login_required
+def delete_schedule(request, schedule_id):
+    """
+    API: Delete a study schedule.
+    """
+    from .models import StudySchedule
+    from django.http import JsonResponse
+
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+
+    try:
+        schedule = StudySchedule.objects.get(id=schedule_id, user=request.user)
+    except StudySchedule.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
+
+    schedule.delete()
+    return JsonResponse({'success': True})
+
+
+@login_required
+def toggle_schedule(request, schedule_id):
+    """
+    API: Toggle a schedule's completed status.
+    """
+    from .models import StudySchedule
+    from django.http import JsonResponse
+
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+
+    try:
+        schedule = StudySchedule.objects.get(id=schedule_id, user=request.user)
+    except StudySchedule.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
+
+    schedule.is_completed = not schedule.is_completed
+    schedule.save()
+    return JsonResponse({'id': schedule.id, 'is_completed': schedule.is_completed})

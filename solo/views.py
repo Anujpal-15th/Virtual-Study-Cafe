@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Sum
-from datetime import datetime, timedelta
+from datetime import timedelta
 import json
 
 from tracker.models import Task, StudySession, Achievement, UserAchievement
@@ -42,7 +42,7 @@ def solo_study_room(request):
     context = {
         'profile': profile,
         'preferences': preferences,
-        'tasks': active_tasks,
+        'user_tasks': active_tasks,
         'today_minutes': today_minutes,
     }
     
@@ -115,14 +115,17 @@ def save_study_session(request):
 
 
 @csrf_exempt
-@login_required
 @require_POST
 def save_auto_session(request):
     """
     Save auto-tracked study session from solo room or group room
     Called automatically when user leaves the room or periodically
     Uses sendBeacon API for reliable delivery
+    Note: No @login_required — sendBeacon can't follow redirects.
     """
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False, 'error': 'Not authenticated'}, status=401)
+
     try:
         # Get data from request body
         data = json.loads(request.body)

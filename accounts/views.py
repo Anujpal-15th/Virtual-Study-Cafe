@@ -25,6 +25,18 @@ def signup_view(request):
     POST: Create new user and send verification email
     """
     if request.method == 'POST':
+        # Clean up old unverified accounts (older than 24 hours) before validation
+        # This frees up usernames/emails that were never verified
+        from django.utils import timezone as tz
+        from datetime import timedelta
+        cutoff = tz.now() - timedelta(hours=24)
+        stale_users = User.objects.filter(
+            profile__email_verified=False,
+            date_joined__lt=cutoff
+        )
+        if stale_users.exists():
+            stale_users.delete()
+        
         form = SignUpForm(request.POST)
         if form.is_valid():
             # Save the new user (but don't log them in yet)
@@ -36,13 +48,23 @@ def signup_view(request):
             verification = EmailVerification.create_for_user(user)
             
             # Send verification email
-            send_verification_email(request, user, verification)
+            email_sent = send_verification_email(request, user, verification)
             
-            messages.success(
-                request, 
-                f'Account created! Please check your email ({user.email}) to verify your account.'
-            )
-            return redirect('verification_sent')
+            if email_sent:
+                messages.success(
+                    request, 
+                    f'Account created! Please check your email ({user.email}) to verify your account.'
+                )
+                return redirect('verification_sent')
+            else:
+                # Email failed but account was created — log them in directly
+                login(request, user)
+                messages.warning(
+                    request, 
+                    f'Account created! We could not send a verification email to {user.email}. '
+                    'You can still use the app. Please verify your email later from your profile.'
+                )
+                return redirect('home')
         else:
             # Show form errors to the user
             for field, errors in form.errors.items():
@@ -72,10 +94,13 @@ def login_view(request):
                 
                 # Check if email is verified
                 if hasattr(user, 'profile') and not user.profile.email_verified:
+                    from django.utils.safestring import mark_safe
                     messages.warning(
                         request, 
-                        f'Welcome back, {username}! Please verify your email to access all features. '
-                        '<a href="/resend-verification/" style="color: white; text-decoration: underline;">Resend verification email</a>'
+                        mark_safe(
+                            f'Welcome back, {username}! Please verify your email to access all features. '
+                            '<a href="/resend-verification/" style="color: white; text-decoration: underline;">Resend verification email</a>'
+                        )
                     )
                 else:
                     messages.success(request, f'Welcome back, {username}!')
@@ -119,7 +144,7 @@ def profile_view(request, username=None):
     
     # Calculate additional stats
     from tracker.models import StudySession
-    from django.db.models import Sum
+    from django.db.models import Sum, Avg
     from datetime import date, timedelta
     
     # Get study sessions for this user
@@ -127,7 +152,7 @@ def profile_view(request, username=None):
     
     # Calculate stats
     total_sessions = sessions.count()
-    avg_session_length = sessions.aggregate(avg=Sum('minutes'))['avg'] or 0
+    avg_session_length = sessions.aggregate(avg=Avg('minutes'))['avg'] or 0
     
     # Last 7 days activity
     seven_days_ago = date.today() - timedelta(days=7)
@@ -152,7 +177,6 @@ def profile_view(request, username=None):
     return render(request, 'accounts/profile.html', context)
 
 
-@login_required
 @login_required
 def edit_profile_view(request):
     """
@@ -439,7 +463,8 @@ def api_update_profile(request):
 
 def send_verification_email(request, user, verification):
     """
-    Send verification email to user with verification link
+    Send verification email to user with verification link.
+    Falls back to printing the link in console if email fails.
     """
     verification_url = request.build_absolute_uri(
         reverse('verify_email', args=[verification.token])
@@ -464,7 +489,16 @@ def send_verification_email(request, user, verification):
         )
         return True
     except Exception as e:
-        print(f"Error sending verification email: {e}")
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Failed to send verification email to {user.email}: {e}")
+        # Always print the verification link so devs can verify manually
+        print(f"\n{'='*60}")
+        print(f"EMAIL SEND FAILED - Manual verification link:")
+        print(f"  User: {user.username} ({user.email})")
+        print(f"  Link: {verification_url}")
+        print(f"  Error: {e}")
+        print(f"{'='*60}\n")
         return False
 
 
@@ -512,7 +546,7 @@ def verify_email_view(request, token):
         )
         return redirect('login')
         
-    except EmailVerification.DoesNotExist:
+    except Exception:
         messages.error(request, 'Invalid verification link.')
         return redirect('login')
 

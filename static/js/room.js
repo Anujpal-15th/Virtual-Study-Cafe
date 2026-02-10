@@ -960,12 +960,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Test all button functionality
-    console.log('Testing button functionality...');
-    setTimeout(() => {
-        testButtonFunctionality();
-    }, 1000);
-    
     // Timer buttons
     const startTimerBtn = document.getElementById('start-timer-btn');
     const pauseTimerBtn = document.getElementById('pause-timer-btn');
@@ -1017,81 +1011,16 @@ window.addEventListener('beforeunload', function() {
     }
 });
 
-// ===== BUTTON TESTING AND ERROR HANDLING =====
-
-/**
- * Test all button functionality to ensure they work properly
- */
-function testButtonFunctionality() {
-    console.log('=== BUTTON FUNCTIONALITY TEST ===');
-    
-    const buttons = [
-        { id: 'start-call-btn', name: 'Start Call' },
-        { id: 'end-call-btn', name: 'End Call' },
-        { id: 'toggle-mic-btn', name: 'Toggle Microphone' },
-        { id: 'toggle-camera-btn', name: 'Toggle Camera' },
-        { id: 'leave-room-btn', name: 'Leave Room' },
-        { id: 'start-timer-btn', name: 'Start Timer' },
-        { id: 'pause-timer-btn', name: 'Pause Timer' },
-        { id: 'reset-timer-btn', name: 'Reset Timer' },
-        { id: 'copy-btn', name: 'Copy Room Code' }
-    ];
-    
-    let working = 0;
-    let missing = 0;
-    
-    buttons.forEach(button => {
-        const element = document.getElementById(button.id);
-        if (element) {
-            console.log(`✅ ${button.name} button found and functional`);
-            working++;
-            
-            // Add visual feedback on hover for debugging
-            element.addEventListener('mouseenter', function() {
-                this.style.outline = '2px solid #00ff00';
-                this.title = `${button.name} - Working ✅`;
-            });
-            element.addEventListener('mouseleave', function() {
-                this.style.outline = '';
-            });
-        } else {
-            console.error(`❌ ${button.name} button NOT FOUND (ID: ${button.id})`);
-            missing++;
-        }
-    });
-    
-    console.log(`Button test complete: ${working} working, ${missing} missing`);
-    
-    if (missing > 0) {
-        console.warn('Some buttons are missing! Check the HTML structure.');
-        showUserError(`Warning: ${missing} buttons are not functioning properly. Please refresh the page.`);
-    } else {
-        console.log('All buttons are properly initialized! 🎉');
-    }
-}
+// ===== ERROR HANDLING =====
 
 /**
  * Display error message to user
  */
 function showUserError(message) {
-    // Try to use the notification system from room_detail.html
     if (typeof showNotification === 'function') {
         showNotification(message, 'error', 5000);
     } else {
-        // Fallback to alert
         alert('Room Error: ' + message);
-    }
-}
-
-/**
- * Display success message to user
- */
-function showUserSuccess(message) {
-    // Try to use the notification system from room_detail.html
-    if (typeof showNotification === 'function') {
-        showNotification(message, 'success', 3000);
-    } else {
-        console.log('Success:', message);
     }
 }
 

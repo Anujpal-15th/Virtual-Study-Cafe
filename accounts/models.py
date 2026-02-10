@@ -24,9 +24,9 @@ class UserProfile(models.Model):
     
     # Gender for personalized avatar
     GENDER_CHOICES = [
-        ('male', '👨 Male'),
-        ('female', '👩 Female'),
-        ('other', '🌟 Other'),
+        ('male', ' Male'),
+        ('female', ' Female'),
+        ('other', ' Other'),
         ('prefer_not_to_say', '🔒 Prefer not to say'),
     ]
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES, 
@@ -158,11 +158,12 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
+def save_user_profile(sender, instance, created, **kwargs):
     """
-    Save the profile whenever the user is saved
+    Save the profile whenever the user is saved (but not on creation - 
+    create_user_profile handles that)
     """
-    if hasattr(instance, 'profile'):
+    if not created and hasattr(instance, 'profile'):
         instance.profile.save()
 
 

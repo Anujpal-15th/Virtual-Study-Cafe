@@ -23,7 +23,7 @@ class Notification(models.Model):
                                    help_text="User who will receive this notification")
     
     # Who triggered this notification (optional - can be system-generated)
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True,
+    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
                                related_name='sent_notifications',
                                help_text="User who triggered this notification (optional)")
     

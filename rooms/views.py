@@ -34,7 +34,6 @@ def home_view(request):
     from tracker.models import StudySession
     from django.db.models import Sum
     from datetime import datetime, timedelta
-    from django.contrib.auth.models import User
     
     # Clean up expired rooms
     expired_rooms = Room.objects.filter(
@@ -436,7 +435,6 @@ def delete_room_view(request, room_code):
     Returns JSON response for AJAX calls.
     """
     from django.http import JsonResponse
-    from django.views.decorators.http import require_http_methods
     
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'POST method required'}, status=405)

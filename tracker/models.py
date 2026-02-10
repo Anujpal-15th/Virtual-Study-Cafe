@@ -138,3 +138,33 @@ class UserAchievement(models.Model):
     def __str__(self):
         return f"{self.user.username} unlocked {self.achievement.name}"
 
+
+class StudySchedule(models.Model):
+    """
+    Represents a scheduled study event on a specific date/time.
+    Users can plan study sessions via the dashboard calendar.
+    """
+    CATEGORY_CHOICES = [
+        ('study', '📚 Study'),
+        ('review', '🔄 Review'),
+        ('exam', '📝 Exam Prep'),
+        ('group', '👥 Group Study'),
+        ('break', '☕ Break'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='study_schedules')
+    title = models.CharField(max_length=100)
+    date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='study')
+    notes = models.TextField(blank=True, default='')
+    is_completed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['date', 'start_time']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.title} on {self.date}"
+

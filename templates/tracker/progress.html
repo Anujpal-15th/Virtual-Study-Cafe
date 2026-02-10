@@ -237,7 +237,7 @@
         type: 'doughnut',
         data: {
             datasets: [{
-                data: [{{ completion_percent }}, {{ 100|add:"-"|add:completion_percent }}],
+                data: [{{ completion_percent }}, {{ remaining_percent }}],
                 backgroundColor: ['#5B7FFF', 'rgba(226, 232, 240, 0.5)'],
                 borderWidth: 0,
                 cutout: '75%'

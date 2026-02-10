@@ -4,6 +4,9 @@
 
 {% block extra_css %}
 <style>
+    /* Hide base.html top-bar on dashboard — dashboard has its own header */
+    .top-bar { display: none !important; }
+    
     /* Modern Professional Dashboard Design */
     * {
         box-sizing: border-box;
@@ -329,6 +332,13 @@
         background: #F7FAFC;
         border: 1px solid #E2E8F0;
         transition: all 0.2s ease;
+        cursor: pointer;
+        position: relative;
+    }
+    
+    .calendar-day:hover {
+        background: #EEF2FF;
+        border-color: #5B7FFF;
     }
     
     .calendar-day.active {
@@ -356,6 +366,206 @@
     
     .calendar-day.active .calendar-day-number {
         color: white;
+    }
+    
+    .calendar-day .schedule-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #5B7FFF;
+        margin: 3px auto 0;
+    }
+    
+    .calendar-day.active .schedule-dot {
+        background: rgba(255,255,255,0.8);
+    }
+    
+    /* Schedule List below calendar */
+    .schedule-list {
+        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .schedule-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 0.75rem;
+        border-radius: 8px;
+        background: #F7FAFC;
+        border: 1px solid #E2E8F0;
+        font-size: 0.8rem;
+        transition: all 0.2s;
+    }
+    
+    .schedule-item:hover {
+        background: #EEF2FF;
+    }
+    
+    .schedule-item.completed {
+        opacity: 0.5;
+        text-decoration: line-through;
+    }
+    
+    .schedule-item-time {
+        color: #5B7FFF;
+        font-weight: 600;
+        white-space: nowrap;
+        font-size: 0.75rem;
+    }
+    
+    .schedule-item-title {
+        flex: 1;
+        color: #1A202C;
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .schedule-item-cat {
+        font-size: 0.85rem;
+    }
+    
+    .schedule-item-actions {
+        display: flex;
+        gap: 0.25rem;
+    }
+    
+    .schedule-item-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 0.8rem;
+        padding: 0.15rem 0.3rem;
+        border-radius: 4px;
+        transition: background 0.2s;
+    }
+    
+    .schedule-item-btn:hover {
+        background: #E2E8F0;
+    }
+    
+    .schedule-add-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        padding: 0.5rem;
+        border-radius: 8px;
+        border: 1px dashed #CBD5E1;
+        background: transparent;
+        color: #64748B;
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+    
+    .schedule-add-btn:hover {
+        border-color: #5B7FFF;
+        color: #5B7FFF;
+        background: #EEF2FF;
+    }
+    
+    /* Schedule Modal */
+    .schedule-modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+    }
+    
+    .schedule-modal {
+        background: white;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 400px;
+        padding: 1.5rem;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    
+    .schedule-modal h3 {
+        margin: 0 0 1rem;
+        font-size: 1.1rem;
+        color: #1A202C;
+    }
+    
+    .schedule-form-group {
+        margin-bottom: 0.75rem;
+    }
+    
+    .schedule-form-group label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.25rem;
+    }
+    
+    .schedule-form-group input,
+    .schedule-form-group select,
+    .schedule-form-group textarea {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #E2E8F0;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        outline: none;
+        transition: border 0.2s;
+        box-sizing: border-box;
+    }
+    
+    .schedule-form-group input:focus,
+    .schedule-form-group select:focus,
+    .schedule-form-group textarea:focus {
+        border-color: #5B7FFF;
+    }
+    
+    .schedule-form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+    
+    .schedule-modal-footer {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+        margin-top: 1rem;
+    }
+    
+    .schedule-btn-cancel {
+        padding: 0.5rem 1rem;
+        border: 1px solid #E2E8F0;
+        border-radius: 8px;
+        background: white;
+        color: #475569;
+        font-size: 0.85rem;
+        cursor: pointer;
+    }
+    
+    .schedule-btn-save {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 8px;
+        background: #5B7FFF;
+        color: white;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    
+    .schedule-btn-save:hover {
+        background: #4A6FEF;
     }
     
     /* Friends/Applicants List */
@@ -853,35 +1063,68 @@
     <!-- Sidebar -->
     <div class="dashboard-sidebar">
         <!-- Schedule Calendar -->
-        <div class="weekly-focus-circle">
+        <div class="weekly-focus-circle" id="scheduleCalendar">
             <div class="section-title" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
                 <span>Schedule Calendar</span>
-                <div style="display: flex; gap: 0.5rem;">
-                    <span style="font-size: 0.875rem; color: #64748B; font-weight: 400;">◀</span>
-                    <span style="font-size: 0.875rem; color: #64748B; font-weight: 600;">May</span>
-                    <span style="font-size: 0.875rem; color: #64748B; font-weight: 400;">▶</span>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <span id="calPrev" style="font-size: 0.875rem; color: #64748B; cursor: pointer; padding: 0.25rem 0.5rem; border-radius: 4px; user-select: none; transition: background 0.2s;" onmouseover="this.style.background='#F1F5F9'" onmouseout="this.style.background='transparent'">◀</span>
+                    <span id="calWeekLabel" style="font-size: 0.875rem; color: #64748B; font-weight: 600; min-width: 60px; text-align: center;"></span>
+                    <span id="calNext" style="font-size: 0.875rem; color: #64748B; cursor: pointer; padding: 0.25rem 0.5rem; border-radius: 4px; user-select: none; transition: background 0.2s;" onmouseover="this.style.background='#F1F5F9'" onmouseout="this.style.background='transparent'">▶</span>
                 </div>
             </div>
-            <div class="calendar-days">
-                <div class="calendar-day">
-                    <div class="calendar-day-label">MON</div>
-                    <div class="calendar-day-number">22</div>
+            <div class="calendar-days" id="calDays">
+                <!-- Filled by JS -->
+            </div>
+            <!-- Schedule list for selected day -->
+            <div class="schedule-list" id="scheduleList">
+                <div style="text-align: center; padding: 0.75rem; color: #94A3B8; font-size: 0.8rem;">
+                    Click a day to view schedules
                 </div>
-                <div class="calendar-day">
-                    <div class="calendar-day-label">TUE</div>
-                    <div class="calendar-day-number">23</div>
+            </div>
+            <button class="schedule-add-btn" id="addScheduleBtn" onclick="openScheduleModal()">
+                ＋ Add Schedule
+            </button>
+        </div>
+
+        <!-- Schedule Modal -->
+        <div class="schedule-modal-overlay" id="scheduleModal">
+            <div class="schedule-modal">
+                <h3>📅 New Study Schedule</h3>
+                <div class="schedule-form-group">
+                    <label>Title</label>
+                    <input type="text" id="schTitle" placeholder="e.g. Math revision">
                 </div>
-                <div class="calendar-day active">
-                    <div class="calendar-day-label">WED</div>
-                    <div class="calendar-day-number">24</div>
+                <div class="schedule-form-group">
+                    <label>Date</label>
+                    <input type="date" id="schDate">
                 </div>
-                <div class="calendar-day">
-                    <div class="calendar-day-label">THU</div>
-                    <div class="calendar-day-number">25</div>
+                <div class="schedule-form-row">
+                    <div class="schedule-form-group">
+                        <label>Start Time</label>
+                        <input type="time" id="schStart" value="09:00">
+                    </div>
+                    <div class="schedule-form-group">
+                        <label>End Time</label>
+                        <input type="time" id="schEnd" value="10:00">
+                    </div>
                 </div>
-                <div class="calendar-day">
-                    <div class="calendar-day-label">FRI</div>
-                    <div class="calendar-day-number">26</div>
+                <div class="schedule-form-group">
+                    <label>Category</label>
+                    <select id="schCategory">
+                        <option value="study">📚 Study</option>
+                        <option value="review">🔄 Review</option>
+                        <option value="exam">📝 Exam Prep</option>
+                        <option value="group">👥 Group Study</option>
+                        <option value="break">☕ Break</option>
+                    </select>
+                </div>
+                <div class="schedule-form-group">
+                    <label>Notes (optional)</label>
+                    <textarea id="schNotes" rows="2" placeholder="Any extra details..."></textarea>
+                </div>
+                <div class="schedule-modal-footer">
+                    <button class="schedule-btn-cancel" onclick="closeScheduleModal()">Cancel</button>
+                    <button class="schedule-btn-save" onclick="saveSchedule()">Save</button>
                 </div>
             </div>
         </div>
@@ -1062,6 +1305,269 @@
             hideJoinRoomModal();
         }
     });
+    
+    // ========== Schedule Calendar ==========
+    (function() {
+        const DAY_NAMES = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const CAT_ICONS = { study: '📚', review: '🔄', exam: '📝', group: '👥', break: '☕' };
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        let weekOffset = 0; // 0 = current week
+        let selectedDate = new Date(today); // currently selected day
+        let schedulesCache = {}; // { 'YYYY-MM-DD': [...] }
+        
+        const calDays = document.getElementById('calDays');
+        const calWeekLabel = document.getElementById('calWeekLabel');
+        const scheduleList = document.getElementById('scheduleList');
+        const calPrev = document.getElementById('calPrev');
+        const calNext = document.getElementById('calNext');
+        
+        function getWeekDays(offset) {
+            // Get Monday of current week, then apply offset
+            const d = new Date(today);
+            const dayOfWeek = d.getDay(); // 0=Sun
+            const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+            d.setDate(d.getDate() + mondayOffset + (offset * 7));
+            
+            const days = [];
+            for (let i = 0; i < 5; i++) { // Mon-Fri
+                const day = new Date(d);
+                day.setDate(d.getDate() + i);
+                days.push(day);
+            }
+            return days;
+        }
+        
+        function dateKey(d) {
+            return d.toISOString().split('T')[0]; // YYYY-MM-DD
+        }
+        
+        function isSameDay(a, b) {
+            return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+        }
+        
+        async function fetchSchedules(startDate, endDate) {
+            const start = dateKey(startDate);
+            const end = dateKey(endDate);
+            try {
+                const resp = await fetch(`/api/schedules/?start=${start}&end=${end}`);
+                if (!resp.ok) return;
+                const data = await resp.json();
+                // Group by date
+                data.schedules.forEach(s => {
+                    if (!schedulesCache[s.date]) schedulesCache[s.date] = [];
+                    // Avoid duplicates
+                    if (!schedulesCache[s.date].find(x => x.id === s.id)) {
+                        schedulesCache[s.date].push(s);
+                    }
+                });
+            } catch (e) {
+                console.error('Failed to fetch schedules:', e);
+            }
+        }
+        
+        function renderWeek() {
+            const days = getWeekDays(weekOffset);
+            calDays.innerHTML = '';
+            
+            // Update week label (month name)
+            const midDay = days[2]; // Wednesday
+            calWeekLabel.textContent = MONTH_SHORT[midDay.getMonth()];
+            
+            days.forEach(day => {
+                const div = document.createElement('div');
+                div.className = 'calendar-day';
+                if (isSameDay(day, today)) div.classList.add('today-marker');
+                if (isSameDay(day, selectedDate)) div.classList.add('active');
+                
+                const key = dateKey(day);
+                const hasSchedules = schedulesCache[key] && schedulesCache[key].length > 0;
+                
+                div.innerHTML = `
+                    <div class="calendar-day-label">${DAY_NAMES[day.getDay()]}</div>
+                    <div class="calendar-day-number">${day.getDate()}</div>
+                    ${hasSchedules ? '<div class="schedule-dot"></div>' : ''}
+                `;
+                
+                div.addEventListener('click', () => {
+                    selectedDate = new Date(day);
+                    renderWeek();
+                    renderScheduleList();
+                    // Pre-fill date in modal
+                    document.getElementById('schDate').value = key;
+                });
+                
+                calDays.appendChild(div);
+            });
+        }
+        
+        function renderScheduleList() {
+            const key = dateKey(selectedDate);
+            const items = schedulesCache[key] || [];
+            
+            if (items.length === 0) {
+                const dayLabel = isSameDay(selectedDate, today) ? 'today' : selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                scheduleList.innerHTML = `
+                    <div style="text-align: center; padding: 0.75rem; color: #94A3B8; font-size: 0.8rem;">
+                        No schedules for ${dayLabel}
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by start_time
+            items.sort((a, b) => a.start_time.localeCompare(b.start_time));
+            
+            scheduleList.innerHTML = items.map(s => `
+                <div class="schedule-item ${s.is_completed ? 'completed' : ''}" data-id="${s.id}">
+                    <span class="schedule-item-cat">${CAT_ICONS[s.category] || '📚'}</span>
+                    <span class="schedule-item-time">${s.start_time}</span>
+                    <span class="schedule-item-title" title="${s.title}${s.notes ? '\n' + s.notes : ''}">${s.title}</span>
+                    <div class="schedule-item-actions">
+                        <button class="schedule-item-btn" title="${s.is_completed ? 'Mark incomplete' : 'Mark done'}" onclick="toggleSchedule(${s.id})">${s.is_completed ? '↩️' : '✅'}</button>
+                        <button class="schedule-item-btn" title="Delete" onclick="deleteSchedule(${s.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function loadAndRender() {
+            const days = getWeekDays(weekOffset);
+            await fetchSchedules(days[0], days[4]);
+            renderWeek();
+            renderScheduleList();
+        }
+        
+        // Navigation
+        calPrev.addEventListener('click', () => {
+            weekOffset--;
+            loadAndRender();
+        });
+        
+        calNext.addEventListener('click', () => {
+            weekOffset++;
+            loadAndRender();
+        });
+        
+        // Set initial date input
+        document.getElementById('schDate').value = dateKey(today);
+        
+        // Initial render
+        loadAndRender();
+        
+        // ===== Schedule CRUD (global functions) =====
+        window.openScheduleModal = function() {
+            document.getElementById('schDate').value = dateKey(selectedDate);
+            document.getElementById('scheduleModal').style.display = 'flex';
+        };
+        
+        window.closeScheduleModal = function() {
+            document.getElementById('scheduleModal').style.display = 'none';
+            document.getElementById('schTitle').value = '';
+            document.getElementById('schNotes').value = '';
+        };
+        
+        window.saveSchedule = async function() {
+            const title = document.getElementById('schTitle').value.trim();
+            const date = document.getElementById('schDate').value;
+            const startTime = document.getElementById('schStart').value;
+            const endTime = document.getElementById('schEnd').value;
+            const category = document.getElementById('schCategory').value;
+            const notes = document.getElementById('schNotes').value.trim();
+            
+            if (!title) { alert('Please enter a title'); return; }
+            if (!date) { alert('Please select a date'); return; }
+            if (!startTime || !endTime) { alert('Please set start and end times'); return; }
+            if (startTime >= endTime) { alert('End time must be after start time'); return; }
+            
+            try {
+                const resp = await fetch('/api/schedules/create/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({ title, date, start_time: startTime, end_time: endTime, category, notes }),
+                });
+                
+                if (!resp.ok) {
+                    const err = await resp.json();
+                    alert(err.error || 'Failed to save');
+                    return;
+                }
+                
+                const newItem = await resp.json();
+                // Add to cache
+                if (!schedulesCache[newItem.date]) schedulesCache[newItem.date] = [];
+                schedulesCache[newItem.date].push(newItem);
+                
+                closeScheduleModal();
+                
+                // If the saved date is in the current week view, re-render
+                selectedDate = new Date(newItem.date + 'T00:00:00');
+                renderWeek();
+                renderScheduleList();
+            } catch (e) {
+                alert('Network error');
+            }
+        };
+        
+        window.toggleSchedule = async function(id) {
+            try {
+                const resp = await fetch(`/api/schedules/${id}/toggle/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                });
+                if (!resp.ok) return;
+                const data = await resp.json();
+                
+                // Update cache
+                for (const key in schedulesCache) {
+                    const arr = schedulesCache[key];
+                    const item = arr.find(s => s.id === id);
+                    if (item) { item.is_completed = data.is_completed; break; }
+                }
+                renderScheduleList();
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        
+        window.deleteSchedule = async function(id) {
+            if (!confirm('Delete this schedule?')) return;
+            try {
+                const resp = await fetch(`/api/schedules/${id}/delete/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                });
+                if (!resp.ok) return;
+                
+                // Remove from cache
+                for (const key in schedulesCache) {
+                    schedulesCache[key] = schedulesCache[key].filter(s => s.id !== id);
+                }
+                renderWeek();
+                renderScheduleList();
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        
+        // Close modal on backdrop click
+        document.getElementById('scheduleModal').addEventListener('click', function(e) {
+            if (e.target === this) closeScheduleModal();
+        });
+        
+        // Close modal on Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('scheduleModal').style.display === 'flex') {
+                closeScheduleModal();
+            }
+        });
+    })();
 </script>
 {% endblock %}
 
