@@ -12,6 +12,12 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     
+    # Email Verification
+    path('verification-sent/', views.verification_sent_view, name='verification_sent'),
+    path('verify-email/<uuid:token>/', views.verify_email_view, name='verify_email'),
+    path('resend-verification/', views.resend_verification_view, name='resend_verification'),
+    path('api/check-verification/', views.check_verification_status, name='check_verification_status'),
+    
     # Password Reset
     path('password-reset/', 
          auth_views.PasswordResetView.as_view(template_name='accounts/password_reset.html'), 

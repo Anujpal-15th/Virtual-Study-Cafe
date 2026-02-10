@@ -18,10 +18,7 @@
     .leaderboard-title {
         font-size: 3rem;
         font-weight: 700;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #1A202C;
         margin-bottom: 0.5rem;
     }
     
@@ -39,7 +36,7 @@
     
     .period-tab {
         padding: 0.8rem 2rem;
-        background: #FFFFFF;
+        background: #F7FAFC;
         border: 1px solid #E2E8F0;
         border-radius: 12px;
         color: #4A5568;
@@ -49,15 +46,15 @@
     }
     
     .period-tab:hover {
-        background: #F7FAFC;
-        border-color: #667eea;
-        color: #667eea;
+        background: #EDF2F7;
+        border-color: #CBD5E0;
+        color: #1A202C;
     }
     
     .period-tab.active {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-color: #667eea;
-        color: #fff;
+        background: #5B7FFF;
+        border-color: #5B7FFF;
+        color: white;
     }
     
     .leaderboard-grid {
@@ -69,12 +66,12 @@
     
     /* Top 3 Podium */
     .podium-section {
-        background: #FFFFFF;
+        background: white;
         border-radius: 20px;
         padding: 2rem;
         border: 1px solid #E2E8F0;
         margin-bottom: 2rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     
     .podium-title {
@@ -180,12 +177,12 @@
     .podium-hours {
         font-size: 1.3rem;
         font-weight: 700;
-        color: #667eea;
+        color: #5B7FFF;
         margin-top: 0.5rem;
     }
     
     .podium-base {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        background: linear-gradient(135deg, rgba(91, 127, 255, 0.1) 0%, rgba(76, 111, 255, 0.1) 100%);
         border-radius: 12px 12px 0 0;
         padding: 1.5rem 1rem;
         border: 1px solid #E2E8F0;
@@ -206,11 +203,11 @@
     
     /* Leaderboard List */
     .leaderboard-list {
-        background: #FFFFFF;
+        background: white;
         border-radius: 20px;
         padding: 2rem;
         border: 1px solid #E2E8F0;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     
     .rank-item {
@@ -227,19 +224,19 @@
     
     .rank-item:hover {
         background: #EDF2F7;
-        border-color: #667eea;
+        border-color: #CBD5E0;
         transform: translateX(5px);
     }
     
     .rank-item.current-user {
-        background: rgba(102, 126, 234, 0.1);
-        border: 1px solid #667eea;
+        background: rgba(91, 127, 255, 0.1);
+        border: 1px solid #5B7FFF;
     }
     
     .rank-number {
         font-size: 1.5rem;
         font-weight: 700;
-        color: #667eea;
+        color: #5B7FFF;
         min-width: 50px;
         text-align: center;
     }
@@ -298,11 +295,11 @@
     }
     
     .stats-card {
-        background: #FFFFFF;
+        background: white;
         border-radius: 20px;
         padding: 1.5rem;
         border: 1px solid #E2E8F0;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     
     .stats-card-title {
@@ -318,13 +315,13 @@
     .stats-card-title svg {
         width: 24px;
         height: 24px;
-        stroke: #667eea;
+        stroke: #5B7FFF;
     }
     
     .your-rank-display {
         text-align: center;
         padding: 2rem;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+        background: linear-gradient(135deg, rgba(91, 127, 255, 0.1) 0%, rgba(76, 111, 255, 0.1) 100%);
         border-radius: 15px;
         margin-bottom: 1rem;
     }
@@ -332,7 +329,7 @@
     .your-rank-number {
         font-size: 4rem;
         font-weight: 700;
-        color: #667eea;
+        color: #5B7FFF;
         line-height: 1;
     }
     
@@ -347,7 +344,7 @@
         align-items: center;
         gap: 1rem;
         padding: 1rem;
-        background: rgba(255, 255, 255, 0.03);
+        background: #F7FAFC;
         border-radius: 10px;
         margin-bottom: 0.8rem;
     }
@@ -357,13 +354,13 @@
     }
     
     .achievement-info h4 {
-        color: #fff;
+        color: #1A202C;
         font-size: 0.95rem;
         margin-bottom: 0.3rem;
     }
     
     .achievement-info p {
-        color: rgba(255, 255, 255, 0.6);
+        color: #64748B;
         font-size: 0.8rem;
     }
     
@@ -371,18 +368,18 @@
         display: flex;
         justify-content: space-between;
         padding: 1rem;
-        background: rgba(255, 255, 255, 0.03);
+        background: #F7FAFC;
         border-radius: 10px;
         margin-bottom: 0.8rem;
     }
     
     .stat-comparison-label {
-        color: rgba(255, 255, 255, 0.7);
+        color: #64748B;
         font-size: 0.9rem;
     }
     
     .stat-comparison-value {
-        color: #fff;
+        color: #1A202C;
         font-weight: 600;
     }
     

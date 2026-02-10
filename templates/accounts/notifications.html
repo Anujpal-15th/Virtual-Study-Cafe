@@ -5,43 +5,43 @@
 
 {% block content %}
 <div class="container" style="max-width: 900px; margin: 80px auto 40px; padding: 20px;">
-    <div style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-radius: 20px; padding: 40px; border: 1px solid rgba(255, 255, 255, 0.1);">
+    <div style="background: white; border-radius: 20px; padding: 40px; border: 1px solid #E2E8F0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
         
         <div style="margin-bottom: 30px;">
-            <h1 style="color: #fff; margin-bottom: 10px;">
+            <h1 style="color: #1A202C; margin-bottom: 10px;">
                 <svg style="width: 32px; height: 32px; vertical-align: middle; margin-right: 10px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                 </svg>
                 Notifications
             </h1>
             {% if unread_count > 0 %}
-                <p style="color: #667eea; font-size: 14px;">You have {{ unread_count }} unread notification{{ unread_count|pluralize }}</p>
+                <p style="color: #5B7FFF; font-size: 14px;">You have {{ unread_count }} unread notification{{ unread_count|pluralize }}</p>
             {% else %}
-                <p style="color: rgba(255, 255, 255, 0.6); font-size: 14px;">No unread notifications</p>
+                <p style="color: #64748B; font-size: 14px;">No unread notifications</p>
             {% endif %}
         </div>
 
         <!-- Unread Notifications -->
         {% if unread_notifications %}
         <div style="margin-bottom: 30px;">
-            <h2 style="color: #fff; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+            <h2 style="color: #1A202C; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #E2E8F0;">
                 Unread
             </h2>
             {% for notification in unread_notifications %}
-            <div style="background: rgba(102, 126, 234, 0.1); border-left: 3px solid #667eea; padding: 20px; margin-bottom: 15px; border-radius: 10px;">
+            <div style="background: #F0F4FF; border-left: 3px solid #5B7FFF; padding: 20px; margin-bottom: 15px; border-radius: 10px;">
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
-                    <h3 style="color: #fff; font-size: 16px; font-weight: 600; margin: 0;">{{ notification.title }}</h3>
-                    <span style="color: rgba(255, 255, 255, 0.5); font-size: 12px; white-space: nowrap; margin-left: 15px;">{{ notification.created_at|timesince }} ago</span>
+                    <h3 style="color: #1A202C; font-size: 16px; font-weight: 600; margin: 0;">{{ notification.title }}</h3>
+                    <span style="color: #64748B; font-size: 12px; white-space: nowrap; margin-left: 15px;">{{ notification.created_at|timesince }} ago</span>
                 </div>
-                <p style="color: rgba(255, 255, 255, 0.8); font-size: 14px; margin: 10px 0;">{{ notification.message }}</p>
+                <p style="color: #4A5568; font-size: 14px; margin: 10px 0;">{{ notification.message }}</p>
                 {% if notification.link %}
-                <a href="{{ notification.link }}" style="color: #667eea; text-decoration: none; font-size: 14px; display: inline-block; margin-top: 10px;">
+                <a href="{{ notification.link }}" style="color: #5B7FFF; text-decoration: none; font-size: 14px; display: inline-block; margin-top: 10px;">
                     View Details →
                 </a>
                 {% endif %}
                 <form method="post" action="{% url 'mark_notification_read' notification.id %}" style="margin-top: 10px;">
                     {% csrf_token %}
-                    <button type="submit" style="background: rgba(102, 126, 234, 0.2); color: #667eea; border: 1px solid #667eea; padding: 6px 12px; border-radius: 6px; font-size: 13px; cursor: pointer;">
+                    <button type="submit" style="background: #5B7FFF; color: white; border: 1px solid #5B7FFF; padding: 6px 12px; border-radius: 6px; font-size: 13px; cursor: pointer;">
                         Mark as Read
                     </button>
                 </form>
@@ -53,18 +53,18 @@
         <!-- Read Notifications -->
         {% if read_notifications %}
         <div>
-            <h2 style="color: #fff; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+            <h2 style="color: #1A202C; font-size: 18px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #E2E8F0;">
                 Recent
             </h2>
             {% for notification in read_notifications %}
-            <div style="background: rgba(255, 255, 255, 0.03); padding: 20px; margin-bottom: 15px; border-radius: 10px; opacity: 0.7;">
+            <div style="background: #F7FAFC; padding: 20px; margin-bottom: 15px; border-radius: 10px;">
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
-                    <h3 style="color: #fff; font-size: 16px; font-weight: 500; margin: 0;">{{ notification.title }}</h3>
-                    <span style="color: rgba(255, 255, 255, 0.4); font-size: 12px; white-space: nowrap; margin-left: 15px;">{{ notification.created_at|timesince }} ago</span>
+                    <h3 style="color: #1A202C; font-size: 16px; font-weight: 500; margin: 0;">{{ notification.title }}</h3>
+                    <span style="color: #64748B; font-size: 12px; white-space: nowrap; margin-left: 15px;">{{ notification.created_at|timesince }} ago</span>
                 </div>
-                <p style="color: rgba(255, 255, 255, 0.6); font-size: 14px; margin: 10px 0;">{{ notification.message }}</p>
+                <p style="color: #64748B; font-size: 14px; margin: 10px 0;">{{ notification.message }}</p>
                 {% if notification.link %}
-                <a href="{{ notification.link }}" style="color: rgba(102, 126, 234, 0.7); text-decoration: none; font-size: 14px; display: inline-block; margin-top: 10px;">
+                <a href="{{ notification.link }}" style="color: #5B7FFF; text-decoration: none; font-size: 14px; display: inline-block; margin-top: 10px;">
                     View Details →
                 </a>
                 {% endif %}
@@ -74,7 +74,7 @@
         {% endif %}
 
         {% if not unread_notifications and not read_notifications %}
-        <div style="text-align: center; padding: 60px 20px; color: rgba(255, 255, 255, 0.4);">
+        <div style="text-align: center; padding: 60px 20px; color: #64748B;">
             <svg style="width: 64px; height: 64px; margin-bottom: 20px; opacity: 0.3;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
             </svg>

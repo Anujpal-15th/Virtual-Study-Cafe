@@ -23,12 +23,9 @@ class Room(models.Model):
     is_public = models.BooleanField(default=True)  # Whether room is visible in public listing
     
     def save(self, *args, **kwargs):
-        """
-        Override save to generate a unique room code if not exists.
-        Room code is a 6-character unique identifier.
-        """
+        
+        
         if not self.room_code:
-            # Generate a unique 6-character room code
             self.room_code = str(uuid.uuid4())[:6].upper()
         super().save(*args, **kwargs)
     

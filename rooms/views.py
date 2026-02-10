@@ -44,11 +44,17 @@ def home_view(request):
         expired_rooms.delete()
         messages.info(request, f'{expired_count} empty room(s) expired and removed.')
     
-    # Get all active rooms created by the current user (both public and private)
+    # Get rooms that meet any of these criteria:
+    # 1. Created by current user
+    # 2. User is a member of (joined)
+    # 3. Global rooms (room_code = 'GLOBAL')
     rooms = Room.objects.filter(
-        Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now()),
-        created_by=request.user  # Only show rooms created by current user
-    )
+        Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now())
+    ).filter(
+        Q(created_by=request.user) |  # Rooms created by user
+        Q(memberships__user=request.user) |  # Rooms user has joined
+        Q(room_code='GLOBAL')  # Global rooms
+    ).distinct()
     
     # Get search query from GET parameters
     search_query = request.GET.get('search', '').strip()
@@ -114,11 +120,16 @@ def home_view(request):
             'hours': round(day_total / 60, 1)
         })
     
-    # Get online friends (users who were active in last 30 minutes)
-    thirty_mins_ago = today - timedelta(minutes=30)
-    online_users = User.objects.filter(
-        Q(study_sessions__created_at__gte=thirty_mins_ago) |
-        Q(room_memberships__joined_at__gte=thirty_mins_ago)
+    # Get study partners (users who are in the same rooms as current user)
+    # Find users who share rooms with the current user
+    user_room_ids = RoomMembership.objects.filter(
+        user=request.user,
+        is_active=True
+    ).values_list('room_id', flat=True)
+    
+    study_partners = User.objects.filter(
+        room_memberships__room_id__in=user_room_ids,
+        room_memberships__is_active=True
     ).exclude(id=request.user.id).distinct().select_related('profile')[:12]
     
     context = {
@@ -129,9 +140,46 @@ def home_view(request):
         'week_total_hours': round(week_total / 60, 1),
         'completion_percent': completion_percent,
         'daily_stats': json.dumps(daily_stats),
-        'online_users': online_users,
+        'study_partners': study_partners,
     }
     return render(request, 'rooms/home.html', context)
+
+
+@login_required
+def browse_rooms_view(request):
+    """
+    Browse all available study rooms.
+    Shows all public rooms that users can join.
+    """
+    # Clean up expired rooms
+    expired_rooms = Room.objects.filter(
+        expires_at__lte=timezone.now()
+    )
+    expired_count = expired_rooms.count()
+    if expired_count > 0:
+        expired_rooms.delete()
+    
+    # Get all available public rooms
+    rooms = Room.objects.filter(
+        Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now()),
+        is_public=True
+    ).annotate(
+        member_count=Count('memberships', filter=Q(memberships__is_active=True))
+    ).select_related('created_by').order_by('-member_count', '-created_at')
+    
+    # Get search query
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        rooms = rooms.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+    
+    context = {
+        'rooms': rooms,
+        'search_query': search_query,
+    }
+    return render(request, 'rooms/browse_rooms.html', context)
 
 
 @login_required
@@ -175,12 +223,35 @@ def create_room_view(request):
 
 
 @login_required
-def join_room_by_code_view(request):
+def join_room_by_code_view(request, room_code=None):
     """
     Handle joining a room by entering a room code.
-    GET: Display join room form
-    POST: Join the room by code and redirect to room detail
+    GET with room_code: Direct join via URL (e.g., /rooms/join/ABC123/)
+    POST: Join the room by code from form and redirect to room detail
     """
+    # Handle GET request with room_code in URL
+    if request.method == 'GET' and room_code:
+        room_code = room_code.strip().upper()
+        
+        # Try to find the room
+        try:
+            room = Room.objects.get(room_code=room_code)
+            
+            # Check if room has expired
+            if room.is_expired():
+                room.delete()
+                messages.error(request, 'This room has expired due to inactivity.')
+                return redirect('home')
+            
+            # Redirect to room detail (which handles membership creation)
+            messages.success(request, f'Joining room "{room.name}"...')
+            return redirect('room_detail', room_code=room.room_code)
+            
+        except Room.DoesNotExist:
+            messages.error(request, f'Room with code "{room_code}" not found. Please check the code and try again.')
+            return redirect('home')
+    
+    # Handle POST request with room_code in form
     if request.method == 'POST':
         room_code = request.POST.get('room_code', '').strip().upper()
         
@@ -207,7 +278,7 @@ def join_room_by_code_view(request):
             messages.error(request, f'Room with code "{room_code}" not found. Please check the code and try again.')
             return redirect('home')
     
-    # GET request - redirect to home
+    # GET request without room_code - redirect to home
     return redirect('home')
 
 
