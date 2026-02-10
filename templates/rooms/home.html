@@ -824,7 +824,6 @@
         <div class="action-buttons-section">
             <div class="section-title">
                 <span>You Need to Study</span>
-                <a href="{% url 'home' %}" class="view-all-link">View All</a>
             </div>
             <div class="action-buttons">
                 <div class="action-btn-card" onclick="window.location.href='{% url 'create_room' %}'">
@@ -891,7 +890,7 @@
         <div class="friends-online-container">
             <div class="section-title" style="display: flex; align-items: center; justify-content: space-between;">
                 <span>Study Partners</span>
-                <a href="{% url 'profile' %}" class="view-all-link">View All</a>
+                <a href="{% url 'all_study_partners' %}" class="view-all-link">View All</a>
             </div>
             <div class="friends-grid">
                 {% if study_partners %}

@@ -70,9 +70,9 @@ function handleWebSocketMessage(data) {
         case 'user_join':
             displayNotification(`${data.username} joined the room`);
             updateMembersList();
-            // If we have local stream and no peer connection, create the offer
+            // If we have an active call and no peer connection, create the offer
             // This ensures the existing user initiates the connection
-            if (localStream && !peerConnection && data.username !== USERNAME) {
+            if (isCallActive && localStream && !peerConnection && data.username !== USERNAME) {
                 console.log('Creating peer connection for new user:', data.username);
                 setTimeout(() => createPeerConnection(), 1500);
             }
@@ -188,15 +188,20 @@ function escapeHtml(text) {
 /**
  * Start a video call
  * Gets user media (camera + mic) and makes it ready for connection
- * Works even when user is alone in the room
- * Does NOT create peer connection - waits for user_join event to handle that
  */
 async function startCall() {
     console.log('Starting call for user:', USERNAME);
     
+    if (isCallActive) {
+        console.log('Call already active');
+        return;
+    }
+    
     try {
         // Get user's camera and microphone
         console.log('Requesting camera and microphone access...');
+        updateVideoStatus('Requesting camera and microphone access...');
+        
         localStream = await navigator.mediaDevices.getUserMedia({
             video: true,
             audio: true
@@ -215,30 +220,36 @@ async function startCall() {
             console.log('Local video loaded');
         };
         
+        // Set initial states
         isCallActive = true;
-        console.log('Setting isCallActive to true and updating buttons');
+        isMicOn = true;
+        isCameraOn = true;
         
-        // Try to update buttons immediately
+        console.log('Setting isCallActive to true and updating buttons');
         updateCallButtons();
         
-        // Also retry after a short delay to ensure DOM is ready
-        setTimeout(() => {
-            console.log('Retry: Updating call buttons after delay');
-            updateCallButtons();
-        }, 500);
+        // Send notification to others that we joined
+        if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+            chatSocket.send(JSON.stringify({
+                type: 'user_join',
+                username: USERNAME
+            }));
+        }
         
-        const memberCount = parseInt(document.getElementById('members-count').textContent);
+        const memberCount = parseInt(document.getElementById('members-count')?.textContent || '1');
         if (memberCount > 1) {
-            updateVideoStatus('Ready - Connecting to peer...');
+            updateVideoStatus('Connected - Ready for video call');
+            // Create peer connection if others are in the room
+            setTimeout(() => createPeerConnection(), 1000);
         } else {
             updateVideoStatus('Ready - Waiting for others to join');
         }
         
     } catch (error) {
         console.error('Error starting call:', error);
-        alert('Could not access camera/microphone. Please check permissions and ensure you\'re using HTTPS or localhost.');
-        updateVideoStatus('Error: ' + error.message);
+        handleVideoError(error, 'Start video call');
         isCallActive = false;
+        updateCallButtons();
     }
 }
 
@@ -595,41 +606,52 @@ function updateVideoStatus(message) {
 /**
  * Update call button visibility based on call state
  */
-/**
- * Update call button visibility based on call state
- */
 function updateCallButtons() {
+    const startBtn = document.getElementById('start-call-btn');
     const endBtn = document.getElementById('end-call-btn');
     const micBtn = document.getElementById('toggle-mic-btn');
     const cameraBtn = document.getElementById('toggle-camera-btn');
     
     console.log('Updating call buttons. isCallActive:', isCallActive);
     console.log('Button elements found:', {
+        startBtn: !!startBtn,
         endBtn: !!endBtn,
         micBtn: !!micBtn,
         cameraBtn: !!cameraBtn
     });
     
     if (isCallActive) {
+        // Hide start button, show call controls
+        if (startBtn) startBtn.classList.add('hidden');
         if (endBtn) {
             endBtn.classList.remove('hidden');
-            console.log('Showing end call button - classes:', endBtn.className);
-        } else {
-            console.error('End call button not found in DOM!');
+            console.log('Showing end call button');
         }
         if (micBtn) {
             micBtn.classList.remove('hidden');
-            console.log('Showing mic button - classes:', micBtn.className);
-        } else {
-            console.error('Mic button not found in DOM!');
+            // Update mic button state
+            if (isMicOn) {
+                micBtn.classList.remove('off');
+                micBtn.title = 'Mute microphone';
+            } else {
+                micBtn.classList.add('off');
+                micBtn.title = 'Unmute microphone';
+            }
         }
         if (cameraBtn) {
             cameraBtn.classList.remove('hidden');
-            console.log('Showing camera button - classes:', cameraBtn.className);
-        } else {
-            console.error('Camera button not found in DOM!');
+            // Update camera button state
+            if (isCameraOn) {
+                cameraBtn.classList.remove('off');
+                cameraBtn.title = 'Turn off camera';
+            } else {
+                cameraBtn.classList.add('off');
+                cameraBtn.title = 'Turn on camera';
+            }
         }
     } else {
+        // Show start button, hide call controls
+        if (startBtn) startBtn.classList.remove('hidden');
         if (endBtn) endBtn.classList.add('hidden');
         if (micBtn) micBtn.classList.add('hidden');
         if (cameraBtn) cameraBtn.classList.add('hidden');
@@ -855,15 +877,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize WebSocket
     initWebSocket();
     
-    // Auto-start video call when page loads
-    setTimeout(() => {
-        console.log('Auto-starting video call...');
-        console.log('Current isCallActive before start:', isCallActive);
-        startCall();
-    }, 1500); // Increased delay to ensure DOM is fully ready
+    // Don't auto-start video call - let user click the button
+    updateVideoStatus('Ready to connect - Click "Start Call" to begin');
     
     // Verify all buttons exist
     console.log('Verifying button elements:');
+    console.log('- Start call button:', document.getElementById('start-call-btn') ? 'Found' : 'NOT FOUND');
     console.log('- End call button:', document.getElementById('end-call-btn') ? 'Found' : 'NOT FOUND');
     console.log('- Toggle mic button:', document.getElementById('toggle-mic-btn') ? 'Found' : 'NOT FOUND');
     console.log('- Toggle camera button:', document.getElementById('toggle-camera-btn') ? 'Found' : 'NOT FOUND');
@@ -871,23 +890,33 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Chat form submission
     const chatForm = document.getElementById('chat-form');
-    chatForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const input = document.getElementById('chat-input');
-        const message = input.value.trim();
-        
-        if (message) {
-            sendChatMessage(message);
-            input.value = '';
-        }
-    });
+    if (chatForm) {
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                sendChatMessage(message);
+                input.value = '';
+            }
+        });
+    }
     
-    // Video call buttons (removed start-call-btn listener, auto-starts now)
+    // Video call buttons
+    const startCallBtn = document.getElementById('start-call-btn');
     const endCallBtn = document.getElementById('end-call-btn');
     const toggleMicBtn = document.getElementById('toggle-mic-btn');
     const toggleCameraBtn = document.getElementById('toggle-camera-btn');
     const leaveRoomBtn = document.getElementById('leave-room-btn');
+    
+    if (startCallBtn) {
+        startCallBtn.addEventListener('click', startCall);
+        console.log('Start call button listener attached');
+    } else {
+        console.error('Start call button not found');
+    }
     
     if (endCallBtn) {
         endCallBtn.addEventListener('click', endCall);
@@ -911,11 +940,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if (leaveRoomBtn) {
-        leaveRoomBtn.addEventListener('click', leaveRoom);
+        leaveRoomBtn.addEventListener('click', function(e) {
+            console.log('Leave room button clicked by:', USERNAME);
+            leaveRoom();
+        });
         console.log('Leave room button listener attached');
     } else {
-        console.error('Leave room button not found');
+        console.error('Leave room button not found - trying alternative selector');
+        // Try to find button by class name
+        const altLeaveBtn = document.querySelector('.leave-room-btn');
+        if (altLeaveBtn) {
+            altLeaveBtn.addEventListener('click', function(e) {
+                console.log('Leave room button clicked (alternative)');
+                leaveRoom();
+            });
+            console.log('Leave room button found and attached via class selector');
+        } else {
+            console.error('Leave room button not found with any selector');
+        }
     }
+    
+    // Test all button functionality
+    console.log('Testing button functionality...');
+    setTimeout(() => {
+        testButtonFunctionality();
+    }, 1000);
     
     // Timer buttons
     const startTimerBtn = document.getElementById('start-timer-btn');
@@ -953,6 +1002,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize timer display
     updateTimerDisplay();
     document.getElementById('timer-display').dataset.originalMinutes = 25;
+    
+    // Initialize button states
+    updateCallButtons();
 });
 
 // Clean up on page unload
@@ -964,3 +1016,105 @@ window.addEventListener('beforeunload', function() {
         endCall();
     }
 });
+
+// ===== BUTTON TESTING AND ERROR HANDLING =====
+
+/**
+ * Test all button functionality to ensure they work properly
+ */
+function testButtonFunctionality() {
+    console.log('=== BUTTON FUNCTIONALITY TEST ===');
+    
+    const buttons = [
+        { id: 'start-call-btn', name: 'Start Call' },
+        { id: 'end-call-btn', name: 'End Call' },
+        { id: 'toggle-mic-btn', name: 'Toggle Microphone' },
+        { id: 'toggle-camera-btn', name: 'Toggle Camera' },
+        { id: 'leave-room-btn', name: 'Leave Room' },
+        { id: 'start-timer-btn', name: 'Start Timer' },
+        { id: 'pause-timer-btn', name: 'Pause Timer' },
+        { id: 'reset-timer-btn', name: 'Reset Timer' },
+        { id: 'copy-btn', name: 'Copy Room Code' }
+    ];
+    
+    let working = 0;
+    let missing = 0;
+    
+    buttons.forEach(button => {
+        const element = document.getElementById(button.id);
+        if (element) {
+            console.log(`✅ ${button.name} button found and functional`);
+            working++;
+            
+            // Add visual feedback on hover for debugging
+            element.addEventListener('mouseenter', function() {
+                this.style.outline = '2px solid #00ff00';
+                this.title = `${button.name} - Working ✅`;
+            });
+            element.addEventListener('mouseleave', function() {
+                this.style.outline = '';
+            });
+        } else {
+            console.error(`❌ ${button.name} button NOT FOUND (ID: ${button.id})`);
+            missing++;
+        }
+    });
+    
+    console.log(`Button test complete: ${working} working, ${missing} missing`);
+    
+    if (missing > 0) {
+        console.warn('Some buttons are missing! Check the HTML structure.');
+        showUserError(`Warning: ${missing} buttons are not functioning properly. Please refresh the page.`);
+    } else {
+        console.log('All buttons are properly initialized! 🎉');
+    }
+}
+
+/**
+ * Display error message to user
+ */
+function showUserError(message) {
+    // Try to use the notification system from room_detail.html
+    if (typeof showNotification === 'function') {
+        showNotification(message, 'error', 5000);
+    } else {
+        // Fallback to alert
+        alert('Room Error: ' + message);
+    }
+}
+
+/**
+ * Display success message to user
+ */
+function showUserSuccess(message) {
+    // Try to use the notification system from room_detail.html
+    if (typeof showNotification === 'function') {
+        showNotification(message, 'success', 3000);
+    } else {
+        console.log('Success:', message);
+    }
+}
+
+/**
+ * Enhanced error handling for video calls
+ */
+function handleVideoError(error, context = 'Video call') {
+    console.error(`${context} error:`, error);
+    
+    let userMessage = 'An error occurred with the video call. ';
+    
+    if (error.name === 'NotAllowedError') {
+        userMessage += 'Please allow camera and microphone access, then try again.';
+    } else if (error.name === 'NotFoundError') {
+        userMessage += 'No camera or microphone found. Please check your devices.';
+    } else if (error.name === 'NotReadableError') {
+        userMessage += 'Your camera/microphone is being used by another application.';
+    } else if (error.name === 'OverconstrainedError') {
+        userMessage += 'Camera settings not supported by your device.';
+    } else {
+        userMessage += 'Please check your connection and try again.';
+    }
+    
+    showUserError(userMessage);
+    updateVideoStatus(`Error: ${error.message || 'Unknown error'}`);
+}

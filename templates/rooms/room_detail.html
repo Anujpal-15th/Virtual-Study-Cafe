@@ -7,10 +7,16 @@
     body, html {
         margin: 0;
         padding: 0;
-        overflow: hidden;
         height: 100vh;
+        height: calc(var(--vh, 1vh) * 100); /* Fallback for mobile browsers */
         width: 100vw;
-        background: #FFFFFF !important;
+        background: #1a1a1a !important;
+        font-family: 'Inter', sans-serif;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        -webkit-text-size-adjust: 100%; /* Prevent text scaling on iOS */
+        -ms-text-size-adjust: 100%; /* Prevent text scaling on Windows Phone */
+        -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
     }
     
     :root {
@@ -18,40 +24,76 @@
         --secondary-color: #00d4ff;
         --danger-color: #ff4757;
         --success-color: #4ade80;
-        --bg-dark: #FFFFFF;
-        --bg-medium: #F7FAFC;
-        --bg-light: #F0F4F8;
-        --border-color: #E2E8F0;
-        --text-dark: #2D3748;
-        --text-medium: #4A5568;
-        --text-light: #718096;
+        --bg-dark: #1a1a1a;
+        --bg-medium: #2d2d2d;
+        --bg-light: #404040;
+        --border-color: #404040;
+        --text-dark: #ffffff;
+        --text-medium: #e0e0e0;
+        --text-light: #b0b0b0;
     }
     
-    /* Main Container */
+    /* Main Container - Full Page */
     .room-container {
         position: fixed;
-        top: 80px;
-        left: 90px;
+        top: 0;
+        left: 0;
         right: 0;
         bottom: 0;
-        padding: 1rem;
+        height: 100vh;
+        height: calc(var(--vh, 1vh) * 100); /* Better mobile support */
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
-        overflow: hidden;
+        background: var(--bg-dark);
     }
     
-    /* Room Header */
+    /* Room Header with Room Code */
     .room-header {
-        background: #FFFFFF;
-        border: 1px solid var(--border-color);
-        border-radius: 10px;
-        padding: 0.75rem 1.25rem;
+        background: var(--bg-medium);
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem 2rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-shrink: 0;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        z-index: 10;
+    }
+    
+    .room-title {
+        color: var(--text-dark);
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .room-code-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .room-code-display {
+        background: var(--bg-light);
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .room-code-label {
+        color: var(--text-medium);
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .room-code-value {
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        font-family: 'Monaco', monospace;
     }
     
     .room-info h1 {
@@ -818,209 +860,956 @@
         font-style: italic;
     }
     
+    /* Bottom Panel */
+    .bottom-panel {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2px;
+        height: 300px;
+        background: var(--bg-dark);
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .chat-section {
+        background: var(--bg-medium);
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+    }
+    
+    .chat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .chat-header h3 {
+        color: var(--text-dark);
+        margin: 0;
+        font-size: 1.1rem;
+    }
+    
+    .chat-members {
+        color: var(--text-light);
+        font-size: 0.85rem;
+    }
+    
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0.5rem;
+        background: var(--bg-dark);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .chat-form {
+        display: flex;
+        gap: 0.75rem;
+    }
+    
+    #chat-input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        background: var(--bg-dark);
+        border: 1px solid var(--border-color);
+        color: var(--text-dark);
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+    
+    .send-btn {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .send-btn:hover {
+        background: #5568d3;
+    }
+    
+    .timer-section {
+        background: var(--bg-medium);
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .timer-header h3 {
+        color: var(--text-dark);
+        margin: 0 0 1rem 0;
+        font-size: 1.1rem;
+    }
+    
+    .timer-display {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--text-dark);
+        background: var(--bg-dark);
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        font-family: 'Monaco', monospace;
+    }
+    
+    .timer-presets {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .preset-btn {
+        background: var(--bg-light);
+        color: var(--text-dark);
+        border: 1px solid var(--border-color);
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .preset-btn:hover, .preset-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    #custom-minutes {
+        background: var(--bg-dark);
+        color: var(--text-dark);
+        border: 1px solid var(--border-color);
+        padding: 0.5rem;
+        border-radius: 6px;
+        width: 80px;
+        text-align: center;
+    }
+    
+    .timer-controls {
+        display: flex;
+        gap: 0.75rem;
+    }
+    
+    .timer-btn {
+        padding: 0.75rem 1rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+    
+    .timer-btn.start {
+        background: var(--success-color);
+        color: white;
+    }
+    
+    .timer-btn.pause {
+        background: #f59e0b;
+        color: white;
+    }
+    
+    .timer-btn.reset {
+        background: var(--bg-light);
+        color: var(--text-dark);
+        border: 1px solid var(--border-color);
+    }
+    
+    .timer-btn:hover {
+        transform: translateY(-1px);
+    }
+    
     /* Responsive */
-    @media (max-width: 1400px) {
-        .room-content {
-            grid-template-columns: 300px 1fr 280px;
-        }
-    }
-    
     @media (max-width: 1200px) {
-        .room-content {
-            grid-template-columns: 350px 1fr;
-        }
-        
-        .right-column {
-            display: none;
-        }
-        
         .video-container {
-            min-height: 300px;
-        }
-    }
-    
-    @media (max-width: 900px) {
-        .room-content {
             grid-template-columns: 1fr;
+            grid-template-rows: 1fr 1fr;
         }
         
-        .left-column {
-            display: none;
+        .bottom-panel {
+            grid-template-columns: 1fr;
+            grid-template-rows: 2fr 1fr;
+            height: 400px;
         }
     }
     
     @media (max-width: 768px) {
-        .room-container {
-            left: 0;
-            padding: 1rem;
-        }
-        
         .room-header {
             flex-direction: column;
             align-items: flex-start;
             gap: 1rem;
+            padding: 1rem;
         }
         
-        .video-container {
-            grid-template-columns: 1fr;
+        .room-code-header {
+            flex-direction: column;
+            width: 100%;
+            gap: 0.75rem;
+        }
+        
+        .controls-container {
+            gap: 1rem;
+        }
+        
+        .control-btn {
+            min-width: 60px;
+            padding: 0.75rem 1rem;
         }
         
         .timer-display {
             font-size: 2rem;
+            padding: 0.75rem 1.5rem;
         }
     }
     
     /* Scrollbar Styles */
-    .members-list::-webkit-scrollbar,
     .chat-messages::-webkit-scrollbar {
         width: 6px;
     }
     
-    .members-list::-webkit-scrollbar-thumb,
     .chat-messages::-webkit-scrollbar-thumb {
-        background: #CBD5E0;
+        background: var(--border-color);
         border-radius: 3px;
+    }
+    
+    .chat-messages::-webkit-scrollbar-track {
+        background: var(--bg-dark);
+    }
+    
+    /* Copy Code Button */
+    .copy-code-btn {
+        background: var(--bg-medium);
+        color: var(--text-dark);
+        border: 1px solid var(--border-color);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .copy-code-btn:hover {
+        background: var(--bg-light);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+    
+    .copy-code-btn.copied {
+        background: var(--success-color);
+        color: white;
+        border-color: var(--success-color);
+    }
+    
+    /* Members Info */
+    .members-info {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    /* Delete/Leave Room Buttons */
+    .delete-room-btn, .leave-room-btn {
+        background: var(--danger-color);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .delete-room-btn:hover, .leave-room-btn:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+    }
+    
+    /* Bottom Panel */
+    .bottom-panel {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2px;
+        height: 300px;
+        background: var(--bg-dark);
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .chat-section {
+        background: var(--bg-medium);
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+    }
+    
+    .chat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .chat-header h3 {
+        color: var(--text-dark);
+        margin: 0;
+        font-size: 1.1rem;
+    }
+    
+    .chat-members {
+        color: var(--text-light);
+        font-size: 0.85rem;
+    }
+    
+    .send-btn {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .send-btn:hover {
+        background: #5568d3;
+    }
+    
+    .timer-section {
+        background: var(--bg-medium);
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .timer-header h3 {
+        color: var(--text-dark);
+        margin: 0 0 1rem 0;
+        font-size: 1.1rem;
+    }
+    
+    /* Video Controls Bar */
+    .video-controls-bar {
+        background: var(--bg-dark);
+        border-top: 1px solid var(--border-color);
+        padding: 1.5rem 0;
+        flex-shrink: 0;
+    }
+    
+    .controls-container {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .control-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 80px;
+        font-weight: 600;
+    }
+    
+    .control-btn.hidden {
+        display: none !important;
+    }
+    
+    .control-btn.primary {
+        background: var(--success-color);
+        color: white;
+    }
+    
+    .control-btn.primary:hover {
+        background: #22c55e;
+        transform: translateY(-2px);
+    }
+    
+    .control-btn.secondary {
+        background: var(--bg-medium);
+        color: var(--text-dark);
+        border: 2px solid var(--border-color);
+    }
+    
+    .control-btn.secondary:hover {
+        background: var(--bg-light);
+        transform: translateY(-2px);
+    }
+    
+    .control-btn.secondary.off {
+        background: var(--danger-color);
+        color: white;
+        border-color: var(--danger-color);
+    }
+    
+    .control-btn.danger {
+        background: var(--danger-color);
+        color: white;
+    }
+    
+    .control-btn.danger:hover {
+        background: #ef4444;
+        transform: translateY(-2px);
+    }
+    
+    .btn-icon {
+        font-size: 1.5rem;
+    }
+    
+    .btn-label {
+        font-size: 0.85rem;
+    }
+    
+    /* Responsive Design */
+    
+    /* Extra Small Devices - Phones (320px - 480px) */
+    @media (max-width: 480px) {
+        .room-container {
+            grid-template-rows: auto auto 1fr auto auto;
+            gap: 0;
+        }
+        
+        .room-header {
+            padding: 1rem 0.75rem;
+        }
+        
+        .room-header h2 {
+            font-size: 1.1rem;
+        }
+        
+        .room-code-section {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .room-code {
+            font-size: 1rem;
+            padding: 0.75rem 1rem;
+        }
+        
+        .copy-code-btn {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+        }
+        
+        .status-bar {
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .status-text {
+            font-size: 0.8rem;
+        }
+        
+        .video-container {
+            padding: 0.25rem;
+        }
+        
+        .video-tile {
+            min-height: 180px;
+        }
+        
+        .video-controls {
+            bottom: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            gap: 0.5rem;
+        }
+        
+        .video-controls button {
+            width: 35px;
+            height: 35px;
+            font-size: 0.9rem;
+        }
+        
+        .video-controls-bar {
+            padding: 1rem 0;
+        }
+        
+        .controls-container {
+            gap: 0.75rem;
+            padding: 0 0.75rem;
+        }
+        
+        .control-btn {
+            min-width: 50px;
+            padding: 0.75rem 0.5rem;
+            border-radius: 10px;
+        }
+        
+        .btn-icon {
+            font-size: 1.1rem;
+        }
+        
+        .btn-label {
+            font-size: 0.7rem;
+        }
+        
+        .bottom-panel {
+            grid-template-columns: 1fr;
+            height: auto;
+            min-height: 250px;
+        }
+        
+        .chat-section, .timer-section {
+            padding: 0.75rem;
+        }
+        
+        .chat-header h3, .timer-header h3 {
+            font-size: 1rem;
+        }
+        
+        .members-info {
+            font-size: 0.8rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .delete-room-btn, .leave-room-btn {
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+        }
+    }
+    
+    /* Small Devices - Large Phones (481px - 768px) */
+    @media (min-width: 481px) and (max-width: 768px) {
+        .room-container {
+            grid-template-rows: auto auto 1fr auto auto;
+        }
+        
+        .room-header {
+            padding: 1.25rem 1rem;
+        }
+        
+        .room-header h2 {
+            font-size: 1.3rem;
+        }
+        
+        .room-code {
+            font-size: 1.1rem;
+            padding: 0.75rem 1.25rem;
+        }
+        
+        .video-tile {
+            min-height: 220px;
+        }
+        
+        .video-controls-bar {
+            padding: 1.25rem 0;
+        }
+        
+        .controls-container {
+            gap: 1rem;
+        }
+        
+        .control-btn {
+            min-width: 65px;
+            padding: 0.9rem 1rem;
+        }
+        
+        .btn-icon {
+            font-size: 1.3rem;
+        }
+        
+        .btn-label {
+            font-size: 0.8rem;
+        }
+        
+        .bottom-panel {
+            grid-template-columns: 1fr;
+            height: auto;
+            min-height: 280px;
+        }
+    }
+    
+    /* Medium Devices - Tablets (769px - 1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .room-container {
+            grid-template-rows: auto auto 1fr auto 250px;
+        }
+        
+        .room-header {
+            padding: 1.5rem;
+        }
+        
+        .video-container {
+            padding: 0.75rem;
+        }
+        
+        .video-tile {
+            min-height: 280px;
+        }
+        
+        .controls-container {
+            gap: 1.5rem;
+        }
+        
+        .control-btn {
+            min-width: 75px;
+            padding: 1rem 1.25rem;
+        }
+        
+        .btn-icon {
+            font-size: 1.4rem;
+        }
+        
+        .bottom-panel {
+            grid-template-columns: 2fr 1fr;
+            height: 250px;
+        }
+    }
+    
+    /* Large Devices - Small Laptops (1025px - 1366px) */
+    @media (min-width: 1025px) and (max-width: 1366px) {
+        .room-container {
+            grid-template-rows: auto auto 1fr auto 280px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .video-tile {
+            min-height: 350px;
+        }
+        
+        .controls-container {
+            gap: 1.75rem;
+        }
+        
+        .control-btn {
+            min-width: 85px;
+            padding: 1.1rem 1.4rem;
+        }
+        
+        .bottom-panel {
+            height: 280px;
+        }
+    }
+    
+    /* Extra Large Devices - Desktop and up (1367px+) */
+    @media (min-width: 1367px) {
+        .room-container {
+            grid-template-rows: auto auto 1fr auto 320px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .room-header {
+            padding: 2rem;
+        }
+        
+        .room-header h2 {
+            font-size: 1.8rem;
+        }
+        
+        .room-code {
+            font-size: 1.3rem;
+            padding: 1rem 1.5rem;
+        }
+        
+        .video-container {
+            padding: 1rem;
+        }
+        
+        .video-tile {
+            min-height: 400px;
+        }
+        
+        .video-controls-bar {
+            padding: 2rem 0;
+        }
+        
+        .controls-container {
+            gap: 2.5rem;
+        }
+        
+        .control-btn {
+            min-width: 100px;
+            padding: 1.25rem 1.75rem;
+        }
+        
+        .btn-icon {
+            font-size: 1.6rem;
+        }
+        
+        .btn-label {
+            font-size: 0.9rem;
+        }
+        
+        .bottom-panel {
+            height: 320px;
+        }
+        
+        .chat-section, .timer-section {
+            padding: 1.5rem;
+        }
+    }
+    
+    /* Landscape Orientation for Mobile Devices */
+    @media (max-height: 500px) and (orientation: landscape) {
+        .room-container {
+            grid-template-rows: auto 1fr auto;
+        }
+        
+        .bottom-panel {
+            display: none; /* Hide chat/timer in landscape to maximize video */
+        }
+        
+        .video-controls-bar {
+            padding: 0.75rem 0;
+        }
+        
+        .controls-container {
+            gap: 1rem;
+        }
+        
+        .control-btn {
+            padding: 0.6rem 0.8rem;
+        }
+        
+        .btn-label {
+            display: none; /* Hide labels in landscape */
+        }
+        
+        .btn-icon {
+            font-size: 1.2rem;
+        }
+    }
+    
+    /* High DPI Displays */
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+        .video-tile video {
+            image-rendering: -webkit-optimize-contrast;
+        }
+        
+        .room-code {
+            -webkit-font-smoothing: antialiased;
+        }
+    }
+    
+    /* Touch Device Optimizations */
+    @media (hover: none) and (pointer: coarse) {
+        .control-btn, .copy-code-btn, .send-btn, .delete-room-btn, .leave-room-btn {
+            min-height: 44px; /* Apple's recommended touch target size */
+            min-width: 44px;
+        }
+        
+        .video-controls button {
+            min-width: 44px;
+            min-height: 44px;
+        }
+        
+        /* Remove hover effects on touch devices */
+        .control-btn:hover, .copy-code-btn:hover, .send-btn:hover, 
+        .delete-room-btn:hover, .leave-room-btn:hover {
+            transform: none;
+        }
+        
+        /* Add active/press states for touch feedback */
+        .control-btn:active, .copy-code-btn:active, .send-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* Larger text for better readability */
+        .room-code {
+            font-size: 1.1rem;
+        }
+        
+        .status-text {
+            font-size: 0.9rem;
+        }
+    }
+    
+    /* Mobile keyboard adjustments */
+    body.mobile-device.keyboard-open {
+        height: auto;
+        min-height: 100vh;
+        min-height: calc(var(--vh, 1vh) * 100);
+    }
+    
+    body.mobile-device.keyboard-open .room-container {
+        height: auto;
+        min-height: 100vh;
+        min-height: calc(var(--vh, 1vh) * 100);
+        position: relative;
+    }
+    
+    body.mobile-device.keyboard-open .bottom-panel {
+        height: 150px !important;
+    }
+    
+    body.mobile-device.keyboard-open .video-container {
+        flex: 0 0 200px; /* Reduce video size when keyboard is open */
+    }
+    
+    /* Reduced Motion Preference */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="room-container">
-    <div class="room-content">
-        <!-- Left Column: Video Call + Timer -->
-        <div class="left-column">
-            <!-- Video Call Section -->
-            <div class="video-section">
-                <!-- Header with title and status -->
-                <div class="video-section-header">
-                    <div class="video-section-title">
-                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
-                        </svg>
-                        Video Call
-                    </div>
-                    <div id="video-status" class="video-status">Ready to connect</div>
-                </div>
-                
-                <!-- Video Grid - Vertical Layout -->
-                <div class="video-container">
-                    <!-- Local Video Tile -->
-                    <div class="video-tile" id="local-tile">
-                        <video id="local-video" autoplay muted playsinline></video>
-                        <div class="video-placeholder" id="local-placeholder">
-                            <span>{{ user.username|first|upper }}</span>
-                        </div>
-                        <div class="video-tile-overlay">
-                            <span class="video-tile-name">You</span>
-                            <div class="video-tile-status">
-                                <span class="video-tile-icon" id="local-mic-icon">🎤</span>
-                                <span class="video-tile-icon" id="local-cam-icon">📹</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Remote Video Tile -->
-                    <div class="video-tile" id="remote-tile">
-                        <video id="remote-video" autoplay playsinline></video>
-                        <div class="video-placeholder" id="remote-placeholder">
-                            <div style="text-align: center;">
-                                <span style="font-size: 3rem; display: block; margin-bottom: 0.5rem;">👥</span>
-                                <span style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Waiting for others to join...</span>
-                            </div>
-                        </div>
-                        <div class="video-tile-overlay" style="display:none;" id="remote-overlay">
-                            <span class="video-tile-name" id="remote-name">Waiting...</span>
-                            <div class="video-tile-status">
-                                <span class="video-tile-icon" id="remote-mic-icon">🎤</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Bottom Controls Bar -->
-                <div class="video-controls">
-                    <button id="toggle-mic-btn" class="btn btn-secondary hidden" title="Microphone">🎤</button>
-                    <button id="toggle-camera-btn" class="btn btn-secondary hidden" title="Camera">📹</button>
-                    <button id="end-call-btn" class="btn btn-danger hidden" title="End Call">📵</button>
-                    <button id="leave-room-btn" class="btn btn-warning" title="Leave Room">🚪</button>
-                </div>
-            </div>
-
-            <!-- Pomodoro Timer Section -->
-            <div class="timer-section">
-                <h2>⏱️ Timer</h2>
-                <div id="timer-display" class="timer-display">25:00</div>
-                
-                <div class="timer-presets">
-                    <button class="preset-btn" data-minutes="25">25m</button>
-                    <button class="preset-btn" data-minutes="50">50m</button>
-                    <input type="number" id="custom-minutes" placeholder="Custom" min="1" max="120">
-                </div>
-                
-                <div class="timer-controls">
-                    <button id="start-timer-btn" class="btn btn-primary">▶️</button>
-                    <button id="pause-timer-btn" class="btn btn-warning" style="display:none;">⏸️</button>
-                    <button id="reset-timer-btn" class="btn btn-secondary">🔄</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Middle Column: Chat -->
-        <div class="middle-column">
-            <!-- Chat Section -->
-            <div class="chat-section">
-                <h3>💬 Chat</h3>
-                <div id="chat-messages" class="chat-messages"></div>
-                
-                <form id="chat-form" class="chat-form">
-                    <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off">
-                    <button type="submit" class="btn btn-primary">Send</button>
-                </form>
-            </div>
-        </div>
-        
-        <!-- Right Column: Room Info & Members -->
-        <div class="right-column">
-            <!-- Room Info Section -->
-            <div class="room-info-section">
-                <div class="icon-display">ℹ️</div>
-                <h3>📋 Room Code</h3>
-                <div class="room-code-box">
-                    <strong id="room-code-text">{{ room.room_code }}</strong>
-                    <button onclick="copyRoomCode()" class="copy-code-btn" id="copy-btn" title="Copy room code">📋 Copy Code</button>
-                </div>
-                
-                <div class="members-count-box">
-                    <span>👥 Members Online</span>
-                    <span id="members-count">{{ members_count }}</span>
-                </div>
-                
-                <!-- Delete Room Button (Owner Only) -->
-                {% if is_owner %}
-                <button class="delete-room-btn" onclick="confirmDeleteRoom()">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                    </svg>
-                    Delete Room
+    <!-- Room Header with Code -->
+    <div class="room-header">
+        <h1 class="room-title">{{ room.name }}</h1>
+        <div class="room-code-header">
+            <div class="room-code-display">
+                <span class="room-code-label">Room Code:</span>
+                <span class="room-code-value" id="room-code-text">{{ room.room_code }}</span>
+                <button onclick="copyRoomCode('{{ room.room_code }}')" class="copy-code-btn" id="copy-btn" title="Copy room code">
+                    📋 Copy
                 </button>
-                {% endif %}
+            </div>
+            <div class="members-info">
+                <span class="members-label">👥 Online:</span>
+                <span class="members-count" id="members-count">{{ members_count }}</span>
+            </div>
+            {% if is_owner %}
+            <button class="delete-room-btn" onclick="confirmDeleteRoom()" title="Delete Room">
+                🗑️ Delete
+            </button>
+            {% endif %}
+            <button id="leave-room-btn" class="leave-room-btn" title="Leave Room">
+                🚪 Leave
+            </button>
+        </div>
+    </div>
+    
+    <!-- Video Section -->
+    <div class="video-main-section">
+        <!-- Status Bar -->
+        <div class="video-status-bar">
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span id="video-status" class="status-text">Ready to connect</span>
+            </div>
+        </div>
+                
+        <!-- Main Video Container -->
+        <div class="video-container">
+            <!-- Local Video -->
+            <div class="video-tile local-video" id="local-tile">
+                <video id="local-video" autoplay muted playsinline></video>
+                <div class="video-placeholder" id="local-placeholder">
+                    <div class="placeholder-content">
+                        <div class="user-avatar">{{ user.username|first|upper }}</div>
+                        <div class="user-name">You ({{ user.username }})</div>
+                    </div>
+                </div>
+                <div class="video-overlay">
+                    <div class="overlay-info">
+                        <span class="user-name">You</span>
+                        <div class="user-status">
+                            <span class="status-icon" id="local-mic-icon">🎤</span>
+                            <span class="status-icon" id="local-cam-icon">📹</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <!-- Members List -->
-            <div class="members-section">
-                <div class="icon-display">👥</div>
-                <h3>👥 Members</h3>
-                <ul id="members-list" class="members-list">
-                    {% for membership in active_members %}
-                    <li class="member-item">
-                        <div style="position: relative;">
-                            <img src="{{ membership.user.profile.get_avatar_url }}" alt="{{ membership.user.username }}" class="member-avatar">
-                            <div class="member-online-indicator"></div>
+            <!-- Remote Video -->
+            <div class="video-tile remote-video" id="remote-tile">
+                <video id="remote-video" autoplay playsinline></video>
+                <div class="video-placeholder" id="remote-placeholder">
+                    <div class="placeholder-content">
+                        <div class="waiting-icon">👥</div>
+                        <div class="waiting-text">Waiting for others to join...</div>
+                    </div>
+                </div>
+                <div class="video-overlay" style="display:none;" id="remote-overlay">
+                    <div class="overlay-info">
+                        <span class="user-name" id="remote-name">Remote User</span>
+                        <div class="user-status">
+                            <span class="status-icon" id="remote-mic-icon">🎤</span>
                         </div>
-                        <span class="member-name">{{ membership.user.username }}</span>
-                    </li>
-                    {% endfor %}
-                </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+                
+    <!-- Video Controls Bar -->
+    <div class="video-controls-bar">
+        <div class="controls-container">
+            <button id="start-call-btn" class="control-btn primary" title="Start Video Call">
+                <span class="btn-icon">📹</span>
+                <span class="btn-label">Start Call</span>
+            </button>
+            <button id="toggle-mic-btn" class="control-btn secondary hidden" title="Microphone">
+                <span class="btn-icon">🎤</span>
+                <span class="btn-label">Mic</span>
+            </button>
+            <button id="toggle-camera-btn" class="control-btn secondary hidden" title="Camera">
+                <span class="btn-icon">📹</span>
+                <span class="btn-label">Camera</span>
+            </button>
+            <button id="end-call-btn" class="control-btn danger hidden" title="End Call">
+                <span class="btn-icon">📵</span>
+                <span class="btn-label">End Call</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Bottom Panel: Chat & Timer -->
+    <div class="bottom-panel">
+        <!-- Chat Section -->
+        <div class="chat-section">
+            <div class="chat-header">
+                <h3>💬 Chat</h3>
+                <span class="chat-members">{{ active_members|length }} member{{ active_members|length|pluralize }}</span>
+            </div>
+            <div id="chat-messages" class="chat-messages"></div>
+            <form id="chat-form" class="chat-form">
+                <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off">
+                <button type="submit" class="send-btn">Send</button>
+            </form>
+        </div>
+        
+        <!-- Timer Section -->
+        <div class="timer-section">
+            <div class="timer-header">
+                <h3>⏱️ Pomodoro Timer</h3>
+            </div>
+            <div class="timer-display" id="timer-display">25:00</div>
+            
+            <div class="timer-presets">
+                <button class="preset-btn" data-minutes="25">25m</button>
+                <button class="preset-btn" data-minutes="50">50m</button>
+                <input type="number" id="custom-minutes" placeholder="Custom" min="1" max="120">
+            </div>
+            
+            <div class="timer-controls">
+                <button id="start-timer-btn" class="timer-btn start">▶️ Start</button>
+                <button id="pause-timer-btn" class="timer-btn pause" style="display:none;">⏸️ Pause</button>
+                <button id="reset-timer-btn" class="timer-btn reset">🔄 Reset</button>
             </div>
         </div>
     </div>
@@ -1033,56 +1822,145 @@
     const IS_OWNER = {{ is_owner|yesno:"true,false" }};
     
     // Copy room code to clipboard
-    function copyRoomCode() {
-        const roomCode = document.getElementById('room-code-text').textContent;
-        const copyBtn = document.getElementById('copy-btn');
-        
-        navigator.clipboard.writeText(roomCode).then(() => {
-            copyBtn.textContent = 'Copied!';
-            copyBtn.classList.add('copied');
+    function copyRoomCode(roomCode) {
+        try {
+            // If no room code is passed, try to get it from the element
+            if (!roomCode) {
+                const roomCodeElement = document.getElementById('room-code-text');
+                roomCode = roomCodeElement ? roomCodeElement.textContent.trim() : '';
+            }
             
-            setTimeout(() => {
-                copyBtn.textContent = 'Copy';
-                copyBtn.classList.remove('copied');
-            }, 2000);
-        }).catch(err => {
-            console.error('Failed to copy:', err);
-            alert('Failed to copy room code');
-        });
+            const copyBtn = event ? event.target : document.getElementById('copy-btn');
+            
+            if (!roomCode) {
+                showNotification('Room code not found', 'error');
+                return;
+            }
+            
+            // Use modern clipboard API if available
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(roomCode).then(() => {
+                    showCopySuccess(copyBtn);
+                }).catch(err => {
+                    console.error('Clipboard API failed:', err);
+                    fallbackCopyTextToClipboard(roomCode, copyBtn);
+                });
+            } else {
+                // Fallback for older browsers or non-secure contexts
+                fallbackCopyTextToClipboard(roomCode, copyBtn);
+            }
+        } catch (error) {
+            console.error('Copy function error:', error);
+            showNotification('Failed to copy room code', 'error');
+        }
+    }
+    
+    // Fallback copy method
+    function fallbackCopyTextToClipboard(text, copyBtn) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                showCopySuccess(copyBtn);
+            } else {
+                showNotification('Failed to copy room code', 'error');
+            }
+        } catch (err) {
+            console.error('Fallback copy failed:', err);
+            showNotification('Copy not supported in this browser', 'error');
+        } finally {
+            document.body.removeChild(textArea);
+        }
+    }
+    
+    // Show copy success feedback
+    function showCopySuccess(copyBtn) {
+        if (!copyBtn) return;
+        
+        const originalText = copyBtn.textContent;
+        const originalClass = copyBtn.className;
+        
+        copyBtn.textContent = '✓ Copied!';
+        copyBtn.classList.add('copied');
+        copyBtn.disabled = true;
+        
+        setTimeout(() => {
+            copyBtn.textContent = originalText;
+            copyBtn.className = originalClass;
+            copyBtn.disabled = false;
+        }, 2000);
+        
+        showNotification('Room code copied to clipboard!', 'success');
     }
     
     // Delete room function (owner only)
     function confirmDeleteRoom() {
-        if (!IS_OWNER) {
-            alert('Only the room owner can delete this room.');
-            return;
-        }
-        
-        const roomName = "{{ room.name|escapejs }}";
-        const roomCode = "{{ room.room_code }}";
-        
-        if (confirm('Are you sure you want to delete this room "' + roomName + '"?\n\nAll members will be disconnected and this action cannot be undone.')) {
+        try {
+            if (!IS_OWNER) {
+                showNotification('Only the room owner can delete this room.', 'error');
+                return;
+            }
+            
+            const roomName = "{{ room.name|escapejs }}";
+            const roomCode = "{{ room.room_code }}";
+            
+            // Show custom confirmation dialog
+            const confirmed = confirm(`Are you sure you want to delete the room "${roomName}"?\n\n⚠️  This will:\n• Disconnect all members\n• Delete all chat history\n• Remove the room permanently\n\nThis action cannot be undone.`);
+            
+            if (!confirmed) {
+                return;
+            }
+            
+            // Show loading state
+            const deleteBtn = event.target;
+            const originalText = deleteBtn.textContent;
+            deleteBtn.textContent = '⏳ Deleting...';
+            deleteBtn.disabled = true;
+            
             // Submit delete request
-            fetch('/rooms/' + roomCode + '/delete/', {
+            fetch(`/rooms/${roomCode}/delete/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}',
                     'Content-Type': 'application/json'
-                }
+                },
+                body: JSON.stringify({ confirm: true })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
-                    alert('Room deleted successfully');
-                    window.location.href = '/dashboard/';
+                    showNotification('Room deleted successfully! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard/';
+                    }, 1500);
                 } else {
-                    alert('Failed to delete room: ' + (data.error || 'Unknown error'));
+                    throw new Error(data.error || 'Unknown server error');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to delete room');
+                console.error('Delete room error:', error);
+                showNotification(`Failed to delete room: ${error.message}`, 'error');
+                
+                // Reset button state
+                deleteBtn.textContent = originalText;
+                deleteBtn.disabled = false;
             });
+        } catch (error) {
+            console.error('Confirm delete room error:', error);
+            showNotification('An unexpected error occurred', 'error');
         }
     }
     
@@ -1163,6 +2041,369 @@
             }
         }
     }, 5 * 60 * 1000); // Check every 5 minutes
+    
+    // ============================================
+    // UI Helper Functions
+    // ============================================
+    
+    // Show notification to user
+    function showNotification(message, type = 'info', duration = 3000) {
+        // Remove any existing notifications
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notification => notification.remove());
+        
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <span class="notification-message">${message}</span>
+            <button class="notification-close" onclick="this.parentElement.remove()">×</button>
+        `;
+        
+        // Add styles
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            min-width: 300px;
+            max-width: 500px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            background: ${type === 'success' ? 'var(--success-color)' : type === 'error' ? 'var(--danger-color)' : 'var(--primary-color)'};
+        `;
+        
+        // Style close button
+        const closeBtn = notification.querySelector('.notification-close');
+        closeBtn.style.cssText = `
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-left: 1rem;
+            padding: 0;
+        `;
+        
+        // Add to page
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 10);
+        
+        // Auto remove
+        if (duration > 0) {
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 300);
+            }, duration);
+        }
+    }
+    
+    // Add button click feedback
+    function addButtonFeedback() {
+        const buttons = document.querySelectorAll('button, .btn');
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                // Add click animation
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    }
+    
+    // Initialize button feedback on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        addButtonFeedback();
+        
+        // Add debug console for testing buttons
+        console.log('🔧 ROOM BUTTONS DEBUG INFO:');
+        console.log('Copy button:', document.getElementById('copy-btn') ? '✅' : '❌');
+        console.log('Leave button:', document.getElementById('leave-room-btn') ? '✅' : '❌');
+        console.log('Delete button:', document.querySelector('.delete-room-btn') ? '✅' : '❌');
+        console.log('Start call button:', document.getElementById('start-call-btn') ? '✅' : '❌');
+        console.log('End call button:', document.getElementById('end-call-btn') ? '✅' : '❌');
+        console.log('Mic button:', document.getElementById('toggle-mic-btn') ? '✅' : '❌');
+        console.log('Camera button:', document.getElementById('toggle-camera-btn') ? '✅' : '❌');
+        console.log('Timer buttons:', {
+            start: document.getElementById('start-timer-btn') ? '✅' : '❌',
+            pause: document.getElementById('pause-timer-btn') ? '✅' : '❌',
+            reset: document.getElementById('reset-timer-btn') ? '✅' : '❌'
+        });
+        
+        // Test button click handlers
+        setTimeout(() => {
+            console.log('🧪 Testing button click handlers...');
+            testButtonClicks();
+        }, 2000);
+    });
+    
+    // Test button click handlers
+    function testButtonClicks() {
+        const buttonTests = [
+            {
+                id: 'copy-btn',
+                name: 'Copy Room Code',
+                test: () => typeof copyRoomCode === 'function'
+            },
+            {
+                selector: '.delete-room-btn',
+                name: 'Delete Room',
+                test: () => typeof confirmDeleteRoom === 'function'
+            }
+        ];
+        
+        buttonTests.forEach(test => {
+            const element = test.id ? document.getElementById(test.id) : document.querySelector(test.selector);
+            if (element) {
+                if (test.test()) {
+                    console.log(`✅ ${test.name} - Handler function available`);
+                } else {
+                    console.error(`❌ ${test.name} - Handler function missing!`);
+                    showNotification(`${test.name} button not working properly`, 'error');
+                }
+            } else {
+                console.warn(`⚠️ ${test.name} - Button element not found`);
+            }
+        });
+        
+        // Test if room.js functions are available
+        const roomJsFunctions = ['startCall', 'endCall', 'toggleMic', 'toggleCamera', 'leaveRoom'];
+        roomJsFunctions.forEach(funcName => {
+            if (typeof window[funcName] === 'function') {
+                console.log(`✅ room.js - ${funcName} function available`);
+            } else {
+                console.error(`❌ room.js - ${funcName} function missing!`);
+            }
+        });
+        
+        console.log('🎯 Button test complete! Check console for any missing functions.');
+    }
+    
+    // Add keyboard shortcuts for better UX
+    document.addEventListener('keydown', function(e) {
+        // Only trigger when not typing in input fields
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            return;
+        }
+        
+        switch(e.key) {
+            case 'c':
+            case 'C':
+                if (e.ctrlKey || e.metaKey) return; // Don't interfere with Ctrl+C
+                const copyBtn = document.getElementById('copy-btn');
+                if (copyBtn) {
+                    copyBtn.click();
+                    showNotification('Room code copied! (Press C again to copy)', 'success', 2000);
+                }
+                break;
+            
+            case 'l':
+            case 'L':
+                if (e.ctrlKey || e.metaKey) return; // Don't interfere with Ctrl+L
+                const leaveBtn = document.getElementById('leave-room-btn');
+                if (leaveBtn) {
+                    leaveBtn.click();
+                }
+                break;
+                
+            case 'v':
+            case 'V':
+                if (e.ctrlKey || e.metaKey) return;
+                const startBtn = document.getElementById('start-call-btn');
+                const endBtn = document.getElementById('end-call-btn');
+                if (startBtn && !startBtn.classList.contains('hidden')) {
+                    startBtn.click();
+                } else if (endBtn && !endBtn.classList.contains('hidden')) {
+                    endBtn.click();
+                }
+                break;
+                
+            case 'm':
+            case 'M':
+                if (e.ctrlKey || e.metaKey) return;
+                const micBtn = document.getElementById('toggle-mic-btn');
+                if (micBtn && !micBtn.classList.contains('hidden')) {
+                    micBtn.click();
+                }
+                break;
+                
+            case '?':
+                if (!e.ctrlKey && !e.metaKey) {
+                    showKeyboardHelp();
+                }
+                break;
+        }
+    });
+    
+    // Add button status indicators
+    function addButtonStatusIndicators() {
+        const buttons = document.querySelectorAll('button[id]');
+        buttons.forEach(button => {
+            const indicator = document.createElement('span');
+            indicator.className = 'button-status-indicator';
+            indicator.innerHTML = '●';
+            indicator.style.cssText = `
+                position: absolute;
+                top: -2px;
+                right: -2px;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                font-size: 6px;
+                background: #22c55e;
+                color: #22c55e;
+                z-index: 10;
+            `;
+            
+            // Add relative positioning to button if not already positioned
+            if (getComputedStyle(button).position === 'static') {
+                button.style.position = 'relative';
+            }
+            
+            button.appendChild(indicator);
+        });
+    }
+    
+    // Initialize status indicators after a delay
+    setTimeout(addButtonStatusIndicators, 3000);
+    
+    // Show keyboard shortcuts help
+    function showKeyboardHelp() {
+        const helpMessage = `
+            🎮 Keyboard Shortcuts:
+            • C - Copy room code
+            • L - Leave room  
+            • V - Start/Stop video call
+            • M - Toggle microphone
+            • ?  - Show this help
+        `;
+        showNotification(helpMessage, 'info', 8000);
+    }
+    
+    // Show initial help message after page loads
+    setTimeout(() => {
+        if (localStorage.getItem('room-help-shown') !== 'true') {
+            showNotification('💡 Press ? for keyboard shortcuts', 'info', 4000);
+            localStorage.setItem('room-help-shown', 'true');
+        }
+    }, 5000);
+    
+    // Mobile-specific optimizations
+    function initializeMobileOptimizations() {
+        // Detect mobile device
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        
+        if (isMobile || isTouch) {
+            // Add mobile class to body for CSS targeting
+            document.body.classList.add('mobile-device');
+            
+            // Prevent zoom on double tap for video elements
+            document.querySelectorAll('video').forEach(video => {
+                video.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                }, { passive: false });
+            });
+            
+            // Optimize video for mobile
+            document.querySelectorAll('video').forEach(video => {
+                video.setAttribute('playsinline', 'true');
+                video.setAttribute('webkit-playsinline', 'true');
+                video.style.objectFit = 'cover';
+            });
+            
+            // Handle orientation changes
+            window.addEventListener('orientationchange', function() {
+                setTimeout(() => {
+                    // Force layout recalculation
+                    window.dispatchEvent(new Event('resize'));
+                    
+                    // Adjust video dimensions
+                    document.querySelectorAll('video').forEach(video => {
+                        video.style.width = '100%';
+                        video.style.height = '100%';
+                    });
+                }, 500);
+            });
+            
+            // Improve touch responsiveness for buttons
+            document.querySelectorAll('.control-btn, .copy-code-btn, .send-btn').forEach(btn => {
+                btn.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.95)';
+                }, { passive: true });
+                
+                btn.addEventListener('touchend', function() {
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                }, { passive: true });
+            });
+            
+            // Handle keyboard show/hide on mobile
+            let initialViewportHeight = window.innerHeight;
+            
+            window.addEventListener('resize', function() {
+                const currentHeight = window.innerHeight;
+                const heightDifference = initialViewportHeight - currentHeight;
+                
+                // If height reduced significantly, keyboard is likely open
+                if (heightDifference > 150) {
+                    document.body.classList.add('keyboard-open');
+                    // Reduce bottom panel height when keyboard is open
+                    const bottomPanel = document.querySelector('.bottom-panel');
+                    if (bottomPanel) {
+                        bottomPanel.style.height = '150px';
+                    }
+                } else {
+                    document.body.classList.remove('keyboard-open');
+                    // Restore original height
+                    const bottomPanel = document.querySelector('.bottom-panel');
+                    if (bottomPanel) {
+                        bottomPanel.style.height = '';
+                    }
+                }
+            });
+        }
+        
+        // Handle viewport units issues on mobile browsers
+        function setVHProperty() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        
+        // Set initial value
+        setVHProperty();
+        
+        // Update on resize and orientation change
+        window.addEventListener('resize', setVHProperty);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(setVHProperty, 100);
+        });
+    }
+    
+    // Initialize mobile optimizations when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeMobileOptimizations);
+    } else {
+        initializeMobileOptimizations();
+    }
 </script>
 {% endblock %}
 

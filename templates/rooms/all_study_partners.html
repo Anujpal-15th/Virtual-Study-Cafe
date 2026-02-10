@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% block title %}All Study Partners - Study Cafe{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #F7F9FC !important;
+    }
+    
+    .ready-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .ready-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .ready-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1A202C;
+    }
+    
+    .back-btn {
+        padding: 0.75rem 1.5rem;
+        background: white;
+        color: #5B7FFF;
+        border: 2px solid #5B7FFF;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .back-btn:hover {
+        background: #5B7FFF;
+        color: white;
+    }
+    
+    .search-box {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .search-input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: 1px solid #E2E8F0;
+        border-radius: 8px;
+        font-size: 0.95rem;
+    }
+    
+    .search-btn {
+        padding: 0.75rem 1.5rem;
+        background: #5B7FFF;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .search-btn:hover {
+        background: #4C6FFF;
+    }
+    
+    .users-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .user-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem 1.5rem;
+        border: 1px solid #E2E8F0;
+        transition: all 0.2s ease;
+        text-align: center;
+    }
+    
+    .user-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(91, 127, 255, 0.15);
+        border-color: #5B7FFF;
+    }
+    
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+        border: 3px solid #EFF6FF;
+        object-fit: cover;
+    }
+    
+    .user-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1A202C;
+        margin-bottom: 0.5rem;
+    }
+    
+    .user-username {
+        font-size: 0.9rem;
+        color: #64748B;
+        margin-bottom: 1rem;
+    }
+    
+    .user-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #EFF6FF;
+        color: #5B7FFF;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        background: #5B7FFF;
+        border-radius: 50%;
+    }
+    
+    .user-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    
+    .action-btn {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+    }
+    
+    .profile-btn {
+        background: #5B7FFF;
+        color: white;
+    }
+    
+    .profile-btn:hover {
+        background: #4C6FFF;
+    }
+    
+    .message-btn {
+        background: white;
+        color: #5B7FFF;
+        border: 2px solid #5B7FFF;
+    }
+    
+    .message-btn:hover {
+        background: #EFF6FF;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #64748B;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #E2E8F0;
+    }
+    
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+    
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ready-container">
+    <div class="ready-header">
+        <h1 class="ready-title">👥 All Study Partners</h1>
+        <a href="{% url 'home' %}" class="back-btn">← Back to Dashboard</a>
+    </div>
+    
+    <form method="GET" class="search-box">
+        <input 
+            type="text" 
+            name="search" 
+            class="search-input" 
+            placeholder="Search study partners by name or username..."
+            value="{{ search_query }}"
+        >
+        <button type="submit" class="search-btn">🔍 Search</button>
+    </form>
+    
+    {% if study_partners %}
+        <div class="users-grid">
+            {% for user in study_partners %}
+            <div class="user-card">
+                <img src="{{ user.profile.get_avatar_url }}" alt="{{ user.username }}" class="user-avatar">
+                
+                <div class="user-name">{{ user.first_name|default:user.username }}</div>
+                <div class="user-username">@{{ user.username }}</div>
+                
+                <div class="user-status">
+                    <div class="status-dot"></div>
+                    Study Partner
+                </div>
+                
+                <div class="user-actions">
+                    <button class="action-btn profile-btn" onclick="window.location.href='{% url 'profile_user' user.username %}'">
+                        View Profile
+                    </button>
+                    <button class="action-btn message-btn" onclick="alert('Messaging feature coming soon!')">
+                        Message
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">👥</div>
+            <h3 style="color: #1A202C; margin-bottom: 0.5rem;">No Study Partners Yet</h3>
+            <p style="margin-bottom: 1.5rem;">
+                {% if search_query %}
+                    No study partners found matching "{{ search_query }}". Try a different search term.
+                {% else %}
+                    Join study rooms to connect with other learners and build your study network!
+                {% endif %}
+            </p>
+            {% if not search_query %}
+                <button onclick="window.location.href='{% url 'browse_rooms' %}'" 
+                        style="padding: 0.75rem 1.5rem; background: #5B7FFF; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                    Browse Study Rooms
+                </button>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
