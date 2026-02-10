@@ -226,22 +226,6 @@
             <h3 class="chart-title">PRODUCTIVITY TREND</h3>
             <canvas id="productivityChart" class="chart-canvas"></canvas>
         </div>
-
-        <!-- Top Achievements -->
-        <div class="achievements-section">
-            <h3 class="chart-title">TOP ACHIEVEMENTS:</h3>
-            <ul class="achievements-list">
-                {% if recent_achievements %}
-                    {% for achievement in recent_achievements %}
-                    <li class="achievement-item">{{ achievement.description }}</li>
-                    {% endfor %}
-                {% else %}
-                    <li class="achievement-item">Solved 50 LeetCode problems</li>
-                    <li class="achievement-item">Finished "Dune" Part 1</li>
-                    <li class="achievement-item">Completed React Project</li>
-                {% endif %}
-            </ul>
-        </div>
     </div>
 </div>
 

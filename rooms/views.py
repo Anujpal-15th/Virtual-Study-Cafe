@@ -227,6 +227,47 @@ def ready_for_study_view(request):
 
 
 @login_required
+def all_study_partners_view(request):
+    """
+    View all study partners (users who have actually studied with the current user).
+    Shows users who have had study sessions in the same rooms as the current user.
+    """
+    from tracker.models import StudySession
+    
+    # Get rooms where the current user has had study sessions
+    user_study_room_ids = StudySession.objects.filter(
+        user=request.user,
+        room__isnull=False
+    ).values_list('room_id', flat=True).distinct()
+    
+    # Get users who have had study sessions in the same rooms (excluding current user)
+    study_partner_ids = StudySession.objects.filter(
+        room_id__in=user_study_room_ids,
+        room__isnull=False
+    ).exclude(user=request.user).values_list('user_id', flat=True).distinct()
+    
+    # Get the actual user objects
+    study_partners = User.objects.filter(
+        id__in=study_partner_ids
+    ).select_related('profile')
+    
+    # Get search query if provided
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        study_partners = study_partners.filter(
+            Q(username__icontains=search_query) |
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query)
+        )
+    
+    context = {
+        'study_partners': study_partners,
+        'search_query': search_query,
+    }
+    return render(request, 'rooms/all_study_partners.html', context)
+
+
+@login_required
 def create_room_view(request):
     """
     Create a new study room.
